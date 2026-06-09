@@ -252,6 +252,20 @@
     .cta-band h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.8rem; }
     .cta-band p { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.8rem; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.7; }
     .cta-band-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 768px) {
+      .partners-hero { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+      .why-stats { grid-template-columns: 1fr 1fr; }
+      .steps-grid { grid-template-columns: 1fr 1fr; }
+      .steps-grid::before { display: none; }
+      .cta-band-actions { flex-direction: column; align-items: center; }
+    }
+
+    @media (max-width: 480px) {
+      .steps-grid { grid-template-columns: 1fr; }
+      .why-stats { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body class="page-partners">
@@ -266,7 +280,10 @@
       <div class="nav-logo">
         <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
       </div>
-      <ul class="nav-links">
+      <button class="nav-hamburger" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
         <li><a href="team.html">Our Team</a></li>
         <li><a href="partners.html" class="active">Partners</a></li>
@@ -432,5 +449,21 @@
     </footer>
 
   </div>
+  <script>
+    const toggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (toggle && navLinks) {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('open');
+        navLinks.classList.toggle('open');
+      });
+      navLinks.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          toggle.classList.remove('open');
+          navLinks.classList.remove('open');
+        });
+      });
+    }
+  </script>
 </body>
 </html>

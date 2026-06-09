@@ -147,6 +147,7 @@
     /* ── SERVICE STRIP ── */
     .service-strip {
       display: flex;
+      flex-wrap: wrap;
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
@@ -163,6 +164,13 @@
     .svc:last-child { border-right: none; }
     .svc-icon { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
     .svc-label { font-size: 0.66rem; color: var(--green-dim); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+
+    @media (max-width: 600px) {
+      .svc { flex: 1 1 33%; border-bottom: 1px solid rgba(58,171,92,0.12); }
+      .hero-cta { flex-direction: column; align-items: center; }
+      .hero-cta a { width: 100%; max-width: 300px; text-align: center; }
+      .partners-row { gap: 0.5rem; }
+    }
 
     /* ── PARTNERS ROW ── */
     .partners { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; }
@@ -229,7 +237,10 @@
       <div class="nav-logo">
         <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
       </div>
-      <ul class="nav-links">
+      <button class="nav-hamburger" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
         <li><a href="index.html" class="active">Home</a></li>
         <li><a href="team.html">Our Team</a></li>
         <li><a href="partners.html">Partners</a></li>
@@ -320,6 +331,23 @@
 
   </div>
 
+  <script>
+    // Hamburger menu
+    const toggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (toggle && navLinks) {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('open');
+        navLinks.classList.toggle('open');
+      });
+      navLinks.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          toggle.classList.remove('open');
+          navLinks.classList.remove('open');
+        });
+      });
+    }
+  </script>
   <script>
     const slides = document.querySelectorAll('.bg-slide');
     let current = 0, started = false;

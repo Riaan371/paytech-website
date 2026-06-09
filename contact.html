@@ -324,6 +324,14 @@
       flex-wrap: wrap;
       flex-shrink: 0;
     }
+
+    @media (max-width: 768px) {
+      .contact-hero { grid-template-columns: 1fr; }
+      .social-row { flex-direction: column; align-items: center; }
+      .social-btn { justify-content: center; width: 100%; max-width: 300px; }
+      .quote-cta-band { flex-direction: column; }
+      .quote-cta-band-actions { width: 100%; flex-direction: column; }
+    }
   </style>
 </head>
 <body class="page-contact">
@@ -338,7 +346,10 @@
       <div class="nav-logo">
         <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
       </div>
-      <ul class="nav-links">
+      <button class="nav-hamburger" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
         <li><a href="team.html">Our Team</a></li>
         <li><a href="partners.html">Partners</a></li>
@@ -501,5 +512,21 @@
     </footer>
 
   </div>
+  <script>
+    const toggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (toggle && navLinks) {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('open');
+        navLinks.classList.toggle('open');
+      });
+      navLinks.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          toggle.classList.remove('open');
+          navLinks.classList.remove('open');
+        });
+      });
+    }
+  </script>
 </body>
 </html>

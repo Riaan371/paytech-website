@@ -190,6 +190,16 @@
     }
 
     .cta-band-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 768px) {
+      .team-grid { grid-template-columns: 1fr; }
+      .values-grid { grid-template-columns: 1fr 1fr; }
+      .cta-band-actions { flex-direction: column; align-items: center; }
+    }
+
+    @media (max-width: 480px) {
+      .values-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body class="page-team">
@@ -204,7 +214,10 @@
       <div class="nav-logo">
         <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
       </div>
-      <ul class="nav-links">
+      <button class="nav-hamburger" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
         <li><a href="team.html" class="active">Our Team</a></li>
         <li><a href="partners.html">Partners</a></li>
@@ -351,5 +364,21 @@
     </footer>
 
   </div>
+  <script>
+    const toggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (toggle && navLinks) {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('open');
+        navLinks.classList.toggle('open');
+      });
+      navLinks.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          toggle.classList.remove('open');
+          navLinks.classList.remove('open');
+        });
+      });
+    }
+  </script>
 </body>
 </html>

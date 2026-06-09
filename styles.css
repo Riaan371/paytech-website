@@ -7,22 +7,22 @@
 
 :root {
   --navy:       #1B2048;
-  --navy-dark:  #0f1429;
-  --navy-mid:   #1e2755;
+  --navy-dark:  #0a0e1e;
+  --navy-mid:   #141a38;
   --green:      #3AAB5C;
   --green-dim:  #5dc97b;
   --green-dark: #2d8a47;
-  --white:      #1B2048;
-  --muted:      #2e3d5f;
-  --muted2:     #4a5a7a;
-  --border:     rgba(58,171,92,0.18);
-  --card-bg:    rgba(255,255,255,0.04);
-  --card-border:rgba(255,255,255,0.08);
+  --white:      #e8eef6;
+  --muted:      rgba(210,225,245,0.65);
+  --muted2:     rgba(180,200,230,0.40);
+  --border:     rgba(58,171,92,0.22);
+  --card-bg:    rgba(255,255,255,0.05);
+  --card-border:rgba(255,255,255,0.10);
 }
 
 html, body {
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  background: #e8f5ec;
+  background: #0a0e1a;
   color: var(--white);
   overflow-x: hidden;
   min-height: 100vh;
@@ -50,7 +50,7 @@ html, body {
   z-index: 0;
   background-size: cover;
   background-position: center;
-  opacity: 0.12;
+  opacity: 0.22;
 }
 
 .bg-overlay {
@@ -59,10 +59,10 @@ html, body {
   z-index: 1;
   background: linear-gradient(
     180deg,
-    rgba(220,242,228,0.78) 0%,
-    rgba(220,242,228,0.65) 40%,
-    rgba(220,242,228,0.72) 75%,
-    rgba(220,242,228,0.88) 100%
+    rgba(8,12,22,0.82) 0%,
+    rgba(8,12,22,0.68) 40%,
+    rgba(8,12,22,0.74) 75%,
+    rgba(8,12,22,0.90) 100%
   );
 }
 
@@ -81,10 +81,10 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 3.5rem;
-  border-bottom: 1px solid rgba(58,171,92,0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(232,245,236,0.85);
+  border-bottom: 1px solid rgba(58,171,92,0.20);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(8,12,22,0.82);
   position: sticky;
   top: 0;
   z-index: 200;
@@ -104,7 +104,7 @@ nav {
 }
 
 .nav-links a {
-  color: #1B2048;
+  color: rgba(220,232,248,0.80);
   text-decoration: none;
   font-size: 0.875rem;
   letter-spacing: 0.03em;
@@ -392,11 +392,11 @@ footer {
 }
 
 /* ── PAGE-SPECIFIC BACKGROUNDS ── */
-/* Home stays #e8f5ec — light mint green */
-body.page-team     { background: #dbeeff; } /* light sky blue   */
-body.page-partners { background: #fdeee0; } /* light peach      */
-body.page-contact  { background: #d8f5f1; } /* light teal       */
-body.page-quote    { background: #fff8e0; } /* light warm gold  */
+/* All dark for premium feel */
+body.page-team     { background: #080e1a; }
+body.page-partners { background: #0a0c18; }
+body.page-contact  { background: #080e16; }
+body.page-quote    { background: #080c14; }
 
 body.page-quote {
   --white:  #ffffff;

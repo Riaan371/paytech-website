@@ -3,6 +3,8 @@
    Shared Stylesheet
    ═══════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -458,33 +460,64 @@ body.page-quote {
 
   .nav-hamburger { display: flex; }
 
+  .nav-hamburger span { background: var(--white); }
+
   .nav-links {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(8,12,22,0.97);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: #1e7a40;
     z-index: 1000;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2.5rem;
+    gap: 0;
+    padding: 5rem 2rem 3rem;
+    overflow-y: auto;
   }
 
   .nav-links.open { display: flex; }
 
-  .nav-links li { list-style: none; }
+  .nav-links li {
+    list-style: none;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .nav-links li:first-child { border-top: 1px solid rgba(255,255,255,0.15); }
 
   .nav-links a {
-    font-size: 1.4rem;
+    display: block;
+    padding: 1.1rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff !important;
     letter-spacing: 0.04em;
   }
 
+  .nav-links a.active { color: #ffffff !important; }
+
   .nav-cta {
-    padding: 0.6rem 2rem !important;
-    border-radius: 8px !important;
+    border: none !important;
+    background: rgba(255,255,255,0.18) !important;
+    color: #ffffff !important;
+    border-radius: 0 !important;
+    padding: 1.1rem 0 !important;
     font-size: 1.2rem !important;
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-cta:hover {
+    background: rgba(255,255,255,0.28) !important;
+    color: #ffffff !important;
+  }
+
+  /* Keep hamburger on top of the overlay */
+  .nav-hamburger {
+    position: relative;
+    z-index: 1002;
   }
 
   /* PAGE HEADER */

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paytech Consulting Solutions | Payroll For Any Size Business</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── HERO ICON ── */
+    .icon-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.6rem;
+    }
+
+    .ring-outer {
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      border: 1px solid rgba(58,171,92,0.28);
+      animation: ringBreath 3.5s ease-in-out 2s infinite;
+      pointer-events: none;
+    }
+
+    .ring-inner {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(58,171,92,0.18);
+      animation: ringBreath 3.5s ease-in-out 2.4s infinite;
+      pointer-events: none;
+    }
+
+    .hero-icon {
+      width: 148px;
+      height: 148px;
+      object-fit: contain;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── HERO BRAND NAME ── */
+    .hero-company-name {
+      font-size: clamp(3rem, 7vw, 5.2rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #000000;
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+
+    .hero-company-sub {
+      font-size: clamp(0.78rem, 1.5vw, 0.95rem);
+      font-weight: 400;
+      color: var(--green);
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    .hero-divider {
+      width: 52px;
+      height: 3px;
+      background: var(--green);
+      border-radius: 2px;
+      margin: 1.4rem auto 1.6rem;
+    }
+
+    /* ── HERO BADGE ── */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(58,171,92,0.1);
+      border: 1px solid rgba(58,171,92,0.28);
+      color: var(--green-dim);
+      font-size: 0.7rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── HERO HEADLINE ── */
+    .hero-h1 {
+      font-size: clamp(1.9rem, 4vw, 3.1rem);
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 1rem;
+      max-width: 660px;
+    }
+
+    .hero-h1 strong { font-weight: 700; color: var(--green); }
+
+    .hero-sub {
+      font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+      color: #1B2048;
+      line-height: 1.75;
+      max-width: 500px;
+      margin-bottom: 2.2rem;
+    }
+
+    /* ── HERO LAYOUT ── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 2rem 5rem;
+      position: relative;
+    }
+
+    .hero-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 0;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.1rem;
+    }
+
+    .hero-phone {
+      font-size: 0.78rem;
+      color: var(--muted2);
+      margin-bottom: 3rem;
+      letter-spacing: 0.04em;
+    }
+
+    .hero-phone a { color: var(--green-dim); text-decoration: none; }
+
+    /* ── SERVICE STRIP ── */
+    .service-strip {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 2.6rem;
+    }
+
+    .svc {
+      padding: 0.8rem 1.4rem;
+      border-right: 1px solid rgba(58,171,92,0.12);
+      text-align: center;
+      flex: 1;
+    }
+
+    .svc:last-child { border-right: none; }
+    .svc-icon { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
+    .svc-label { font-size: 0.66rem; color: var(--green-dim); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+
+    /* ── PARTNERS ROW ── */
+    .partners { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; }
+    .partners-label { font-size: 0.65rem; color: var(--muted2); letter-spacing: 0.14em; text-transform: uppercase; }
+    .partners-row { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+
+    /* ── SCROLL HINT ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--muted2);
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: riseUp 1s ease 2.6s forwards;
+    }
+
+    .scroll-mouse {
+      width: 20px; height: 30px;
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      padding-top: 5px;
+    }
+
+    .scroll-wheel {
+      width: 3px; height: 5px;
+      background: var(--green);
+      border-radius: 2px;
+      animation: wheelDrop 1.8s ease-in-out 3s infinite;
+    }
+
+    @keyframes wheelDrop {
+      0%   { transform: translateY(0);    opacity: 1; }
+      75%  { transform: translateY(10px); opacity: 0; }
+      100% { transform: translateY(0);    opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SLIDESHOW BACKGROUND -->
+  <div class="bg-wrap" id="bgWrap">
+    <div class="bg-slide" style="background-image:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1920&q=75&auto=format&fit=crop')"></div>
+    <div class="bg-slide" style="background-image:url('https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1920&q=75&auto=format&fit=crop')"></div>
+    <div class="bg-slide" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=75&auto=format&fit=crop')"></div>
+    <div class="bg-slide" style="background-image:url('https://images.unsplash.com/photo-1573164713988-8665fc963095?w=1920&q=75&auto=format&fit=crop')"></div>
+    <div class="bg-slide" style="background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&q=75&auto=format&fit=crop')"></div>
+  </div>
+  <div class="bg-overlay"></div>
+
+  <div class="page">
+
+    <!-- NAV -->
+    <nav>
+      <div class="nav-logo">
+        <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html" class="nav-cta">Get a Quote</a></li>
+      </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="icon-wrap rise rise-d0">
+        <div class="ring-outer"></div>
+        <div class="ring-inner"></div>
+        <img class="hero-icon" src="Current LOGO/After Canva/Canva Logo.png" alt="Paytech icon" />
+      </div>
+
+      <div class="hero-brand">
+        <div class="hero-company-name rise rise-d1">Paytech</div>
+        <div class="hero-company-sub rise rise-d2">Consulting Solutions</div>
+      </div>
+
+      <div class="hero-divider rise rise-d2"></div>
+
+      <div class="hero-badge rise rise-d3">
+        <span class="badge-dot"></span>
+        South Africa's Payroll Specialists
+      </div>
+
+      <h1 class="hero-h1 rise rise-d3">
+        Your People. Their Pay.<br>
+        <strong>Our Expertise.</strong>
+      </h1>
+
+      <p class="hero-sub rise rise-d4">
+        From consulting to full outsourcing — Paytech takes the complexity
+        out of payroll so you can focus on growing your business.
+        Sage &amp; PaySpace certified experts, serving businesses of all sizes.
+      </p>
+
+      <div class="hero-cta rise rise-d5">
+        <a href="quote.html" class="btn-primary">Get a Free Consultation</a>
+        <a href="team.html" class="btn-ghost">Meet Our Team</a>
+      </div>
+
+      <p class="hero-phone rise rise-d5">
+        Call us &nbsp;·&nbsp;
+        <a href="tel:0824401937">082 440 1937</a>
+        &nbsp;·&nbsp;
+        <a href="mailto:johan@payatease.co.za" style="color:rgba(255,255,255,0.28);text-decoration:none;">johan@payatease.co.za</a>
+      </p>
+
+      <div class="service-strip rise rise-d6">
+        <div class="svc"><span class="svc-icon">📋</span><span class="svc-label">Consulting</span></div>
+        <div class="svc"><span class="svc-icon">🔄</span><span class="svc-label">Outsourcing</span></div>
+        <div class="svc"><span class="svc-icon">💻</span><span class="svc-label">Sage Payroll</span></div>
+        <div class="svc"><span class="svc-icon">⚡</span><span class="svc-label">PaySpace</span></div>
+        <div class="svc"><span class="svc-icon">🌐</span><span class="svc-label">Deel Local</span></div>
+      </div>
+
+      <div class="partners rise rise-d7">
+        <p class="partners-label">Certified partners &amp; platforms</p>
+        <div class="partners-row">
+          <div class="partner-pill">Sage Payroll</div>
+          <div class="partner-pill">PaySpace</div>
+          <div class="partner-pill">Deel Local</div>
+        </div>
+      </div>
+
+      <div class="scroll-hint">
+        <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+        <span>Scroll</span>
+      </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></div>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html">Get a Quote</a></li>
+      </ul>
+      <span class="footer-copy">© 2025 Paytech Consulting Solutions. All rights reserved.</span>
+    </footer>
+
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.bg-slide');
+    let current = 0, started = false;
+    function showSlide(i) { slides.forEach((s,idx) => s.style.opacity = idx===i ? '0.55' : '0'); }
+    function startSlideshow() {
+      if (started) return; started = true;
+      showSlide(0);
+      setInterval(() => { current=(current+1)%slides.length; showSlide(current); }, 5000);
+    }
+    let loaded = 0;
+    slides.forEach(s => {
+      const img = new Image();
+      img.onload = img.onerror = () => { if(++loaded===1) startSlideshow(); };
+      img.src = s.style.backgroundImage.replace(/url\(['"]?([^'"]+)['"]?\)/,'$1');
+    });
+    setTimeout(startSlideshow, 2000);
+  </script>
+</body>
+</html>

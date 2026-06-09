@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partners | Paytech Consulting Solutions</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .partners-hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.4rem;
+      margin-top: 3rem;
+    }
+
+    .partner-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 2rem 1.8rem;
+      transition: border-color 0.25s, transform 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .partner-card:hover {
+      border-color: rgba(58,171,92,0.4);
+      transform: translateY(-4px);
+    }
+
+    .partner-card.featured {
+      border-color: rgba(58,171,92,0.3);
+      background: rgba(58,171,92,0.06);
+    }
+
+    .partner-logo-area {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+    }
+
+    .partner-logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .sage-color   { color: #00c38a; }
+    .payspace-color { color: #0052cc; }
+    .deel-color   { color: #00a0e9; }
+
+    .partner-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      margin-bottom: 0.8rem;
+      width: fit-content;
+    }
+
+    .badge-certified {
+      background: rgba(58,171,92,0.15);
+      border: 1px solid rgba(58,171,92,0.3);
+      color: var(--green-dim);
+    }
+
+    .partner-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .partner-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.4rem;
+      flex: 1;
+    }
+
+    .partner-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .partner-features li {
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .partner-features li::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+
+    .partner-link {
+      font-size: 0.8rem;
+      color: var(--green-dim);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+
+    .partner-link:hover { color: var(--green); }
+
+    /* WHY SECTION */
+    .why-section {
+      margin-top: 5rem;
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      margin-top: 2.5rem;
+      align-items: center;
+    }
+
+    .why-content h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .why-content p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.75;
+      margin-bottom: 1rem;
+    }
+
+    .why-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 1.4rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--green);
+      letter-spacing: -0.03em;
+      display: block;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted2);
+      letter-spacing: 0.06em;
+    }
+
+    /* HOW WE WORK */
+    .how-section {
+      margin-top: 5rem;
+      text-align: center;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: 2.5rem;
+      position: relative;
+    }
+
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 15%;
+      right: 15%;
+      height: 1px;
+      background: rgba(58,171,92,0.2);
+      z-index: 0;
+    }
+
+    .step {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 0 0.5rem;
+    }
+
+    .step-num {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(58,171,92,0.12);
+      border: 1.5px solid rgba(58,171,92,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--green);
+      margin: 0 auto 1rem;
+    }
+
+    .step-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+
+    .step-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .cta-band {
+      margin-top: 5rem;
+      background: rgba(58,171,92,0.08);
+      border: 1px solid rgba(58,171,92,0.2);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .cta-band h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.8rem; }
+    .cta-band p { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.8rem; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+    .cta-band-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body class="page-partners">
+
+  <div class="bg-static" style="background-image:url('https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1920&q=60&auto=format&fit=crop')"></div>
+  <div class="bg-overlay"></div>
+
+  <div class="page">
+
+    <!-- NAV -->
+    <nav>
+      <div class="nav-logo">
+        <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html" class="active">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html" class="nav-cta">Get a Quote</a></li>
+      </ul>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header rise rise-d0">
+      <span class="label">Certified on the platforms that matter</span>
+      <h1>Our Partners</h1>
+      <p>Paytech is certified across South Africa's leading payroll platforms — giving your business access to the best tools, backed by expert guidance.</p>
+      <div class="page-divider"></div>
+    </div>
+
+    <main>
+
+      <!-- PARTNER CARDS -->
+      <div class="partners-hero">
+
+        <!-- Sage -->
+        <div class="partner-card featured rise rise-d1">
+          <div class="partner-logo-area">
+            <span class="partner-logo-text sage-color">Sage Payroll</span>
+          </div>
+          <span class="partner-badge badge-certified">Certified Partner</span>
+          <div class="partner-name">Sage Payroll</div>
+          <p class="partner-desc">
+            South Africa's most widely used payroll solution. Sage provides a powerful,
+            cloud-ready payroll platform trusted by thousands of businesses — from small
+            teams to enterprise corporates.
+          </p>
+          <ul class="partner-features">
+            <li>Full payroll processing &amp; pay slips</li>
+            <li>SARS statutory compliance &amp; submissions</li>
+            <li>Leave management &amp; employee self-service</li>
+            <li>Integration with HR and accounting systems</li>
+            <li>Cloud &amp; desktop deployment options</li>
+          </ul>
+          <a href="https://www.sage.com/en-za/products/sage-payroll/" target="_blank" class="partner-link">
+            Visit Sage South Africa →
+          </a>
+        </div>
+
+        <!-- PaySpace -->
+        <div class="partner-card rise rise-d2">
+          <div class="partner-logo-area">
+            <span class="partner-logo-text payspace-color">PaySpace</span>
+          </div>
+          <span class="partner-badge badge-certified">Certified Partner</span>
+          <div class="partner-name">PaySpace</div>
+          <p class="partner-desc">
+            A fully cloud-based payroll and HR solution built for the African market.
+            PaySpace (now part of the Deel family) delivers enterprise-grade payroll
+            with modern self-service capabilities.
+          </p>
+          <ul class="partner-features">
+            <li>100% cloud-based — access anywhere</li>
+            <li>Multi-company &amp; multi-currency support</li>
+            <li>Employee self-service portal</li>
+            <li>Automated tax &amp; UIF calculations</li>
+            <li>Real-time reporting &amp; analytics</li>
+          </ul>
+          <a href="https://payspace.com" target="_blank" class="partner-link">
+            Visit PaySpace →
+          </a>
+        </div>
+
+        <!-- Deel Local -->
+        <div class="partner-card rise rise-d3">
+          <div class="partner-logo-area">
+            <span class="partner-logo-text deel-color">Deel Local</span>
+          </div>
+          <span class="partner-badge badge-certified">Certified Partner</span>
+          <div class="partner-name">Deel Local Payroll</div>
+          <p class="partner-desc">
+            Deel Local (powered by PaySpace) brings global-standard payroll
+            infrastructure to South African businesses — ideal for companies
+            with remote teams, contractors, or international operations.
+          </p>
+          <ul class="partner-features">
+            <li>Local &amp; international payroll in one platform</li>
+            <li>Contractor &amp; full-time employee management</li>
+            <li>Compliance across 150+ countries</li>
+            <li>Seamless onboarding &amp; offboarding</li>
+            <li>Built-in equity &amp; benefits management</li>
+          </ul>
+          <a href="https://www.deel.com" target="_blank" class="partner-link">
+            Visit Deel →
+          </a>
+        </div>
+
+      </div>
+
+      <!-- WHY PAYTECH -->
+      <div class="why-section rise rise-d4">
+        <div class="why-grid">
+          <div class="why-content">
+            <span class="section-label">Why choose Paytech</span>
+            <h2>Platform expertise you can rely on</h2>
+            <p>
+              Being certified isn't just a badge — it means our team has completed rigorous training on each platform,
+              stays up to date with every update, and knows how to configure the system to suit your specific business.
+            </p>
+            <p>
+              Whether you're migrating from one platform to another, starting fresh, or need ongoing support —
+              Paytech has you covered across all three platforms.
+            </p>
+            <a href="quote.html" class="btn-primary" style="margin-top:0.5rem;">Talk to a specialist</a>
+          </div>
+          <div class="why-stats">
+            <div class="stat-card">
+              <span class="stat-number">3</span>
+              <span class="stat-label">Certified platforms</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">15+</span>
+              <span class="stat-label">Years experience</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">200+</span>
+              <span class="stat-label">Businesses served</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">100%</span>
+              <span class="stat-label">Compliance rate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOW WE WORK -->
+      <div class="how-section rise rise-d5">
+        <span class="section-label">Our process</span>
+        <h2 style="font-size:2rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.5rem;">How we get you set up</h2>
+        <p style="color:var(--muted);max-width:480px;margin:0 auto;font-size:0.95rem;line-height:1.7;">
+          From first call to first pay run — here's what working with Paytech looks like.
+        </p>
+        <div class="steps-grid">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-title">Consultation</div>
+            <p class="step-desc">We learn about your business, headcount, and current payroll challenges.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-title">Platform Selection</div>
+            <p class="step-desc">We recommend the right platform and service level for your needs.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-title">Setup &amp; Migration</div>
+            <p class="step-desc">We handle all configuration, data migration, and testing.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-title">Go Live &amp; Support</div>
+            <p class="step-desc">Ongoing support, training, and monthly payroll management.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-band rise rise-d6">
+        <h2>Not sure which platform is right for you?</h2>
+        <p>Our specialists will assess your business and recommend the best fit — at no cost to you.</p>
+        <div class="cta-band-actions">
+          <a href="quote.html" class="btn-primary">Get a Free Consultation</a>
+          <a href="contact.html" class="btn-ghost">Contact Us</a>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></div>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html">Get a Quote</a></li>
+      </ul>
+      <span class="footer-copy">© 2025 Paytech Consulting Solutions. All rights reserved.</span>
+    </footer>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get a Quote | Paytech Consulting Solutions</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .quote-layout {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2.5rem;
+      margin-top: 3rem;
+      align-items: start;
+    }
+
+    /* LEFT SIDEBAR */
+    .quote-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      position: sticky;
+      top: 90px;
+    }
+
+    .sidebar-card {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 1.4rem 1.5rem;
+    }
+
+    .sidebar-card.green-card {
+      background: rgba(58,171,92,0.08);
+      border-color: rgba(58,171,92,0.25);
+    }
+
+    .sidebar-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.8rem;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      margin-bottom: 0.7rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .sidebar-item:last-child { margin-bottom: 0; }
+    .sidebar-item .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+
+    .contact-quick a {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--green-dim);
+      text-decoration: none;
+      margin-bottom: 0.4rem;
+      transition: color 0.2s;
+    }
+
+    .contact-quick a:hover { color: var(--green); }
+
+    /* FORM CARD */
+    .quote-form-card {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 2.4rem;
+    }
+
+    .quote-form-card h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .quote-form-card > p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      line-height: 1.65;
+    }
+
+    /* FORM SECTIONS */
+    .form-section {
+      margin-bottom: 2.2rem;
+    }
+
+    .form-section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(58,171,92,0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-section-title .num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(58,171,92,0.18);
+      border: 1px solid rgba(58,171,92,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--green);
+      flex-shrink: 0;
+    }
+
+    /* SERVICES CHECKBOXES */
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .service-check {
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.7rem 0.9rem;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+
+    .service-check:has(input:checked) {
+      background: rgba(58,171,92,0.1);
+      border-color: rgba(58,171,92,0.4);
+    }
+
+    .service-check input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      accent-color: var(--green);
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 3px;
+    }
+
+    .service-check-label { cursor: pointer; }
+    .service-check-label strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.15rem;
+    }
+
+    .service-check-label span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* PREFERRED TIME */
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .time-option {
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.6rem;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .time-option:has(input:checked) {
+      background: rgba(58,171,92,0.1);
+      border-color: rgba(58,171,92,0.4);
+    }
+
+    .time-option input { accent-color: var(--green); cursor: pointer; }
+    .time-option label { font-size: 0.82rem; color: var(--muted); cursor: pointer; }
+
+    /* SUBMIT ROW */
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-top: 1.8rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .form-footer-note {
+      font-size: 0.75rem;
+      color: var(--muted2);
+      line-height: 1.5;
+      max-width: 300px;
+    }
+
+    .submit-btn {
+      background: var(--green);
+      color: var(--navy-dark);
+      border: none;
+      padding: 0.95rem 2.6rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: 0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .submit-btn:hover { background: var(--green-dim); transform: translateY(-2px); }
+
+    /* SUCCESS STATE */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(58,171,92,0.15);
+      border: 2px solid rgba(58,171,92,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1.5rem;
+    }
+
+    .success-state h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.8rem;
+    }
+
+    .success-state p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      max-width: 440px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .success-details {
+      background: rgba(58,171,92,0.08);
+      border: 1px solid rgba(58,171,92,0.2);
+      border-radius: 10px;
+      padding: 1.2rem 1.6rem;
+      max-width: 400px;
+      margin: 0 auto 2rem;
+      text-align: left;
+    }
+
+    .success-details p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .success-details strong { color: var(--green); }
+  </style>
+</head>
+<body class="page-quote">
+
+  <!-- Green background for quote page -->
+  <div style="position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#0a2218 0%,#0d2e1e 35%,#112b1a 65%,#0a1f14 100%);"></div>
+  <div style="position:fixed;inset:0;z-index:0;background-image:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1920&q=60&auto=format&fit=crop');background-size:cover;background-position:center;opacity:0.06;"></div>
+
+  <div class="page">
+
+    <!-- NAV -->
+    <nav>
+      <div class="nav-logo">
+        <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html" class="nav-cta active">Get a Quote</a></li>
+      </ul>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header rise rise-d0">
+      <span class="label">Free · No obligation · We call you</span>
+      <h1>Request a Callback</h1>
+      <p>Fill in the form and one of our payroll specialists will call you back within 2 hours during business hours.</p>
+      <div class="page-divider"></div>
+    </div>
+
+    <main>
+      <div class="quote-layout">
+
+        <!-- SIDEBAR -->
+        <div class="quote-sidebar">
+
+          <div class="sidebar-card green-card rise rise-d1">
+            <h3>What happens next?</h3>
+            <div class="sidebar-item">
+              <span class="icon">📞</span>
+              <span>A payroll specialist calls you back within <strong style="color:var(--white)">2 business hours</strong>.</span>
+            </div>
+            <div class="sidebar-item">
+              <span class="icon">💬</span>
+              <span>We learn about your business and current payroll setup.</span>
+            </div>
+            <div class="sidebar-item">
+              <span class="icon">📋</span>
+              <span>We send you a tailored quote within <strong style="color:var(--white)">24 hours</strong>.</span>
+            </div>
+            <div class="sidebar-item">
+              <span class="icon">✅</span>
+              <span>No commitment required. 100% free consultation.</span>
+            </div>
+          </div>
+
+          <div class="sidebar-card rise rise-d2">
+            <h3>Our services</h3>
+            <div class="sidebar-item"><span class="icon">📋</span><span>Payroll Consulting</span></div>
+            <div class="sidebar-item"><span class="icon">🔄</span><span>Full Payroll Outsourcing</span></div>
+            <div class="sidebar-item"><span class="icon">💻</span><span>Sage Payroll Setup &amp; Support</span></div>
+            <div class="sidebar-item"><span class="icon">⚡</span><span>PaySpace Implementation</span></div>
+            <div class="sidebar-item"><span class="icon">🌐</span><span>Deel Local Payroll</span></div>
+            <div class="sidebar-item"><span class="icon">⚖️</span><span>Compliance Reviews</span></div>
+            <div class="sidebar-item"><span class="icon">🎓</span><span>Payroll Training</span></div>
+          </div>
+
+          <div class="sidebar-card contact-quick rise rise-d3">
+            <h3>Prefer to call us?</h3>
+            <a href="tel:0824401937">📞 082 440 1937</a>
+            <a href="mailto:johan@payatease.co.za">✉️ johan@payatease.co.za</a>
+            <p style="font-size:0.75rem;color:var(--muted2);margin-top:0.5rem;">Mon–Fri 08:00–17:00 · Sat 09:00–13:00</p>
+          </div>
+
+        </div>
+
+        <!-- QUOTE FORM -->
+        <div class="quote-form-card rise rise-d2">
+
+          <h2>Get Your Free Quote</h2>
+          <p>Complete the form below and we'll put together a solution that fits your business perfectly. All fields marked <span style="color:var(--green);">*</span> are required.</p>
+
+          <form id="quoteForm" onsubmit="handleQuoteSubmit(event)">
+
+            <!-- SECTION 1: CONTACT DETAILS -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="num">1</span> Your Contact Details
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>First Name <span>*</span></label>
+                  <input type="text" id="firstName" placeholder="e.g. Johan" required />
+                </div>
+                <div class="form-group">
+                  <label>Last Name <span>*</span></label>
+                  <input type="text" placeholder="e.g. Oosthuysen" required />
+                </div>
+                <div class="form-group">
+                  <label>Email Address <span>*</span></label>
+                  <input type="email" placeholder="you@company.co.za" required />
+                </div>
+                <div class="form-group">
+                  <label>Phone Number <span>*</span></label>
+                  <input type="tel" placeholder="082 000 0000" required />
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: COMPANY INFO -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="num">2</span> Company Information
+              </div>
+              <div class="form-grid">
+                <div class="form-group full">
+                  <label>Company Name <span>*</span></label>
+                  <input type="text" placeholder="Your company name" required />
+                </div>
+                <div class="form-group">
+                  <label>Industry / Sector</label>
+                  <select>
+                    <option value="" disabled selected>Select your industry</option>
+                    <option>Retail &amp; Wholesale</option>
+                    <option>Manufacturing</option>
+                    <option>Professional Services</option>
+                    <option>Healthcare</option>
+                    <option>Construction &amp; Engineering</option>
+                    <option>Hospitality &amp; Tourism</option>
+                    <option>Education</option>
+                    <option>Financial Services</option>
+                    <option>Non-Profit / NGO</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Number of Employees <span>*</span></label>
+                  <select required>
+                    <option value="" disabled selected>Select headcount</option>
+                    <option>1 – 10 employees</option>
+                    <option>11 – 25 employees</option>
+                    <option>26 – 50 employees</option>
+                    <option>51 – 100 employees</option>
+                    <option>101 – 250 employees</option>
+                    <option>251 – 500 employees</option>
+                    <option>500+ employees</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Current Payroll System</label>
+                  <select>
+                    <option value="" disabled selected>What do you use now?</option>
+                    <option>Sage Payroll</option>
+                    <option>PaySpace</option>
+                    <option>Deel / Deel Local</option>
+                    <option>VIP Payroll</option>
+                    <option>Excel / Manual</option>
+                    <option>No system yet</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Payroll Frequency</label>
+                  <select>
+                    <option value="" disabled selected>How often do you pay?</option>
+                    <option>Monthly</option>
+                    <option>Bi-monthly (twice a month)</option>
+                    <option>Weekly</option>
+                    <option>Fortnightly</option>
+                    <option>Not sure yet</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3: SERVICES NEEDED -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="num">3</span> Services You're Interested In
+              </div>
+              <div class="services-grid">
+                <label class="service-check">
+                  <input type="checkbox" />
+                  <div class="service-check-label">
+                    <strong>Payroll Consulting</strong>
+                    <span>Expert advice on your payroll setup, processes, and best practices.</span>
+                  </div>
+                </label>
+                <label class="service-check">
+                  <input type="checkbox" />
+                  <div class="service-check-label">
+                    <strong>Full Outsourcing</strong>
+                    <span>We handle your entire monthly payroll end-to-end.</span>
+                  </div>
+                </label>
+                <label class="service-check">
+                  <input type="checkbox" />
+                  <div class="service-check-label">
+                    <strong>Sage Payroll</strong>
+                    <span>Implementation, configuration, training, and ongoing support.</span>
+                  </div>
+                </label>
+                <label class="service-check">
+                  <input type="checkbox" />
+                  <div class="service-check-label">
+                    <strong>PaySpace / Deel</strong>
+                    <span>Cloud payroll setup, migration, and support.</span>
+                  </div>
+                </label>
+                <label class="service-check">
+                  <input type="checkbox" />
+                  <div class="service-check-label">
+                    <strong>Compliance Review</strong>
+                    <span>Audit your payroll for SARS, UIF, and labour law compliance.</span>
+                  </div>
+                </label>
+                <label class="service-check">
+                  <input type="checkbox" />
+                  <div class="service-check-label">
+                    <strong>Payroll Training</strong>
+                    <span>Train your team to manage payroll confidently and correctly.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- SECTION 4: CALLBACK PREFERENCE -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="num">4</span> Preferred Callback Time
+              </div>
+              <div class="time-grid">
+                <label class="time-option">
+                  <input type="radio" name="calltime" value="morning" />
+                  <label>🌅 Morning (8am–12pm)</label>
+                </label>
+                <label class="time-option">
+                  <input type="radio" name="calltime" value="afternoon" />
+                  <label>☀️ Afternoon (12pm–5pm)</label>
+                </label>
+                <label class="time-option">
+                  <input type="radio" name="calltime" value="anytime" checked />
+                  <label>🕐 Anytime</label>
+                </label>
+              </div>
+            </div>
+
+            <!-- SECTION 5: ADDITIONAL INFO -->
+            <div class="form-section">
+              <div class="form-section-title">
+                <span class="num">5</span> Additional Information
+              </div>
+              <div class="form-grid">
+                <div class="form-group full">
+                  <label>Tell us about your payroll needs or challenges</label>
+                  <textarea placeholder="E.g. We're a growing team of 30 and our current manual process is taking too long. We'd like to automate and ensure compliance..."></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>How did you hear about Paytech?</label>
+                  <select>
+                    <option value="" disabled selected>Select an option</option>
+                    <option>Google search</option>
+                    <option>LinkedIn</option>
+                    <option>Facebook</option>
+                    <option>Referral from a colleague</option>
+                    <option>Sage / PaySpace referral</option>
+                    <option>Word of mouth</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBMIT -->
+            <div class="form-footer">
+              <p class="form-footer-note">
+                🔒 Your information is kept strictly confidential and never shared with third parties.
+                We'll only use it to prepare your personalised quote.
+              </p>
+              <button type="submit" class="submit-btn">
+                Request My Callback ↗
+              </button>
+            </div>
+
+          </form>
+
+          <!-- SUCCESS STATE -->
+          <div class="success-state" id="quoteSuccess">
+            <div class="success-icon">✅</div>
+            <h2>Request Received!</h2>
+            <p>
+              Thank you — your quote request has been submitted successfully.
+              A Paytech specialist will call you back within 2 business hours.
+            </p>
+            <div class="success-details">
+              <p>
+                In the meantime, feel free to reach us directly:<br>
+                <strong>📞 082 440 1937</strong><br>
+                <strong>✉️ johan@payatease.co.za</strong>
+              </p>
+            </div>
+            <a href="index.html" class="btn-ghost">← Back to Home</a>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></div>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html">Get a Quote</a></li>
+      </ul>
+      <span class="footer-copy">© 2025 Paytech Consulting Solutions. All rights reserved.</span>
+    </footer>
+
+  </div>
+
+  <script>
+    function handleQuoteSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('firstName').value || 'there';
+      document.getElementById('quoteForm').style.display = 'none';
+      document.getElementById('quoteSuccess').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meet the Team | Paytech Consulting Solutions</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .team-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.2s;
+    }
+
+    .team-card:hover {
+      border-color: rgba(58,171,92,0.35);
+      transform: translateY(-4px);
+    }
+
+    .team-photo {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      background: var(--navy-mid);
+    }
+
+    .team-photo-placeholder {
+      width: 100%;
+      height: 220px;
+      background: linear-gradient(135deg, #1B2048 0%, #252c5a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .team-initials {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(58,171,92,0.15);
+      border: 2px solid rgba(58,171,92,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .team-body {
+      padding: 1.4rem 1.6rem 1.6rem;
+    }
+
+    .team-role {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 0.35rem;
+    }
+
+    .team-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.7rem;
+      letter-spacing: -0.02em;
+    }
+
+    .team-bio {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .team-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .team-tag {
+      background: rgba(58,171,92,0.1);
+      border: 1px solid rgba(58,171,92,0.22);
+      color: var(--green-dim);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+    }
+
+    .team-contact {
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .team-contact a {
+      font-size: 0.82rem;
+      color: var(--muted2);
+      text-decoration: none;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .team-contact a:hover { color: var(--green); }
+
+    .values-section {
+      margin-top: 5rem;
+      text-align: center;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin-top: 2.5rem;
+    }
+
+    .value-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 1.6rem 1.4rem;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .value-card:hover { border-color: rgba(58,171,92,0.3); }
+
+    .value-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.8rem;
+    }
+
+    .value-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+
+    .value-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .cta-band {
+      margin-top: 5rem;
+      background: rgba(58,171,92,0.08);
+      border: 1px solid rgba(58,171,92,0.2);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .cta-band h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.8rem;
+    }
+
+    .cta-band p {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 1.8rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+
+    .cta-band-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body class="page-team">
+
+  <div class="bg-static" style="background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&q=60&auto=format&fit=crop')"></div>
+  <div class="bg-overlay"></div>
+
+  <div class="page">
+
+    <!-- NAV -->
+    <nav>
+      <div class="nav-logo">
+        <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html" class="active">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html" class="nav-cta">Get a Quote</a></li>
+      </ul>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header rise rise-d0">
+      <span class="label">The people behind Paytech</span>
+      <h1>Meet Our Team</h1>
+      <p>Experienced payroll professionals who are passionate about simplifying the complex — for businesses of every size.</p>
+      <div class="page-divider"></div>
+    </div>
+
+    <!-- MAIN -->
+    <main>
+
+      <!-- TEAM CARDS -->
+      <div class="team-grid">
+
+        <!-- Johan -->
+        <div class="team-card rise rise-d1">
+          <div class="team-photo-placeholder">
+            <div class="team-initials">JO</div>
+          </div>
+          <div class="team-body">
+            <div class="team-role">Managing Director · Operations</div>
+            <div class="team-name">Johan Oosthuysen</div>
+            <p class="team-bio">
+              With over 15 years of payroll experience, Johan leads Paytech's operations with a hands-on approach.
+              He is a certified Sage and PaySpace professional, trusted by hundreds of businesses across South Africa
+              to deliver accurate, compliant payroll solutions.
+            </p>
+            <div class="team-tags">
+              <span class="team-tag">Sage Certified</span>
+              <span class="team-tag">PaySpace</span>
+              <span class="team-tag">Deel Local</span>
+              <span class="team-tag">Payroll Strategy</span>
+            </div>
+            <div class="team-contact">
+              <a href="tel:0824401937">📞 082 440 1937</a>
+              <a href="mailto:johan@payatease.co.za">✉️ johan@payatease.co.za</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placeholder 2 -->
+        <div class="team-card rise rise-d2">
+          <div class="team-photo-placeholder">
+            <div class="team-initials">PT</div>
+          </div>
+          <div class="team-body">
+            <div class="team-role">Payroll Consultant</div>
+            <div class="team-name">Team Member</div>
+            <p class="team-bio">
+              A dedicated payroll consultant specialising in Sage Payroll implementations, compliance reviews,
+              and employee self-service setup. Passionate about helping businesses transition to digital payroll systems.
+            </p>
+            <div class="team-tags">
+              <span class="team-tag">Sage Payroll</span>
+              <span class="team-tag">Compliance</span>
+              <span class="team-tag">Implementation</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placeholder 3 -->
+        <div class="team-card rise rise-d3">
+          <div class="team-photo-placeholder">
+            <div class="team-initials">PT</div>
+          </div>
+          <div class="team-body">
+            <div class="team-role">Payroll Specialist</div>
+            <div class="team-name">Team Member</div>
+            <p class="team-bio">
+              Specialises in PaySpace and Deel Local implementations, supporting businesses with end-to-end
+              payroll outsourcing and monthly payroll processing for SMEs and large enterprises.
+            </p>
+            <div class="team-tags">
+              <span class="team-tag">PaySpace</span>
+              <span class="team-tag">Deel Local</span>
+              <span class="team-tag">Outsourcing</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VALUES -->
+      <div class="values-section rise rise-d4">
+        <span class="section-label">What drives us</span>
+        <h2 style="font-size:2rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.5rem;">Our Values</h2>
+        <p style="color:var(--muted);max-width:480px;margin:0 auto;font-size:0.95rem;line-height:1.7;">
+          Every business we serve is built on trust. These are the principles that guide everything we do.
+        </p>
+        <div class="values-grid">
+          <div class="value-card">
+            <span class="value-icon">🎯</span>
+            <div class="value-title">Accuracy First</div>
+            <p class="value-desc">Payroll errors cost businesses time and money. We get it right, every time.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon">🤝</span>
+            <div class="value-title">Partnership</div>
+            <p class="value-desc">We don't just process payroll — we become a trusted extension of your team.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon">⚖️</span>
+            <div class="value-title">Compliance</div>
+            <p class="value-desc">Always up to date with South African labour law and tax legislation.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon">💡</span>
+            <div class="value-title">Innovation</div>
+            <p class="value-desc">Embracing the best payroll technology so your business stays ahead.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA BAND -->
+      <div class="cta-band rise rise-d5">
+        <h2>Ready to work with us?</h2>
+        <p>Let's talk about your payroll needs. We'll put together a solution that fits your business perfectly.</p>
+        <div class="cta-band-actions">
+          <a href="quote.html" class="btn-primary">Get a Free Consultation</a>
+          <a href="contact.html" class="btn-ghost">Contact Us</a>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></div>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html">Get a Quote</a></li>
+      </ul>
+      <span class="footer-copy">© 2025 Paytech Consulting Solutions. All rights reserved.</span>
+    </footer>
+
+  </div>
+</body>
+</html>

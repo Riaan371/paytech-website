@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us | Paytech Consulting Solutions</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+
+    /* ── CONTACT: big direct info layout ── */
+
+    .contact-hero {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 3rem;
+      margin-top: 3rem;
+      align-items: start;
+    }
+
+    /* LEFT: Person card + direct contact */
+    .person-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .person-banner {
+      height: 120px;
+      background: linear-gradient(135deg, #1B2048 0%, #252c5a 50%, #1a3d27 100%);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 2rem 0;
+    }
+
+    .person-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: rgba(58,171,92,0.15);
+      border: 3px solid var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--green);
+      margin-bottom: -45px;
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+
+    .person-body {
+      padding: 3.5rem 2rem 2rem;
+    }
+
+    .person-role {
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 0.2rem;
+    }
+
+    .person-name {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.7rem;
+    }
+
+    .person-bio {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.8rem;
+    }
+
+    /* Big direct contact buttons */
+    .contact-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .contact-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      text-decoration: none;
+      color: var(--white);
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+
+    .contact-action-btn:hover {
+      border-color: rgba(58,171,92,0.5);
+      background: rgba(58,171,92,0.08);
+      transform: translateX(4px);
+    }
+
+    .contact-action-btn.primary-action {
+      background: rgba(58,171,92,0.12);
+      border-color: rgba(58,171,92,0.3);
+    }
+
+    .contact-action-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(58,171,92,0.15);
+      border: 1px solid rgba(58,171,92,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .contact-action-text strong {
+      display: block;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .contact-action-text span {
+      font-size: 0.75rem;
+      color: var(--muted2);
+      letter-spacing: 0.02em;
+    }
+
+    .contact-action-arrow {
+      margin-left: auto;
+      color: var(--green);
+      font-size: 1.1rem;
+      opacity: 0.7;
+    }
+
+    /* RIGHT COLUMN */
+    .contact-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    /* Hours card */
+    .hours-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.6rem;
+    }
+
+    .hours-card h3 {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.2rem;
+    }
+
+    .hours-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .hours-row:last-child { border-bottom: none; }
+
+    .hours-day {
+      font-size: 0.875rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hours-time {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .hours-closed {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .open-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    /* Response guarantee card */
+    .guarantee-card {
+      background: rgba(58,171,92,0.08);
+      border: 1px solid rgba(58,171,92,0.25);
+      border-radius: 14px;
+      padding: 1.4rem 1.6rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .guarantee-icon {
+      font-size: 1.8rem;
+      flex-shrink: 0;
+    }
+
+    .guarantee-text h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+    }
+
+    .guarantee-text p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Location card */
+    .location-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.4rem 1.6rem;
+    }
+
+    .location-card h3 {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 0.8rem;
+    }
+
+    .location-card p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* SOCIAL ROW */
+    .social-section {
+      margin-top: 4rem;
+      text-align: center;
+    }
+
+    .social-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .social-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 0.8rem 1.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .social-btn:hover {
+      border-color: rgba(58,171,92,0.4);
+      color: var(--green-dim);
+      transform: translateY(-2px);
+    }
+
+    /* BOTTOM CTA */
+    .quote-cta-band {
+      margin-top: 4rem;
+      background: rgba(58,171,92,0.08);
+      border: 1px solid rgba(58,171,92,0.22);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .quote-cta-band-left h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .quote-cta-band-left p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .quote-cta-band-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="page-contact">
+
+  <div class="bg-static" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=60&auto=format&fit=crop')"></div>
+  <div class="bg-overlay"></div>
+
+  <div class="page">
+
+    <!-- NAV -->
+    <nav>
+      <div class="nav-logo">
+        <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html" class="active">Contact</a></li>
+        <li><a href="quote.html" class="nav-cta">Get a Quote</a></li>
+      </ul>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header rise rise-d0">
+      <span class="label">Real people, real answers</span>
+      <h1>Let's Talk</h1>
+      <p>No bots, no call centres. When you contact Paytech, you speak directly with an experienced payroll professional.</p>
+      <div class="page-divider"></div>
+    </div>
+
+    <main>
+
+      <div class="contact-hero">
+
+        <!-- LEFT: Johan's card + direct contact -->
+        <div class="person-card rise rise-d1">
+          <div class="person-banner">
+            <div class="person-avatar">JO</div>
+          </div>
+          <div class="person-body">
+            <div class="person-role">Managing Director · Operations</div>
+            <div class="person-name">Johan Oosthuysen</div>
+            <p class="person-bio">
+              When you reach out to Paytech, you're talking directly to Johan — not a switchboard.
+              With over 15 years of payroll experience, he'll give you a straight answer and a practical solution.
+            </p>
+
+            <div class="contact-actions">
+              <a href="tel:0824401937" class="contact-action-btn primary-action">
+                <div class="contact-action-icon">📞</div>
+                <div class="contact-action-text">
+                  <strong>082 440 1937</strong>
+                  <span>Call Johan directly</span>
+                </div>
+                <span class="contact-action-arrow">→</span>
+              </a>
+              <a href="mailto:johan@payatease.co.za" class="contact-action-btn">
+                <div class="contact-action-icon">✉️</div>
+                <div class="contact-action-text">
+                  <strong>johan@payatease.co.za</strong>
+                  <span>Email — response within 1 business day</span>
+                </div>
+                <span class="contact-action-arrow">→</span>
+              </a>
+              <a href="https://www.payatease.co.za" target="_blank" class="contact-action-btn">
+                <div class="contact-action-icon">🌐</div>
+                <div class="contact-action-text">
+                  <strong>www.payatease.co.za</strong>
+                  <span>Visit our website</span>
+                </div>
+                <span class="contact-action-arrow">→</span>
+              </a>
+              <a href="#" class="contact-action-btn">
+                <div class="contact-action-icon">💼</div>
+                <div class="contact-action-text">
+                  <strong>LinkedIn</strong>
+                  <span>Connect professionally</span>
+                </div>
+                <span class="contact-action-arrow">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Hours, guarantee, location -->
+        <div class="contact-right">
+
+          <div class="hours-card rise rise-d2">
+            <h3>🕐 Business Hours</h3>
+            <div class="hours-row">
+              <span class="hours-day"><span class="open-dot"></span> Monday</span>
+              <span class="hours-time">08:00 – 17:00</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day"><span class="open-dot"></span> Tuesday</span>
+              <span class="hours-time">08:00 – 17:00</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day"><span class="open-dot"></span> Wednesday</span>
+              <span class="hours-time">08:00 – 17:00</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day"><span class="open-dot"></span> Thursday</span>
+              <span class="hours-time">08:00 – 17:00</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day"><span class="open-dot"></span> Friday</span>
+              <span class="hours-time">08:00 – 17:00</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day">Saturday</span>
+              <span class="hours-time">09:00 – 13:00</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day">Sunday &amp; Public Holidays</span>
+              <span class="hours-closed">Closed</span>
+            </div>
+          </div>
+
+          <div class="guarantee-card rise rise-d3">
+            <span class="guarantee-icon">⚡</span>
+            <div class="guarantee-text">
+              <h4>We respond fast</h4>
+              <p>
+                Emails answered within 1 business day. Quote requests called back within 2 hours.
+                Urgent payroll queries handled same day wherever possible.
+              </p>
+            </div>
+          </div>
+
+          <div class="location-card rise rise-d3">
+            <h3>📍 Where We Operate</h3>
+            <p>
+              Paytech serves businesses across South Africa — remotely and on-site.
+              Whether you're in Johannesburg, Cape Town, Durban, or anywhere else,
+              we can support your payroll needs.
+            </p>
+            <p style="margin-top:0.6rem;font-size:0.8rem;color:var(--muted2);">Add your physical address here if applicable.</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- SOCIAL -->
+      <div class="social-section rise rise-d4">
+        <span class="section-label">Find us on social media</span>
+        <div class="social-row">
+          <a href="#" class="social-btn">💼 LinkedIn</a>
+          <a href="#" class="social-btn">📘 Facebook</a>
+          <a href="https://www.payatease.co.za" target="_blank" class="social-btn">🌐 Website</a>
+        </div>
+      </div>
+
+      <!-- BOTTOM CTA: push to quote -->
+      <div class="quote-cta-band rise rise-d5">
+        <div class="quote-cta-band-left">
+          <h2>Need a formal quote?</h2>
+          <p>
+            Fill in our quote request form and we'll prepare a tailored solution for your business —
+            and call you back within 2 hours.
+          </p>
+        </div>
+        <div class="quote-cta-band-actions">
+          <a href="quote.html" class="btn-primary">Get a Free Quote →</a>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></div>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team.html">Our Team</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="quote.html">Get a Quote</a></li>
+      </ul>
+      <span class="footer-copy">© 2025 Paytech Consulting Solutions. All rights reserved.</span>
+    </footer>
+
+  </div>
+</body>
+</html>

@@ -465,75 +465,76 @@ body.page-quote {
   }
 
   .nav-hamburger { display: flex; }
-
   .nav-hamburger span { background: var(--white); }
 
+  /* Full-screen overlay */
   .nav-links {
     display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     width: 100vw;
     height: 100vh;
-    background: #0a0e1a;
     z-index: 999;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    padding: 5rem 2rem 3rem;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
     overflow-y: auto;
+    background: #0a0e1a;
   }
 
   .nav-links.open { display: flex; }
 
-  /* Logo item — hidden on desktop, shown in mobile menu */
+  /* ── TOP: white logo section ── */
   .nav-mobile-logo {
-    display: block !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    padding: 5rem 2rem 3.5rem;
     border: none !important;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+    flex-shrink: 0;
   }
 
-  .nav-mobile-logo img { height: 44px; width: auto; }
+  .nav-mobile-logo img { height: 64px; width: auto; }
 
-  .nav-links li {
+  /* ── BOTTOM: dark hero nav items ── */
+  .nav-links li:not(.nav-mobile-logo) {
     list-style: none;
-    width: 100%;
     text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,0.10);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
-  .nav-links li:first-child { border-top: 1px solid rgba(255,255,255,0.10); }
+  .nav-links li:nth-child(2) { border-top: 1px solid rgba(255,255,255,0.08); }
 
   .nav-links a {
     display: block;
-    padding: 1.1rem 0;
-    font-size: 1.2rem;
+    padding: 1.2rem 2rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: #ffffff !important;
     letter-spacing: 0.04em;
   }
 
-  .nav-links a.active { color: #ffffff !important; }
+  .nav-links a.active { color: var(--green) !important; }
 
   .nav-cta {
     border: none !important;
-    background: rgba(255,255,255,0.18) !important;
-    color: #ffffff !important;
+    background: rgba(58,171,92,0.15) !important;
+    color: var(--green) !important;
     border-radius: 0 !important;
-    padding: 1.1rem 0 !important;
-    font-size: 1.2rem !important;
+    padding: 1.2rem 2rem !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
     width: 100%;
     text-align: center;
   }
 
   .nav-cta:hover {
-    background: rgba(255,255,255,0.28) !important;
-    color: #ffffff !important;
+    background: rgba(58,171,92,0.28) !important;
   }
 
-  /* Keep hamburger on top of the overlay */
+  /* Hamburger stays above the overlay */
   .nav-hamburger {
     position: relative;
     z-index: 1001;

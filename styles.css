@@ -61,10 +61,10 @@ html, body {
   z-index: 1;
   background: linear-gradient(
     180deg,
-    rgba(8,12,22,0.82) 0%,
-    rgba(8,12,22,0.68) 40%,
-    rgba(8,12,22,0.74) 75%,
-    rgba(8,12,22,0.90) 100%
+    rgba(20,26,44,0.68) 0%,
+    rgba(20,26,44,0.54) 40%,
+    rgba(20,26,44,0.60) 75%,
+    rgba(20,26,44,0.78) 100%
   );
 }
 
@@ -423,7 +423,7 @@ body.page-quote {
   transform: translateY(-50%);
   width: 420px;
   height: 420px;
-  opacity: 0.035;
+  opacity: 0.08;
   pointer-events: none;
   z-index: 0;
   filter: grayscale(1) brightness(2);

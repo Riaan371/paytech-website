@@ -24,7 +24,7 @@
 
 html, body {
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  background: #11182c;
+  background: #1c2440;
   color: var(--white);
   overflow-x: hidden;
   min-height: 100vh;
@@ -96,6 +96,10 @@ nav {
   height: 38px;
   width: auto;
   display: block;
+  background: rgba(255,255,255,0.92);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
 }
 
 .nav-links {
@@ -395,10 +399,10 @@ footer {
 
 /* ── PAGE-SPECIFIC BACKGROUNDS ── */
 /* All dark for premium feel */
-body.page-team     { background: #131a2e; }
-body.page-partners { background: #12172a; }
-body.page-contact  { background: #111928; }
-body.page-quote    { background: #111620; }
+body.page-team     { background: #1d2540; }
+body.page-partners { background: #1c2238; }
+body.page-contact  { background: #1b2336; }
+body.page-quote    { background: #1b2030; }
 
 body.page-quote {
   --white:  #ffffff;

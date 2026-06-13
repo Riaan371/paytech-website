@@ -406,6 +406,25 @@ body.page-quote {
   --muted2: rgba(255,255,255,0.32);
 }
 
+/* ── WATERMARK (inner pages) ── */
+.page-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-watermark {
+  position: absolute;
+  top: 50%;
+  right: -100px;
+  transform: translateY(-50%);
+  width: 420px;
+  height: 420px;
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 0;
+  filter: grayscale(1) brightness(2);
+}
+
 /* ── SECTION LABEL ── */
 .section-label {
   font-size: 0.68rem;

@@ -213,6 +213,20 @@
       animation: wheelDrop 1.8s ease-in-out 3s infinite;
     }
 
+    /* ── WATERMARK ── */
+    .watermark {
+      position: absolute;
+      top: 50%;
+      right: -120px;
+      transform: translateY(-50%);
+      width: 620px;
+      height: 620px;
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 0;
+      filter: grayscale(1) brightness(2);
+    }
+
     @keyframes wheelDrop {
       0%   { transform: translateY(0);    opacity: 1; }
       75%  { transform: translateY(10px); opacity: 0; }
@@ -237,13 +251,13 @@
     <!-- NAV -->
     <nav>
       <div class="nav-logo">
-        <a href="index.html"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></a>
+        <a href="index.html"><img src="Current LOGO/After Canva/paytech-icon-transparent.png" alt="Paytech" /></a>
       </div>
       <button class="nav-hamburger" id="navToggle" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links" id="navLinks">
-        <li class="nav-mobile-logo"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></li>
+        <li class="nav-mobile-logo"><img src="Current LOGO/After Canva/paytech-icon-transparent.png" alt="Paytech" /></li>
         <li><a href="index.html" class="active">Home</a></li>
         <li><a href="team.html">Our Team</a></li>
         <li><a href="partners.html">Partners</a></li>
@@ -255,10 +269,12 @@
     <!-- HERO -->
     <section class="hero">
 
+      <img class="watermark" src="Current LOGO/After Canva/paytech-icon-transparent.png" alt="" />
+
       <div class="icon-wrap rise rise-d0">
         <div class="ring-outer"></div>
         <div class="ring-inner"></div>
-        <img class="hero-icon" src="Current LOGO/After Canva/Canva Logo.png" alt="Paytech icon" />
+        <img class="hero-icon" src="Current LOGO/After Canva/paytech-icon-transparent.png" alt="Paytech icon" />
       </div>
 
       <div class="hero-brand">
@@ -321,7 +337,7 @@
 
     <!-- FOOTER -->
     <footer>
-      <div class="footer-logo"><img src="Current LOGO/paytech_logo2.png" alt="Paytech" /></div>
+      <div class="footer-logo"><img src="Current LOGO/After Canva/paytech-icon-transparent.png" alt="Paytech" /></div>
       <ul class="footer-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="team.html">Our Team</a></li>

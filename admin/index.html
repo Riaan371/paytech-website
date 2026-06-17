@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paytech Admin Portal</title>
+  <link rel="icon" type="image/png" href="../Current LOGO/After Canva/paytech-icon-transparent.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Quicksand:wght@600;700&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --navy:      #1B2048;
+      --navy-dark: #0f1530;
+      --green:     #3AAB5C;
+      --green-dim: #5dc97b;
+      --green-light: #e8f7ed;
+      --white:     #ffffff;
+      --gray-50:   #f8fafc;
+      --gray-100:  #f1f5f9;
+      --gray-200:  #e2e8f0;
+      --gray-400:  #94a3b8;
+      --gray-600:  #475569;
+      --gray-800:  #1e293b;
+      --danger:    #ef4444;
+      --warning:   #f59e0b;
+      --info:      #3b82f6;
+      --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+      --radius:    10px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      width: 100vw; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+      position: fixed; inset: 0; z-index: 1000;
+    }
+    #login-screen.hidden { display: none; }
+
+    .login-card {
+      background: white;
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      width: 420px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .login-logo { height: 56px; margin-bottom: 1.8rem; }
+    .login-card h2 { font-size: 1.5rem; font-weight: 700; color: var(--navy); margin-bottom: 0.3rem; }
+    .login-card p { color: var(--gray-400); font-size: 0.85rem; margin-bottom: 2rem; }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: 240px; min-height: 100vh;
+      background: var(--navy-dark);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: width 0.3s;
+    }
+
+    .sidebar-logo {
+      padding: 1.4rem 1.2rem 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-logo img { height: 32px; background: white; border-radius: 999px; padding: 4px 12px; }
+
+    .sidebar-label {
+      font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); padding: 1.2rem 1.2rem 0.4rem;
+    }
+
+    nav.sidebar-nav { flex: 1; padding: 0.4rem 0.7rem; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.7rem 0.9rem; border-radius: 8px;
+      color: rgba(255,255,255,0.6); font-size: 0.875rem; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; margin-bottom: 2px;
+      user-select: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: white; }
+    .nav-item.active { background: var(--green); color: white; }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .nav-badge {
+      margin-left: auto; background: var(--green); color: white;
+      font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 999px;
+    }
+
+    .sidebar-footer {
+      padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-user {
+      display: flex; align-items: center; gap: 0.7rem;
+      color: rgba(255,255,255,0.7); font-size: 0.8rem;
+    }
+    .sidebar-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--green); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.8rem; color: white; flex-shrink: 0;
+    }
+    .sidebar-user-name { font-weight: 600; }
+    .sidebar-user-role { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+    #btn-logout {
+      margin-top: 0.5rem; width: 100%; padding: 0.5rem;
+      background: rgba(255,255,255,0.06); border: none; border-radius: 6px;
+      color: rgba(255,255,255,0.5); font-size: 0.78rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    #btn-logout:hover { background: rgba(239,68,68,0.2); color: #fca5a5; }
+
+    /* ── MAIN CONTENT ── */
+    #main { margin-left: 240px; flex: 1; min-height: 100vh; }
+
+    .topbar {
+      background: white; border-bottom: 1px solid var(--gray-200);
+      padding: 1rem 2rem; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 50;
+      box-shadow: var(--shadow);
+    }
+    .topbar-title { font-size: 1.2rem; font-weight: 700; color: var(--navy); }
+    .topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+    /* ── PAGE SECTIONS ── */
+    .page { display: none; padding: 2rem; }
+    .page.active { display: block; }
+
+    /* ── STATS CARDS ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white; border-radius: var(--radius); padding: 1.4rem 1.6rem;
+      box-shadow: var(--shadow); border-left: 4px solid transparent;
+    }
+    .stat-card.green  { border-color: var(--green); }
+    .stat-card.navy   { border-color: var(--navy); }
+    .stat-card.amber  { border-color: var(--warning); }
+    .stat-card.blue   { border-color: var(--info); }
+    .stat-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.5rem; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--navy); line-height: 1; }
+    .stat-sub { font-size: 0.75rem; color: var(--gray-400); margin-top: 0.3rem; }
+
+    /* ── CARDS & TABLES ── */
+    .card {
+      background: white; border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .card-header {
+      padding: 1.2rem 1.6rem; border-bottom: 1px solid var(--gray-100);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; color: var(--navy); }
+    .card-body { padding: 0; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--gray-400); padding: 0.75rem 1.4rem;
+      background: var(--gray-50); border-bottom: 1px solid var(--gray-100);
+    }
+    td {
+      padding: 0.9rem 1.4rem; border-bottom: 1px solid var(--gray-100);
+      font-size: 0.875rem; color: var(--gray-800);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-50); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1.2rem; border-radius: 7px;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      border: none; transition: all 0.2s; text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-primary:hover { background: var(--green-dim); }
+    .btn-outline { background: white; color: var(--navy); border: 1.5px solid var(--gray-200); }
+    .btn-outline:hover { border-color: var(--green); color: var(--green); }
+    .btn-danger  { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.78rem; }
+    .btn-navy { background: var(--navy); color: white; }
+    .btn-navy:hover { background: var(--navy-dark); }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-block; padding: 0.2rem 0.7rem; border-radius: 999px;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
+    }
+    .badge-green  { background: #dcfce7; color: #166534; }
+    .badge-amber  { background: #fef3c7; color: #92400e; }
+    .badge-red    { background: #fee2e2; color: #991b1b; }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-gray   { background: var(--gray-100); color: var(--gray-600); }
+
+    /* ── FORMS ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.78rem; font-weight: 600; color: var(--gray-600); }
+    input, select, textarea {
+      padding: 0.6rem 0.9rem; border: 1.5px solid var(--gray-200);
+      border-radius: 7px; font-size: 0.875rem; font-family: inherit;
+      color: var(--gray-800); background: white; outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--green); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 500; display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px; padding: 2rem;
+      width: 90%; max-width: 640px; max-height: 90vh; overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--navy); }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: var(--gray-100); cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gray-600); transition: background 0.2s;
+    }
+    .modal-close:hover { background: var(--gray-200); }
+    .modal-footer { margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+    /* ── QUOTE/INVOICE PREVIEW ── */
+    #doc-preview {
+      background: white; padding: 3rem;
+      font-family: 'Inter', sans-serif; color: #1e293b;
+      max-width: 780px; margin: 0 auto;
+    }
+    .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; }
+    .doc-logo { height: 50px; }
+    .doc-title-block { text-align: right; }
+    .doc-type { font-size: 2rem; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; }
+    .doc-number { font-size: 0.85rem; color: var(--gray-400); margin-top: 0.2rem; }
+    .doc-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+    .doc-meta-block h4 { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.5rem; }
+    .doc-meta-block p { font-size: 0.9rem; line-height: 1.6; }
+    .doc-meta-block strong { color: var(--navy); }
+    .doc-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+    .doc-table th { background: var(--navy); color: white; padding: 0.7rem 1rem; font-size: 0.78rem; letter-spacing: 0.04em; text-align: left; }
+    .doc-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--gray-100); font-size: 0.875rem; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-totals { margin-left: auto; width: 260px; }
+    .doc-total-row { display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.875rem; }
+    .doc-total-row.grand { font-weight: 800; font-size: 1rem; color: var(--navy); border-top: 2px solid var(--navy); padding-top: 0.6rem; margin-top: 0.3rem; }
+    .doc-footer { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200); font-size: 0.78rem; color: var(--gray-400); text-align: center; }
+    .doc-stamp {
+      display: inline-block; padding: 0.4rem 1.2rem; border: 3px solid var(--green);
+      color: var(--green); font-weight: 800; font-size: 1.2rem; letter-spacing: 0.1em;
+      transform: rotate(-8deg); opacity: 0.7; margin-top: 1rem;
+      text-transform: uppercase;
+    }
+
+    /* ── MISC ── */
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--gray-400); }
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+    .empty-state p { font-size: 0.9rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .section-title { font-size: 1.3rem; font-weight: 800; color: var(--navy); }
+    .search-input { padding: 0.55rem 1rem; border: 1.5px solid var(--gray-200); border-radius: 7px; font-size: 0.875rem; width: 260px; outline: none; }
+    .search-input:focus { border-color: var(--green); }
+    .divider { height: 1px; background: var(--gray-100); margin: 1.5rem 0; }
+    .text-green { color: var(--green); }
+    .text-muted { color: var(--gray-400); font-size: 0.8rem; }
+    .mt-4 { margin-top: 1rem; }
+    .flex { display: flex; } .gap-2 { gap: 0.5rem; } .items-center { align-items: center; }
+
+    /* Line items in quote builder */
+    .line-items-table { width: 100%; border-collapse: collapse; }
+    .line-items-table th { padding: 0.5rem; text-align: left; font-size: 0.72rem; color: var(--gray-400); border-bottom: 1px solid var(--gray-200); }
+    .line-items-table td { padding: 0.4rem; }
+    .line-items-table input { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+    #line-total { font-size: 1.3rem; font-weight: 800; color: var(--navy); }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+      background: var(--navy); color: white; padding: 0.9rem 1.6rem;
+      border-radius: 10px; font-size: 0.875rem; font-weight: 500;
+      box-shadow: var(--shadow-lg); transform: translateY(100px);
+      opacity: 0; transition: all 0.3s; pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { background: var(--green); }
+    #toast.error   { background: var(--danger); }
+
+    @media print {
+      #sidebar, #topbar, .topbar-actions { display: none !important; }
+      #main { margin: 0 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ LOGIN ═══════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <img class="login-logo" src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" />
+    <h2>Admin Portal</h2>
+    <p>Sign in to manage clients, invoices &amp; quotes</p>
+    <div class="form-group" style="text-align:left;margin-bottom:0.9rem;">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="admin@paytech.org.za" />
+    </div>
+    <div class="form-group" style="text-align:left;margin-bottom:1.4rem;">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" />
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:0.8rem;" onclick="handleLogin()">Sign In</button>
+    <p id="login-error" style="color:#ef4444;font-size:0.8rem;margin-top:0.8rem;display:none;"></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ SIDEBAR ═══════════════════════════════════ -->
+<div id="sidebar">
+  <div class="sidebar-logo">
+    <img src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" />
+  </div>
+  <div class="sidebar-label">Main Menu</div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('clients')">
+      <span class="nav-icon">👥</span> Clients
+    </div>
+    <div class="nav-item" onclick="showPage('invoices')">
+      <span class="nav-icon">🧾</span> Invoices
+      <span class="nav-badge" id="badge-invoices">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('quotes')">
+      <span class="nav-icon">📄</span> Quotes
+    </div>
+    <div class="nav-item" onclick="showPage('schedule')">
+      <span class="nav-icon">📅</span> Schedule
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="user-avatar">A</div>
+      <div>
+        <div class="sidebar-user-name" id="user-name">Admin</div>
+        <div class="sidebar-user-role">Paytech Admin</div>
+      </div>
+    </div>
+    <button id="btn-logout" onclick="handleLogout()">⬅ Sign Out</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ MAIN ═══════════════════════════════════ -->
+<div id="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-actions">
+      <span class="text-muted" id="topbar-date"></span>
+      <a href="../index.html" class="btn btn-outline btn-sm" target="_blank">🌐 View Website</a>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="page active" id="page-dashboard">
+    <div style="padding:2rem;">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Total Clients</div>
+          <div class="stat-value" id="stat-clients">0</div>
+          <div class="stat-sub">Active client base</div>
+        </div>
+        <div class="stat-card navy">
+          <div class="stat-label">Invoices This Month</div>
+          <div class="stat-value" id="stat-invoices">0</div>
+          <div class="stat-sub">Sent &amp; pending</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Pending Payment</div>
+          <div class="stat-value" id="stat-pending">0</div>
+          <div class="stat-sub">Awaiting payment</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Quotes Sent</div>
+          <div class="stat-value" id="stat-quotes">0</div>
+          <div class="stat-sub">This month</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Invoices</div>
+            <button class="btn btn-primary btn-sm" onclick="showPage('invoices')">View All</button>
+          </div>
+          <div class="card-body">
+            <table>
+              <thead><tr><th>Client</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="dash-invoices"><tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:2rem;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Quick Actions</div></div>
+          <div style="padding:1.4rem;display:flex;flex-direction:column;gap:0.7rem;">
+            <button class="btn btn-primary" style="justify-content:center;" onclick="openClientModal()">➕ New Client</button>
+            <button class="btn btn-navy" style="justify-content:center;" onclick="openInvoiceModal()">🧾 Create Invoice</button>
+            <button class="btn btn-outline" style="justify-content:center;" onclick="openQuoteModal()">📄 Create Quote</button>
+            <button class="btn btn-outline" style="justify-content:center;" onclick="showPage('schedule')">📅 View Schedule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CLIENTS ── -->
+  <div class="page" id="page-clients">
+    <div style="padding:2rem;">
+      <div class="section-header">
+        <div class="section-title">Clients</div>
+        <div class="flex gap-2 items-center">
+          <input type="text" class="search-input" id="client-search" placeholder="🔍 Search clients..." oninput="filterClients()" />
+          <button class="btn btn-primary" onclick="openClientModal()">➕ Add Client</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>Service</th><th>Monthly Fee</th><th>Actions</th></tr></thead>
+            <tbody id="clients-table-body">
+              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:3rem;">Loading clients...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INVOICES ── -->
+  <div class="page" id="page-invoices">
+    <div style="padding:2rem;">
+      <div class="section-header">
+        <div class="section-title">Invoices</div>
+        <div class="flex gap-2 items-center">
+          <input type="text" class="search-input" placeholder="🔍 Search invoices..." oninput="filterInvoices(this.value)" />
+          <button class="btn btn-primary" onclick="openInvoiceModal()">➕ New Invoice</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <table>
+            <thead><tr><th>#</th><th>Client</th><th>Amount</th><th>Period</th><th>Status</th><th>Due Date</th><th>Actions</th></tr></thead>
+            <tbody id="invoices-table-body">
+              <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:3rem;">Loading invoices...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── QUOTES ── -->
+  <div class="page" id="page-quotes">
+    <div style="padding:2rem;">
+      <div class="section-header">
+        <div class="section-title">Quotes</div>
+        <button class="btn btn-primary" onclick="openQuoteModal()">➕ New Quote</button>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <table>
+            <thead><tr><th>#</th><th>Client</th><th>Amount</th><th>Valid Until</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="quotes-table-body">
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading quotes...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCHEDULE ── -->
+  <div class="page" id="page-schedule">
+    <div style="padding:2rem;">
+      <div class="section-header">
+        <div class="section-title">Monthly Invoice Schedule</div>
+        <button class="btn btn-primary" onclick="runMonthlyInvoicing()">⚡ Run This Month's Invoicing</button>
+      </div>
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header"><div class="card-title">Recurring Clients</div></div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Client</th><th>Service</th><th>Monthly Fee</th><th>Day of Month</th><th>Next Invoice</th><th>Status</th></tr></thead>
+            <tbody id="schedule-table-body">
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading schedule...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ MODALS ═══════════════════════════════════ -->
+
+<!-- CLIENT MODAL -->
+<div class="modal-overlay" id="client-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="client-modal-title">Add New Client</div>
+      <button class="modal-close" onclick="closeModal('client-modal')">✕</button>
+    </div>
+    <input type="hidden" id="client-id" />
+    <div class="form-grid">
+      <div class="form-group"><label>Company Name *</label><input id="c-company" placeholder="Acme (Pty) Ltd" /></div>
+      <div class="form-group"><label>Contact Person *</label><input id="c-contact" placeholder="John Smith" /></div>
+      <div class="form-group"><label>Email *</label><input id="c-email" type="email" placeholder="john@acme.co.za" /></div>
+      <div class="form-group"><label>Phone</label><input id="c-phone" placeholder="082 000 0000" /></div>
+      <div class="form-group"><label>VAT Number</label><input id="c-vat" placeholder="4123456789" /></div>
+      <div class="form-group"><label>Company Reg</label><input id="c-reg" placeholder="2020/123456/07" /></div>
+      <div class="form-group full"><label>Physical Address</label><textarea id="c-address" rows="2" placeholder="123 Main Street, Sandton, Gauteng"></textarea></div>
+      <div class="form-group"><label>Service Type</label>
+        <select id="c-service">
+          <option value="Payroll Consulting">Payroll Consulting</option>
+          <option value="Payroll Outsourcing">Payroll Outsourcing</option>
+          <option value="PaySpace Support">PaySpace Support</option>
+          <option value="Deel Local">Deel Local</option>
+          <option value="Compliance">Compliance</option>
+          <option value="Once-off">Once-off</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Monthly Fee (ZAR)</label><input id="c-fee" type="number" placeholder="0.00" /></div>
+      <div class="form-group"><label>Number of Employees</label><input id="c-employees" type="number" placeholder="0" /></div>
+      <div class="form-group"><label>Invoice Day (1-28)</label><input id="c-invoice-day" type="number" placeholder="1" min="1" max="28" value="1" /></div>
+      <div class="form-group full"><label>Notes</label><textarea id="c-notes" rows="2" placeholder="Any special requirements or notes..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('client-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()">💾 Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay" id="invoice-modal">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-header">
+      <div class="modal-title">Create Invoice</div>
+      <button class="modal-close" onclick="closeModal('invoice-modal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Client *</label>
+        <select id="inv-client"><option value="">-- Select Client --</option></select>
+      </div>
+      <div class="form-group"><label>Invoice Number</label><input id="inv-number" placeholder="INV-001" /></div>
+      <div class="form-group"><label>Invoice Date</label><input id="inv-date" type="date" /></div>
+      <div class="form-group"><label>Due Date</label><input id="inv-due" type="date" /></div>
+      <div class="form-group"><label>Period (e.g. June 2026)</label><input id="inv-period" placeholder="June 2026" /></div>
+      <div class="form-group"><label>Status</label>
+        <select id="inv-status">
+          <option value="Draft">Draft</option>
+          <option value="Sent">Sent</option>
+          <option value="Paid">Paid</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div style="margin-bottom:0.8rem;display:flex;justify-content:space-between;align-items:center;">
+      <strong style="font-size:0.9rem;">Line Items</strong>
+      <button class="btn btn-outline btn-sm" onclick="addLineItem()">+ Add Row</button>
+    </div>
+    <table class="line-items-table">
+      <thead><tr><th style="width:50%">Description</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead>
+      <tbody id="inv-lines"></tbody>
+    </table>
+    <div style="margin-top:1rem;text-align:right;">
+      <div style="font-size:0.8rem;color:var(--gray-400);">Subtotal: <span id="inv-subtotal">R 0.00</span></div>
+      <div style="font-size:0.8rem;color:var(--gray-400);">VAT (15%): <span id="inv-vat">R 0.00</span></div>
+      <div style="font-size:1.1rem;font-weight:800;color:var(--navy);">TOTAL: <span id="inv-total-display">R 0.00</span></div>
+    </div>
+    <div class="form-group full mt-4"><label>Notes / Payment Terms</label>
+      <textarea id="inv-notes" placeholder="Payment due within 30 days. EFT to: Paytech Consulting Solutions..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('invoice-modal')">Cancel</button>
+      <button class="btn btn-outline" onclick="previewDocument('invoice')">👁 Preview</button>
+      <button class="btn btn-primary" onclick="saveInvoice()">💾 Save Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE MODAL -->
+<div class="modal-overlay" id="quote-modal">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-header">
+      <div class="modal-title">Create Quote</div>
+      <button class="modal-close" onclick="closeModal('quote-modal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Client *</label>
+        <select id="qt-client"><option value="">-- Select Client --</option></select>
+      </div>
+      <div class="form-group"><label>Quote Number</label><input id="qt-number" placeholder="QT-001" /></div>
+      <div class="form-group"><label>Quote Date</label><input id="qt-date" type="date" /></div>
+      <div class="form-group"><label>Valid Until</label><input id="qt-valid" type="date" /></div>
+      <div class="form-group"><label>Service Type</label>
+        <select id="qt-service">
+          <option>Payroll Consulting</option>
+          <option>Payroll Outsourcing</option>
+          <option>PaySpace Implementation</option>
+          <option>Deel Local Setup</option>
+          <option>Compliance Review</option>
+          <option>Custom</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Status</label>
+        <select id="qt-status"><option>Draft</option><option>Sent</option><option>Accepted</option><option>Declined</option></select>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div style="margin-bottom:0.8rem;display:flex;justify-content:space-between;align-items:center;">
+      <strong style="font-size:0.9rem;">Line Items</strong>
+      <button class="btn btn-outline btn-sm" onclick="addQuoteLine()">+ Add Row</button>
+    </div>
+    <table class="line-items-table">
+      <thead><tr><th style="width:50%">Description</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead>
+      <tbody id="qt-lines"></tbody>
+    </table>
+    <div style="margin-top:1rem;text-align:right;">
+      <div style="font-size:0.8rem;color:var(--gray-400);">Subtotal: <span id="qt-subtotal">R 0.00</span></div>
+      <div style="font-size:0.8rem;color:var(--gray-400);">VAT (15%): <span id="qt-vat">R 0.00</span></div>
+      <div style="font-size:1.1rem;font-weight:800;color:var(--navy);">TOTAL: <span id="qt-total-display">R 0.00</span></div>
+    </div>
+    <div class="form-group full mt-4"><label>Terms &amp; Conditions / Notes</label>
+      <textarea id="qt-notes" placeholder="This quote is valid for 30 days. Prices exclude VAT unless stated..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('quote-modal')">Cancel</button>
+      <button class="btn btn-outline" onclick="previewDocument('quote')">👁 Preview</button>
+      <button class="btn btn-primary" onclick="saveQuote()">💾 Save Quote</button>
+    </div>
+  </div>
+</div>
+
+<!-- DOCUMENT PREVIEW MODAL -->
+<div class="modal-overlay" id="preview-modal">
+  <div class="modal" style="max-width:820px;">
+    <div class="modal-header">
+      <div class="modal-title" id="preview-title">Document Preview</div>
+      <button class="modal-close" onclick="closeModal('preview-modal')">✕</button>
+    </div>
+    <div id="doc-preview"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('preview-modal')">Close</button>
+      <button class="btn btn-outline" onclick="downloadPDF()">⬇ Download PDF</button>
+      <button class="btn btn-primary" onclick="sendByEmail()">📧 Send by Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// SUPABASE CONFIG — paste your keys here
+// ═══════════════════════════════════════════
+const SUPABASE_URL  = 'https://ehulmwyzqozxzykemhgp.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodWxtd3l6cW96eHp5a2VtaGdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDY0NjcsImV4cCI6MjA5NTI4MjQ2N30.JdJn-ADMiXSmrSeNAdI2CFtZhWtV7q_qTtVGx_mNWQQ';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── State ──
+let clients = [], invoices = [], quotes = [], currentUser = null;
+let currentDocType = null, currentDocData = null;
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('en-ZA', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  setDefaultDates();
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    initApp();
+  }
+});
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value;
+  const pw    = document.getElementById('login-password').value;
+  const err   = document.getElementById('login-error');
+  err.style.display = 'none';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if (error) {
+    err.textContent = error.message;
+    err.style.display = 'block';
+    return;
+  }
+  currentUser = data.user;
+  initApp();
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+function initApp() {
+  document.getElementById('login-screen').classList.add('hidden');
+  const name = currentUser.email.split('@')[0];
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+  loadAll();
+}
+
+async function loadAll() {
+  await Promise.all([loadClients(), loadInvoices(), loadQuotes()]);
+  updateDashboard();
+  loadSchedule();
+}
+
+// ═══════════════════════════════════════════
+// CLIENTS
+// ═══════════════════════════════════════════
+async function loadClients() {
+  const { data } = await sb.from('clients').select('*').order('company_name');
+  clients = data || [];
+  renderClientsTable();
+  populateClientDropdowns();
+}
+
+function renderClientsTable(filter = '') {
+  const tbody = document.getElementById('clients-table-body');
+  const rows = clients.filter(c =>
+    !filter || c.company_name.toLowerCase().includes(filter) || (c.contact_person||'').toLowerCase().includes(filter)
+  );
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">👥</div><p>No clients yet. Add your first client!</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(c => `
+    <tr>
+      <td><strong>${c.company_name}</strong></td>
+      <td>${c.contact_person||'-'}</td>
+      <td><a href="mailto:${c.email}" style="color:var(--green);text-decoration:none;">${c.email||'-'}</a></td>
+      <td>${c.phone||'-'}</td>
+      <td><span class="badge badge-blue">${c.service_type||'-'}</span></td>
+      <td><strong>R ${Number(c.monthly_fee||0).toFixed(2)}</strong></td>
+      <td>
+        <div class="flex gap-2">
+          <button class="btn btn-outline btn-sm" onclick="editClient('${c.id}')">✏</button>
+          <button class="btn btn-primary btn-sm" onclick="quickInvoice('${c.id}')">🧾</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterClients() {
+  renderClientsTable(document.getElementById('client-search').value.toLowerCase());
+}
+
+function openClientModal(id = null) {
+  ['client-id','c-company','c-contact','c-email','c-phone','c-vat','c-reg','c-address','c-notes'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('c-fee').value = '';
+  document.getElementById('c-employees').value = '';
+  document.getElementById('c-invoice-day').value = '1';
+  document.getElementById('client-modal-title').textContent = 'Add New Client';
+  openModal('client-modal');
+}
+
+function editClient(id) {
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('client-id').value = c.id;
+  document.getElementById('c-company').value  = c.company_name || '';
+  document.getElementById('c-contact').value  = c.contact_person || '';
+  document.getElementById('c-email').value    = c.email || '';
+  document.getElementById('c-phone').value    = c.phone || '';
+  document.getElementById('c-vat').value      = c.vat_number || '';
+  document.getElementById('c-reg').value      = c.company_reg || '';
+  document.getElementById('c-address').value  = c.address || '';
+  document.getElementById('c-service').value  = c.service_type || 'Payroll Consulting';
+  document.getElementById('c-fee').value      = c.monthly_fee || '';
+  document.getElementById('c-employees').value= c.employees || '';
+  document.getElementById('c-invoice-day').value = c.invoice_day || '1';
+  document.getElementById('c-notes').value    = c.notes || '';
+  document.getElementById('client-modal-title').textContent = 'Edit Client';
+  openModal('client-modal');
+}
+
+async function saveClient() {
+  const id = document.getElementById('client-id').value;
+  const payload = {
+    company_name:   document.getElementById('c-company').value,
+    contact_person: document.getElementById('c-contact').value,
+    email:          document.getElementById('c-email').value,
+    phone:          document.getElementById('c-phone').value,
+    vat_number:     document.getElementById('c-vat').value,
+    company_reg:    document.getElementById('c-reg').value,
+    address:        document.getElementById('c-address').value,
+    service_type:   document.getElementById('c-service').value,
+    monthly_fee:    parseFloat(document.getElementById('c-fee').value) || 0,
+    employees:      parseInt(document.getElementById('c-employees').value) || 0,
+    invoice_day:    parseInt(document.getElementById('c-invoice-day').value) || 1,
+    notes:          document.getElementById('c-notes').value,
+  };
+  if (!payload.company_name) return toast('Company name is required', 'error');
+  let err;
+  if (id) {
+    ({ error: err } = await sb.from('clients').update(payload).eq('id', id));
+  } else {
+    ({ error: err } = await sb.from('clients').insert(payload));
+  }
+  if (err) return toast(err.message, 'error');
+  closeModal('client-modal');
+  toast('Client saved!', 'success');
+  await loadClients();
+  updateDashboard();
+}
+
+async function deleteClient(id) {
+  if (!confirm('Delete this client? This cannot be undone.')) return;
+  await sb.from('clients').delete().eq('id', id);
+  toast('Client deleted');
+  await loadClients();
+}
+
+// ═══════════════════════════════════════════
+// INVOICES
+// ═══════════════════════════════════════════
+async function loadInvoices() {
+  const { data } = await sb.from('invoices').select('*, clients(company_name, email, address, vat_number)').order('created_at', { ascending: false });
+  invoices = data || [];
+  renderInvoicesTable();
+  const pending = invoices.filter(i => i.status === 'Sent' || i.status === 'Overdue').length;
+  document.getElementById('badge-invoices').textContent = pending;
+}
+
+function renderInvoicesTable(filter = '') {
+  const tbody = document.getElementById('invoices-table-body');
+  const rows = filter ? invoices.filter(i => (i.clients?.company_name||'').toLowerCase().includes(filter)) : invoices;
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🧾</div><p>No invoices yet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(i => `
+    <tr>
+      <td><strong>${i.invoice_number}</strong></td>
+      <td>${i.clients?.company_name||'Unknown'}</td>
+      <td><strong>R ${Number(i.total||0).toFixed(2)}</strong></td>
+      <td>${i.period||'-'}</td>
+      <td><span class="badge ${statusBadge(i.status)}">${i.status}</span></td>
+      <td>${i.due_date ? new Date(i.due_date).toLocaleDateString('en-ZA') : '-'}</td>
+      <td>
+        <div class="flex gap-2">
+          <button class="btn btn-outline btn-sm" onclick="viewInvoice('${i.id}')">👁</button>
+          <button class="btn btn-primary btn-sm" onclick="emailInvoice('${i.id}')">📧</button>
+          <button class="btn btn-outline btn-sm" onclick="markPaid('${i.id}')">✓ Paid</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${i.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterInvoices(v) { renderInvoicesTable(v.toLowerCase()); }
+
+let invLines = [];
+
+function openInvoiceModal(prefillClientId = null) {
+  invLines = [{ desc: '', qty: 1, price: 0 }];
+  renderInvLines();
+  populateClientDropdowns();
+  document.getElementById('inv-number').value = nextNumber('INV', invoices.map(i=>i.invoice_number));
+  document.getElementById('inv-status').value = 'Draft';
+  document.getElementById('inv-notes').value  = 'Payment due within 30 days.\nBank: [Your Bank]\nAcc: [Account Number]\nRef: [Invoice Number]';
+  if (prefillClientId) document.getElementById('inv-client').value = prefillClientId;
+  openModal('invoice-modal');
+}
+
+function quickInvoice(clientId) {
+  const c = clients.find(x => x.id === clientId);
+  openInvoiceModal(clientId);
+  if (c && c.monthly_fee) {
+    invLines = [{ desc: `${c.service_type} – ${new Date().toLocaleString('default',{month:'long',year:'numeric'})}`, qty: 1, price: c.monthly_fee }];
+    renderInvLines();
+    calcInvTotal();
+  }
+}
+
+function addLineItem() { invLines.push({ desc: '', qty: 1, price: 0 }); renderInvLines(); }
+
+function renderInvLines() {
+  document.getElementById('inv-lines').innerHTML = invLines.map((l,i) => `
+    <tr>
+      <td><input value="${l.desc}" oninput="invLines[${i}].desc=this.value" style="width:100%" /></td>
+      <td><input type="number" value="${l.qty}" style="width:60px" oninput="invLines[${i}].qty=+this.value;calcInvTotal()" /></td>
+      <td><input type="number" value="${l.price}" style="width:90px" oninput="invLines[${i}].price=+this.value;calcInvTotal()" /></td>
+      <td>R ${(l.qty*l.price).toFixed(2)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="invLines.splice(${i},1);renderInvLines();calcInvTotal()">✕</button></td>
+    </tr>`).join('');
+}
+
+function calcInvTotal() {
+  const sub = invLines.reduce((s,l)=>s+l.qty*l.price,0);
+  const vat = sub * 0.15;
+  document.getElementById('inv-subtotal').textContent = `R ${sub.toFixed(2)}`;
+  document.getElementById('inv-vat').textContent      = `R ${vat.toFixed(2)}`;
+  document.getElementById('inv-total-display').textContent = `R ${(sub+vat).toFixed(2)}`;
+}
+
+async function saveInvoice() {
+  const clientId = document.getElementById('inv-client').value;
+  if (!clientId) return toast('Please select a client', 'error');
+  const sub = invLines.reduce((s,l)=>s+l.qty*l.price,0);
+  const payload = {
+    client_id:      clientId,
+    invoice_number: document.getElementById('inv-number').value,
+    invoice_date:   document.getElementById('inv-date').value,
+    due_date:       document.getElementById('inv-due').value,
+    period:         document.getElementById('inv-period').value,
+    status:         document.getElementById('inv-status').value,
+    subtotal:       sub,
+    vat:            sub * 0.15,
+    total:          sub * 1.15,
+    line_items:     JSON.stringify(invLines),
+    notes:          document.getElementById('inv-notes').value,
+  };
+  const { error } = await sb.from('invoices').insert(payload);
+  if (error) return toast(error.message, 'error');
+  closeModal('invoice-modal');
+  toast('Invoice saved!', 'success');
+  await loadInvoices();
+  updateDashboard();
+}
+
+async function markPaid(id) {
+  await sb.from('invoices').update({ status: 'Paid' }).eq('id', id);
+  toast('Marked as paid', 'success');
+  await loadInvoices();
+}
+
+async function deleteInvoice(id) {
+  if (!confirm('Delete this invoice?')) return;
+  await sb.from('invoices').delete().eq('id', id);
+  toast('Invoice deleted');
+  await loadInvoices();
+}
+
+function viewInvoice(id) {
+  const inv = invoices.find(i => i.id === id);
+  if (!inv) return;
+  currentDocType = 'invoice'; currentDocData = inv;
+  renderDocPreview(inv, 'INVOICE');
+  openModal('preview-modal');
+  document.getElementById('preview-title').textContent = `Invoice ${inv.invoice_number}`;
+}
+
+function emailInvoice(id) {
+  const inv = invoices.find(i => i.id === id);
+  if (!inv) return;
+  const email = inv.clients?.email || '';
+  const subject = encodeURIComponent(`Invoice ${inv.invoice_number} – Paytech Consulting Solutions`);
+  const body = encodeURIComponent(`Dear ${inv.clients?.company_name||'Client'},\n\nPlease find attached invoice ${inv.invoice_number} for R ${Number(inv.total||0).toFixed(2)}.\n\nKind regards,\nPaytech Consulting Solutions\ninfo@paytech.org.za | 082 440 1937`);
+  window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+}
+
+// ═══════════════════════════════════════════
+// QUOTES
+// ═══════════════════════════════════════════
+let qtLines = [];
+
+async function loadQuotes() {
+  const { data } = await sb.from('quotes').select('*, clients(company_name, email, address, vat_number)').order('created_at', { ascending: false });
+  quotes = data || [];
+  renderQuotesTable();
+}
+
+function renderQuotesTable() {
+  const tbody = document.getElementById('quotes-table-body');
+  if (!quotes.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📄</div><p>No quotes yet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = quotes.map(q => `
+    <tr>
+      <td><strong>${q.quote_number}</strong></td>
+      <td>${q.clients?.company_name||'Unknown'}</td>
+      <td><strong>R ${Number(q.total||0).toFixed(2)}</strong></td>
+      <td>${q.valid_until ? new Date(q.valid_until).toLocaleDateString('en-ZA') : '-'}</td>
+      <td><span class="badge ${statusBadge(q.status)}">${q.status}</span></td>
+      <td>
+        <div class="flex gap-2">
+          <button class="btn btn-outline btn-sm" onclick="viewQuote('${q.id}')">👁</button>
+          <button class="btn btn-primary btn-sm" onclick="emailQuote('${q.id}')">📧</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteQuote('${q.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function openQuoteModal() {
+  qtLines = [{ desc: '', qty: 1, price: 0 }];
+  renderQtLines();
+  populateClientDropdowns();
+  document.getElementById('qt-number').value = nextNumber('QT', quotes.map(q=>q.quote_number));
+  document.getElementById('qt-status').value = 'Draft';
+  document.getElementById('qt-notes').value  = 'This quote is valid for 30 days from the date of issue.\nAll prices are exclusive of VAT at 15%.';
+  openModal('quote-modal');
+}
+
+function addQuoteLine() { qtLines.push({ desc: '', qty: 1, price: 0 }); renderQtLines(); }
+
+function renderQtLines() {
+  document.getElementById('qt-lines').innerHTML = qtLines.map((l,i) => `
+    <tr>
+      <td><input value="${l.desc}" oninput="qtLines[${i}].desc=this.value" style="width:100%" /></td>
+      <td><input type="number" value="${l.qty}" style="width:60px" oninput="qtLines[${i}].qty=+this.value;calcQtTotal()" /></td>
+      <td><input type="number" value="${l.price}" style="width:90px" oninput="qtLines[${i}].price=+this.value;calcQtTotal()" /></td>
+      <td>R ${(l.qty*l.price).toFixed(2)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="qtLines.splice(${i},1);renderQtLines();calcQtTotal()">✕</button></td>
+    </tr>`).join('');
+}
+
+function calcQtTotal() {
+  const sub = qtLines.reduce((s,l)=>s+l.qty*l.price,0);
+  const vat = sub * 0.15;
+  document.getElementById('qt-subtotal').textContent = `R ${sub.toFixed(2)}`;
+  document.getElementById('qt-vat').textContent      = `R ${vat.toFixed(2)}`;
+  document.getElementById('qt-total-display').textContent = `R ${(sub+vat).toFixed(2)}`;
+}
+
+async function saveQuote() {
+  const clientId = document.getElementById('qt-client').value;
+  if (!clientId) return toast('Please select a client', 'error');
+  const sub = qtLines.reduce((s,l)=>s+l.qty*l.price,0);
+  const payload = {
+    client_id:    clientId,
+    quote_number: document.getElementById('qt-number').value,
+    quote_date:   document.getElementById('qt-date').value,
+    valid_until:  document.getElementById('qt-valid').value,
+    service_type: document.getElementById('qt-service').value,
+    status:       document.getElementById('qt-status').value,
+    subtotal:     sub, vat: sub*0.15, total: sub*1.15,
+    line_items:   JSON.stringify(qtLines),
+    notes:        document.getElementById('qt-notes').value,
+  };
+  const { error } = await sb.from('quotes').insert(payload);
+  if (error) return toast(error.message, 'error');
+  closeModal('quote-modal');
+  toast('Quote saved!', 'success');
+  await loadQuotes();
+  updateDashboard();
+}
+
+async function deleteQuote(id) {
+  if (!confirm('Delete this quote?')) return;
+  await sb.from('quotes').delete().eq('id', id);
+  toast('Quote deleted');
+  await loadQuotes();
+}
+
+function viewQuote(id) {
+  const q = quotes.find(x => x.id === id);
+  if (!q) return;
+  currentDocType = 'quote'; currentDocData = q;
+  renderDocPreview(q, 'QUOTATION');
+  openModal('preview-modal');
+  document.getElementById('preview-title').textContent = `Quote ${q.quote_number}`;
+}
+
+function emailQuote(id) {
+  const q = quotes.find(x => x.id === id);
+  if (!q) return;
+  const email = q.clients?.email || '';
+  const subject = encodeURIComponent(`Quotation ${q.quote_number} – Paytech Consulting Solutions`);
+  const body = encodeURIComponent(`Dear ${q.clients?.company_name||'Client'},\n\nPlease find attached quotation ${q.quote_number} for R ${Number(q.total||0).toFixed(2)}.\n\nThis quote is valid until ${q.valid_until ? new Date(q.valid_until).toLocaleDateString('en-ZA') : 'stated date'}.\n\nKind regards,\nPaytech Consulting Solutions\ninfo@paytech.org.za | 082 440 1937`);
+  window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+}
+
+// ═══════════════════════════════════════════
+// SCHEDULE
+// ═══════════════════════════════════════════
+function loadSchedule() {
+  const tbody = document.getElementById('schedule-table-body');
+  const recurring = clients.filter(c => c.monthly_fee > 0);
+  if (!recurring.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📅</div><p>No recurring clients configured.</p></div></td></tr>`;
+    return;
+  }
+  const now = new Date();
+  tbody.innerHTML = recurring.map(c => {
+    const day = c.invoice_day || 1;
+    let next = new Date(now.getFullYear(), now.getMonth(), day);
+    if (next <= now) next = new Date(now.getFullYear(), now.getMonth()+1, day);
+    const alreadyInvoiced = invoices.some(i => i.client_id === c.id && i.period === `${now.toLocaleString('default',{month:'long'})} ${now.getFullYear()}`);
+    return `
+    <tr>
+      <td><strong>${c.company_name}</strong></td>
+      <td>${c.service_type}</td>
+      <td><strong>R ${Number(c.monthly_fee).toFixed(2)}</strong></td>
+      <td>Day ${day}</td>
+      <td>${next.toLocaleDateString('en-ZA')}</td>
+      <td><span class="badge ${alreadyInvoiced ? 'badge-green' : 'badge-amber'}">${alreadyInvoiced ? '✓ Done' : 'Pending'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+async function runMonthlyInvoicing() {
+  const now = new Date();
+  const period = `${now.toLocaleString('default',{month:'long'})} ${now.getFullYear()}`;
+  const recurring = clients.filter(c => c.monthly_fee > 0);
+  let created = 0;
+  for (const c of recurring) {
+    const alreadyDone = invoices.some(i => i.client_id === c.id && i.period === period);
+    if (alreadyDone) continue;
+    const dueDate = new Date(now.getFullYear(), now.getMonth(), c.invoice_day||1);
+    if (dueDate < now) dueDate.setMonth(dueDate.getMonth()+1);
+    const num = nextNumber('INV', invoices.map(i=>i.invoice_number));
+    const lines = [{ desc: `${c.service_type} – ${period}`, qty: 1, price: c.monthly_fee }];
+    await sb.from('invoices').insert({
+      client_id: c.id, invoice_number: num, invoice_date: now.toISOString().split('T')[0],
+      due_date: dueDate.toISOString().split('T')[0], period, status: 'Draft',
+      subtotal: c.monthly_fee, vat: c.monthly_fee*0.15, total: c.monthly_fee*1.15,
+      line_items: JSON.stringify(lines), notes: 'Payment due within 30 days.',
+    });
+    created++;
+  }
+  toast(`✅ Created ${created} invoice${created!==1?'s':''} for ${period}`, 'success');
+  await loadInvoices();
+  loadSchedule();
+  updateDashboard();
+}
+
+// ═══════════════════════════════════════════
+// DOCUMENT PREVIEW & PDF
+// ═══════════════════════════════════════════
+function renderDocPreview(doc, type) {
+  const lines = JSON.parse(doc.line_items || '[]');
+  const sub   = Number(doc.subtotal||0);
+  const vat   = Number(doc.vat||0);
+  const total = Number(doc.total||0);
+  const client = doc.clients || {};
+  const isInvoice = type === 'INVOICE';
+  const number = isInvoice ? doc.invoice_number : doc.quote_number;
+  const date   = isInvoice ? doc.invoice_date   : doc.quote_date;
+  const extra  = isInvoice
+    ? `<div class="doc-total-row"><span>Due Date:</span><span><strong>${doc.due_date ? new Date(doc.due_date).toLocaleDateString('en-ZA') : '-'}</strong></span></div>`
+    : `<div class="doc-total-row"><span>Valid Until:</span><span><strong>${doc.valid_until ? new Date(doc.valid_until).toLocaleDateString('en-ZA') : '-'}</strong></span></div>`;
+
+  document.getElementById('doc-preview').innerHTML = `
+    <div style="padding:2rem;font-family:'Inter',sans-serif;">
+      <div class="doc-header">
+        <img class="doc-logo" src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" style="height:48px;background:#fff;border-radius:999px;padding:4px 14px;">
+        <div class="doc-title-block">
+          <div class="doc-type">${type}</div>
+          <div class="doc-number">${number}</div>
+          <div class="doc-number">Date: ${date ? new Date(date).toLocaleDateString('en-ZA') : '-'}</div>
+        </div>
+      </div>
+      <div class="doc-meta">
+        <div class="doc-meta-block">
+          <h4>From</h4>
+          <p><strong>Paytech Consulting Solutions</strong><br>info@paytech.org.za<br>082 440 1937<br>South Africa</p>
+        </div>
+        <div class="doc-meta-block">
+          <h4>To</h4>
+          <p><strong>${client.company_name||'-'}</strong><br>${client.address||''}<br>${client.vat_number ? 'VAT: '+client.vat_number : ''}</p>
+        </div>
+      </div>
+      <table class="doc-table">
+        <thead><tr><th style="width:55%">Description</th><th>Qty</th><th>Unit Price</th><th style="text-align:right">Amount</th></tr></thead>
+        <tbody>
+          ${lines.map(l=>`<tr><td>${l.desc}</td><td>${l.qty}</td><td>R ${Number(l.price).toFixed(2)}</td><td style="text-align:right">R ${(l.qty*l.price).toFixed(2)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="doc-totals">
+        <div class="doc-total-row"><span>Subtotal:</span><span>R ${sub.toFixed(2)}</span></div>
+        <div class="doc-total-row"><span>VAT (15%):</span><span>R ${vat.toFixed(2)}</span></div>
+        ${extra}
+        <div class="doc-total-row grand"><span>TOTAL DUE:</span><span>R ${total.toFixed(2)}</span></div>
+      </div>
+      ${doc.notes ? `<div style="margin-top:1.5rem;padding:1rem;background:#f8fafc;border-radius:8px;font-size:0.82rem;color:#475569;white-space:pre-line;">${doc.notes}</div>` : ''}
+      <div class="doc-footer">
+        Paytech Consulting Solutions &nbsp;·&nbsp; info@paytech.org.za &nbsp;·&nbsp; 082 440 1937<br>
+        South Africa's Payroll Specialists &nbsp;·&nbsp; PaySpace &amp; Deel Local Certified
+      </div>
+    </div>`;
+}
+
+function downloadPDF() {
+  if (!currentDocData) return;
+  const el  = document.getElementById('doc-preview');
+  const num = currentDocType === 'invoice' ? currentDocData.invoice_number : currentDocData.quote_number;
+  html2pdf().set({ margin:10, filename:`${num}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} }).from(el).save();
+}
+
+function sendByEmail() {
+  if (!currentDocData) return;
+  const isInv = currentDocType === 'invoice';
+  const num   = isInv ? currentDocData.invoice_number : currentDocData.quote_number;
+  const email = currentDocData.clients?.email || '';
+  const subj  = encodeURIComponent(`${isInv?'Invoice':'Quotation'} ${num} – Paytech Consulting Solutions`);
+  const body  = encodeURIComponent(`Dear ${currentDocData.clients?.company_name||'Client'},\n\nPlease see attached ${isInv?'invoice':'quotation'} ${num} for R ${Number(currentDocData.total||0).toFixed(2)}.\n\nKind regards,\nPaytech Consulting Solutions\ninfo@paytech.org.za | 082 440 1937`);
+  window.open(`mailto:${email}?subject=${subj}&body=${body}`);
+  toast('Email client opened', 'success');
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+function updateDashboard() {
+  const now = new Date();
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const monthInvoices = invoices.filter(i => (i.invoice_date||'').startsWith(thisMonth));
+  document.getElementById('stat-clients').textContent  = clients.length;
+  document.getElementById('stat-invoices').textContent = monthInvoices.length;
+  document.getElementById('stat-pending').textContent  = invoices.filter(i=>i.status==='Sent'||i.status==='Overdue').length;
+  document.getElementById('stat-quotes').textContent   = quotes.filter(q=>(q.quote_date||'').startsWith(thisMonth)).length;
+
+  const dashInv = document.getElementById('dash-invoices');
+  const recent  = invoices.slice(0,6);
+  dashInv.innerHTML = recent.length ? recent.map(i=>`
+    <tr>
+      <td>${i.clients?.company_name||'?'}</td>
+      <td>R ${Number(i.total||0).toFixed(2)}</td>
+      <td><span class="badge ${statusBadge(i.status)}">${i.status}</span></td>
+      <td>${i.invoice_date ? new Date(i.invoice_date).toLocaleDateString('en-ZA') : '-'}</td>
+    </tr>`).join('') : `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:2rem;">No invoices yet</td></tr>`;
+}
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function populateClientDropdowns() {
+  ['inv-client','qt-client'].forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">-- Select Client --</option>' +
+      clients.map(c=>`<option value="${c.id}">${c.company_name}</option>`).join('');
+    sel.value = cur;
+  });
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => { if (n.textContent.toLowerCase().includes(name.toLowerCase().slice(0,4))) n.classList.add('active'); });
+  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule' };
+  document.getElementById('page-title').textContent = titles[name] || name;
+  if (name === 'schedule') loadSchedule();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function statusBadge(s) {
+  return { 'Paid':'badge-green','Draft':'badge-gray','Sent':'badge-blue','Overdue':'badge-red','Accepted':'badge-green','Declined':'badge-red' }[s] || 'badge-gray';
+}
+
+function nextNumber(prefix, existing) {
+  const nums = existing.map(n => parseInt((n||'').replace(/\D/g,''))||0);
+  const max  = nums.length ? Math.max(...nums) : 0;
+  return `${prefix}-${String(max+1).padStart(3,'0')}`;
+}
+
+function setDefaultDates() {
+  const today = new Date().toISOString().split('T')[0];
+  const due   = new Date(Date.now()+30*864e5).toISOString().split('T')[0];
+  const valid = new Date(Date.now()+14*864e5).toISOString().split('T')[0];
+  ['inv-date','qt-date'].forEach(f => { const el=document.getElementById(f); if(el) el.value=today; });
+  const invDue = document.getElementById('inv-due'); if(invDue) invDue.value = due;
+  const qtVal  = document.getElementById('qt-valid'); if(qtVal) qtVal.value = valid;
+  const period = document.getElementById('inv-period');
+  if (period) period.value = new Date().toLocaleString('default',{month:'long',year:'numeric'});
+}
+
+function previewDocument(type) {
+  if (type === 'invoice') {
+    const clientId = document.getElementById('inv-client').value;
+    const c = clients.find(x=>x.id===clientId);
+    const sub = invLines.reduce((s,l)=>s+l.qty*l.price,0);
+    const doc = {
+      invoice_number: document.getElementById('inv-number').value,
+      invoice_date:   document.getElementById('inv-date').value,
+      due_date:       document.getElementById('inv-due').value,
+      period:         document.getElementById('inv-period').value,
+      subtotal: sub, vat: sub*0.15, total: sub*1.15,
+      line_items: JSON.stringify(invLines),
+      notes: document.getElementById('inv-notes').value,
+      clients: c ? { company_name: c.company_name, email: c.email, address: c.address, vat_number: c.vat_number } : null,
+    };
+    currentDocType = 'invoice'; currentDocData = doc;
+    renderDocPreview(doc, 'INVOICE');
+  } else {
+    const clientId = document.getElementById('qt-client').value;
+    const c = clients.find(x=>x.id===clientId);
+    const sub = qtLines.reduce((s,l)=>s+l.qty*l.price,0);
+    const doc = {
+      quote_number: document.getElementById('qt-number').value,
+      quote_date:   document.getElementById('qt-date').value,
+      valid_until:  document.getElementById('qt-valid').value,
+      subtotal: sub, vat: sub*0.15, total: sub*1.15,
+      line_items: JSON.stringify(qtLines),
+      notes: document.getElementById('qt-notes').value,
+      clients: c ? { company_name: c.company_name, email: c.email, address: c.address, vat_number: c.vat_number } : null,
+    };
+    currentDocType = 'quote'; currentDocData = doc;
+    renderDocPreview(doc, 'QUOTATION');
+  }
+  openModal('preview-modal');
+  document.getElementById('preview-title').textContent = type === 'invoice' ? 'Invoice Preview' : 'Quote Preview';
+}
+
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' '+type : '');
+  setTimeout(() => el.className = '', 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Paytech Consulting Solutions</title>
+  <link rel="icon" type="image/png" href="../Current LOGO/After Canva/paytech-icon-transparent.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Quicksand:wght@700&display=swap');
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --navy: #1B2048; --navy-dark: #0f1530;
+      --green: #3AAB5C; --green-dim: #5dc97b;
+      --white: #e8eef6;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--navy-dark) 0%, #1a2340 50%, #0d1525 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    /* Animated background rings */
+    body::before {
+      content: ''; position: absolute;
+      width: 600px; height: 600px; border-radius: 50%;
+      border: 1px solid rgba(58,171,92,0.08);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: pulse 4s ease-in-out infinite;
+    }
+    body::after {
+      content: ''; position: absolute;
+      width: 900px; height: 900px; border-radius: 50%;
+      border: 1px solid rgba(58,171,92,0.05);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: pulse 4s ease-in-out 1s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.5; }
+      50%      { transform: translate(-50%,-50%) scale(1.05); opacity: 1; }
+    }
+    .card {
+      background: rgba(255,255,255,0.97);
+      border-radius: 24px;
+      padding: 3rem 2.8rem;
+      width: 420px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      position: relative; z-index: 10;
+      animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .logo-wrap {
+      text-align: center; margin-bottom: 2rem;
+    }
+    .logo-wrap img {
+      height: 52px;
+      background: var(--navy-dark);
+      border-radius: 999px;
+      padding: 8px 20px;
+    }
+    h1 { font-size: 1.6rem; font-weight: 800; color: var(--navy); text-align: center; margin-bottom: 0.3rem; }
+    .sub { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-bottom: 2rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+    label { font-size: 0.78rem; font-weight: 600; color: #475569; }
+    input {
+      padding: 0.75rem 1rem; border: 1.5px solid #e2e8f0;
+      border-radius: 9px; font-size: 0.9rem; outline: none;
+      transition: border-color 0.2s; font-family: inherit; color: #1e293b;
+    }
+    input:focus { border-color: var(--green); }
+
+    .btn {
+      width: 100%; padding: 0.85rem; border: none; border-radius: 9px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      background: var(--green); color: white;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem; font-family: inherit;
+    }
+    .btn:hover { background: var(--green-dim); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .error {
+      background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;
+      border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.82rem;
+      margin-top: 0.8rem; display: none;
+    }
+    .back-link {
+      display: block; text-align: center; margin-top: 1.5rem;
+      color: #94a3b8; font-size: 0.8rem; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--green); }
+    .loading { display: none; text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-wrap">
+      <img src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" />
+    </div>
+    <h1>Welcome Back</h1>
+    <p class="sub">Sign in to your Paytech account</p>
+
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="your@email.co.za" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button class="btn" id="login-btn" onclick="handleLogin()">Sign In</button>
+    <div class="error" id="error-msg"></div>
+    <div class="loading" id="loading">Signing you in...</div>
+
+    <a class="back-link" href="../index.html">← Back to website</a>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://ehulmwyzqozxzykemhgp.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodWxtd3l6cW96eHp5a2VtaGdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDY0NjcsImV4cCI6MjA5NTI4MjQ2N30.JdJn-ADMiXSmrSeNAdI2CFtZhWtV7q_qTtVGx_mNWQQ';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // If already logged in, redirect immediately
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session) redirectByRole(session.user.id);
+    });
+
+    document.getElementById('password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    async function handleLogin() {
+      const email = document.getElementById('email').value.trim();
+      const pw    = document.getElementById('password').value;
+      const err   = document.getElementById('error-msg');
+      const btn   = document.getElementById('login-btn');
+      const load  = document.getElementById('loading');
+
+      err.style.display = 'none';
+      btn.disabled = true;
+      load.style.display = 'block';
+
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+      if (error) {
+        err.textContent = 'Invalid email or password. Please try again.';
+        err.style.display = 'block';
+        btn.disabled = false;
+        load.style.display = 'none';
+        return;
+      }
+      await redirectByRole(data.user.id);
+    }
+
+    async function redirectByRole(userId) {
+      const { data } = await sb.from('user_roles').select('role').eq('user_id', userId).single();
+      const role = data?.role || 'client';
+      if (role === 'admin')      window.location.href = '../admin/';
+      else if (role === 'consultant') window.location.href = '../consultant/';
+      else                        window.location.href = '../portal/';
+    }
+  </script>
+</body>
+</html>

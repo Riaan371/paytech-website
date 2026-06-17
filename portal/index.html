@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Invoices | Paytech Client Portal</title>
+  <link rel="icon" type="image/png" href="../Current LOGO/After Canva/paytech-icon-transparent.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --navy:#1B2048; --navy-dark:#0f1530; --green:#3AAB5C; --green-dim:#5dc97b;
+      --green-light:#e8f7ed; --gray-50:#f8fafc; --gray-100:#f1f5f9;
+      --gray-200:#e2e8f0; --gray-400:#94a3b8; --gray-600:#475569; --gray-800:#1e293b;
+      --shadow:0 1px 3px rgba(0,0,0,0.08); --shadow-md:0 4px 16px rgba(0,0,0,0.08);
+    }
+    body { font-family:'Inter',sans-serif; background:var(--gray-50); color:var(--gray-800); min-height:100vh; }
+
+    /* TOP NAV */
+    .topnav {
+      background:var(--navy-dark); padding:1rem 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 2px 12px rgba(0,0,0,0.3);
+    }
+    .topnav img { height:34px; background:white; border-radius:999px; padding:4px 12px; }
+    .topnav-right { display:flex; align-items:center; gap:1rem; }
+    .user-chip {
+      display:flex; align-items:center; gap:0.6rem;
+      color:rgba(255,255,255,0.8); font-size:0.85rem;
+    }
+    .user-avatar {
+      width:32px; height:32px; border-radius:50%;
+      background:var(--green); display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:0.8rem; color:white;
+    }
+    .btn-logout {
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.6); padding:0.4rem 1rem; border-radius:6px;
+      font-size:0.78rem; cursor:pointer; transition:all 0.2s; font-family:inherit;
+    }
+    .btn-logout:hover { background:rgba(239,68,68,0.2); color:#fca5a5; border-color:rgba(239,68,68,0.3); }
+
+    /* HERO BANNER */
+    .portal-hero {
+      background:linear-gradient(135deg,var(--navy) 0%,#243060 100%);
+      padding:2.5rem 2rem; color:white; text-align:center;
+    }
+    .portal-hero h1 { font-size:1.6rem; font-weight:800; margin-bottom:0.3rem; }
+    .portal-hero p  { color:rgba(255,255,255,0.6); font-size:0.9rem; }
+
+    /* STATS */
+    .stats-row {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;
+      max-width:900px; margin:-1.2rem auto 0; padding:0 1.5rem;
+      position:relative; z-index:10;
+    }
+    .stat-card {
+      background:white; border-radius:12px; padding:1.2rem 1.4rem;
+      box-shadow:var(--shadow-md); border-top:3px solid transparent;
+      text-align:center;
+    }
+    .stat-card.green { border-color:var(--green); }
+    .stat-card.amber { border-color:#f59e0b; }
+    .stat-card.blue  { border-color:#3b82f6; }
+    .stat-val  { font-size:1.8rem; font-weight:800; color:var(--navy); }
+    .stat-lbl  { font-size:0.72rem; color:var(--gray-400); font-weight:600; text-transform:uppercase; letter-spacing:0.06em; margin-top:0.2rem; }
+
+    /* MAIN */
+    .main { max-width:960px; margin:2rem auto; padding:0 1.5rem 4rem; }
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+    .section-title { font-size:1.1rem; font-weight:700; color:var(--navy); }
+
+    .card { background:white; border-radius:12px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:1.5rem; }
+    .card-header { padding:1rem 1.4rem; border-bottom:1px solid var(--gray-100); display:flex; align-items:center; justify-content:space-between; }
+    .card-title  { font-size:0.95rem; font-weight:700; color:var(--navy); }
+
+    table { width:100%; border-collapse:collapse; }
+    th { text-align:left; font-size:0.68rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--gray-400); padding:0.75rem 1.2rem; background:var(--gray-50); border-bottom:1px solid var(--gray-100); }
+    td { padding:0.85rem 1.2rem; border-bottom:1px solid var(--gray-100); font-size:0.875rem; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--gray-50); }
+
+    .badge { display:inline-block; padding:0.2rem 0.7rem; border-radius:999px; font-size:0.7rem; font-weight:600; }
+    .badge-green { background:#dcfce7; color:#166534; }
+    .badge-amber { background:#fef3c7; color:#92400e; }
+    .badge-red   { background:#fee2e2; color:#991b1b; }
+    .badge-blue  { background:#dbeafe; color:#1e40af; }
+    .badge-gray  { background:var(--gray-100); color:var(--gray-600); }
+
+    .btn { display:inline-flex; align-items:center; gap:0.35rem; padding:0.45rem 1rem; border-radius:7px; font-size:0.8rem; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; font-family:inherit; }
+    .btn-primary { background:var(--green); color:white; }
+    .btn-primary:hover { background:var(--green-dim); }
+    .btn-outline { background:white; color:var(--navy); border:1.5px solid var(--gray-200); }
+    .btn-outline:hover { border-color:var(--green); color:var(--green); }
+    .btn-danger  { background:#ef4444; color:white; }
+
+    /* MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+    .modal-overlay.open { display:flex; }
+    .modal { background:white; border-radius:16px; padding:2rem; width:90%; max-width:580px; max-height:90vh; overflow-y:auto; box-shadow:0 25px 60px rgba(0,0,0,0.2); }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.4rem; }
+    .modal-title  { font-size:1.05rem; font-weight:700; color:var(--navy); }
+    .modal-close  { width:30px; height:30px; border-radius:50%; border:none; background:var(--gray-100); cursor:pointer; font-size:0.9rem; display:flex; align-items:center; justify-content:center; }
+    .modal-footer { margin-top:1.4rem; display:flex; gap:0.75rem; justify-content:flex-end; }
+    .form-group   { display:flex; flex-direction:column; gap:0.35rem; margin-bottom:1rem; }
+    label  { font-size:0.78rem; font-weight:600; color:var(--gray-600); }
+    input, select, textarea { padding:0.6rem 0.9rem; border:1.5px solid var(--gray-200); border-radius:7px; font-size:0.875rem; font-family:inherit; color:var(--gray-800); outline:none; transition:border-color 0.2s; width:100%; }
+    input:focus, textarea:focus, select:focus { border-color:var(--green); }
+    textarea { resize:vertical; min-height:100px; }
+
+    /* INVOICE PREVIEW */
+    #inv-preview-content { font-family:'Inter',sans-serif; padding:2rem; }
+    .doc-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2rem; }
+    .doc-type   { font-size:1.8rem; font-weight:800; color:var(--navy); }
+    .doc-number { font-size:0.85rem; color:var(--gray-400); }
+    .doc-meta   { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .doc-meta h4 { font-size:0.65rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-400); margin-bottom:0.4rem; }
+    .doc-meta p  { font-size:0.875rem; line-height:1.6; }
+    .doc-table   { width:100%; border-collapse:collapse; margin-bottom:1.2rem; }
+    .doc-table th { background:var(--navy); color:white; padding:0.6rem 0.9rem; font-size:0.75rem; text-align:left; }
+    .doc-table td { padding:0.6rem 0.9rem; border-bottom:1px solid var(--gray-100); font-size:0.85rem; }
+    .doc-totals  { margin-left:auto; width:240px; }
+    .doc-total-row { display:flex; justify-content:space-between; padding:0.35rem 0; font-size:0.85rem; }
+    .doc-total-row.grand { font-weight:800; font-size:0.95rem; color:var(--navy); border-top:2px solid var(--navy); padding-top:0.5rem; margin-top:0.3rem; }
+    .doc-footer { margin-top:2rem; padding-top:1rem; border-top:1px solid var(--gray-200); font-size:0.75rem; color:var(--gray-400); text-align:center; }
+
+    .empty-state { text-align:center; padding:3rem; color:var(--gray-400); }
+    .empty-icon  { font-size:2.5rem; margin-bottom:0.6rem; }
+
+    /* Query status colours */
+    .query-open     { border-left:3px solid #f59e0b; }
+    .query-progress { border-left:3px solid #3b82f6; }
+    .query-resolved { border-left:3px solid var(--green); }
+
+    #toast { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; background:var(--navy); color:white; padding:0.8rem 1.4rem; border-radius:9px; font-size:0.875rem; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.2); transform:translateY(80px); opacity:0; transition:all 0.3s; pointer-events:none; }
+    #toast.show    { transform:translateY(0); opacity:1; }
+    #toast.success { background:var(--green); }
+    #toast.error   { background:#ef4444; }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <img src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" />
+  <div class="topnav-right">
+    <div class="user-chip">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <span id="user-name">Loading...</span>
+    </div>
+    <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="portal-hero">
+  <h1 id="company-name">Your Invoices</h1>
+  <p id="company-sub">Paytech Consulting Solutions — Client Portal</p>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card green"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">Total Invoices</div></div>
+  <div class="stat-card amber"><div class="stat-val" id="stat-pending">0</div><div class="stat-lbl">Awaiting Payment</div></div>
+  <div class="stat-card blue"><div class="stat-val" id="stat-queries">0</div><div class="stat-lbl">Open Queries</div></div>
+</div>
+
+<div class="main">
+
+  <!-- INVOICES -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📄 My Invoices</div>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Period</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="inv-tbody">
+        <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🧾</div><p>Loading invoices...</p></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QUERIES -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">💬 My Queries</div>
+    </div>
+    <div id="queries-list" style="padding:1rem;">
+      <div class="empty-state"><div class="empty-icon">💬</div><p>No queries logged yet.</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- INVOICE PREVIEW MODAL -->
+<div class="modal-overlay" id="inv-modal">
+  <div class="modal" style="max-width:760px;">
+    <div class="modal-header">
+      <div class="modal-title" id="inv-modal-title">Invoice</div>
+      <button class="modal-close" onclick="closeModal('inv-modal')">✕</button>
+    </div>
+    <div id="inv-preview-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('inv-modal')">Close</button>
+      <button class="btn btn-outline" onclick="downloadInv()">⬇ Download PDF</button>
+      <button class="btn btn-primary" onclick="openQueryModal(currentInvId)">💬 Log a Query</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUERY MODAL -->
+<div class="modal-overlay" id="query-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Log a Query</div>
+      <button class="modal-close" onclick="closeModal('query-modal')">✕</button>
+    </div>
+    <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:1.2rem;">Invoice: <strong id="query-inv-num"></strong></p>
+    <div class="form-group"><label>Subject *</label><input id="q-subject" placeholder="e.g. Incorrect amount on invoice" /></div>
+    <div class="form-group"><label>Message *</label><textarea id="q-message" placeholder="Please describe your query in detail..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('query-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitQuery()">📤 Submit Query</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://ehulmwyzqozxzykemhgp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodWxtd3l6cW96eHp5a2VtaGdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDY0NjcsImV4cCI6MjA5NTI4MjQ2N30.JdJn-ADMiXSmrSeNAdI2CFtZhWtV7q_qTtVGx_mNWQQ';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let clientId = null, invoices = [], queries = [], currentInvId = null, currentInv = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '../login/'; return; }
+
+  const user = session.user;
+  document.getElementById('user-name').textContent = user.email.split('@')[0];
+  document.getElementById('user-avatar').textContent = user.email[0].toUpperCase();
+
+  // Get role + client_id
+  const { data: roleData } = await sb.from('user_roles').select('role, client_id').eq('user_id', user.id).single();
+  if (!roleData || roleData.role !== 'client') { window.location.href = '../login/'; return; }
+  clientId = roleData.client_id;
+
+  // Load client info
+  const { data: client } = await sb.from('clients').select('*').eq('id', clientId).single();
+  if (client) {
+    document.getElementById('company-name').textContent = client.company_name;
+    document.getElementById('company-sub').textContent = `${client.service_type} · Paytech Client Portal`;
+  }
+
+  await loadInvoices();
+  await loadQueries();
+});
+
+async function loadInvoices() {
+  const { data } = await sb.from('invoices').select('*').eq('client_id', clientId).order('invoice_date', { ascending: false });
+  invoices = data || [];
+  document.getElementById('stat-total').textContent   = invoices.length;
+  document.getElementById('stat-pending').textContent = invoices.filter(i => i.status === 'Sent' || i.status === 'Overdue').length;
+  renderInvoices();
+}
+
+function renderInvoices() {
+  const tbody = document.getElementById('inv-tbody');
+  if (!invoices.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🧾</div><p>No invoices yet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = invoices.map(i => `
+    <tr>
+      <td><strong>${i.invoice_number}</strong></td>
+      <td>${i.period || '-'}</td>
+      <td><strong>R ${Number(i.total||0).toFixed(2)}</strong></td>
+      <td>${i.due_date ? new Date(i.due_date).toLocaleDateString('en-ZA') : '-'}</td>
+      <td><span class="badge ${statusBadge(i.status)}">${i.status}</span></td>
+      <td style="display:flex;gap:0.5rem;">
+        <button class="btn btn-outline" onclick="viewInvoice('${i.id}')">👁 View</button>
+        <button class="btn btn-primary" onclick="openQueryModal('${i.id}')">💬 Query</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function loadQueries() {
+  const { data } = await sb.from('invoice_queries').select('*, invoices(invoice_number)').eq('client_id', clientId).order('created_at', { ascending: false });
+  queries = data || [];
+  document.getElementById('stat-queries').textContent = queries.filter(q => q.status === 'Open').length;
+  renderQueries();
+}
+
+function renderQueries() {
+  const el = document.getElementById('queries-list');
+  if (!queries.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>No queries logged yet. You can log a query from any invoice.</p></div>`;
+    return;
+  }
+  el.innerHTML = queries.map(q => `
+    <div style="border:1px solid #e2e8f0;border-radius:10px;padding:1rem;margin-bottom:0.8rem;" class="query-${q.status==='Open'?'open':q.status==='In Progress'?'progress':'resolved'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+        <strong style="font-size:0.9rem;">${q.subject}</strong>
+        <span class="badge ${q.status==='Open'?'badge-amber':q.status==='In Progress'?'badge-blue':'badge-green'}">${q.status}</span>
+      </div>
+      <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.5rem;">Invoice ${q.invoices?.invoice_number||'?'} · ${new Date(q.created_at).toLocaleDateString('en-ZA')}</div>
+      <div style="font-size:0.85rem;color:#475569;">${q.message}</div>
+      ${q.admin_reply ? `<div style="margin-top:0.7rem;padding:0.7rem;background:#f0fdf4;border-radius:7px;border-left:3px solid var(--green);font-size:0.82rem;"><strong style="color:var(--green);">Paytech Reply:</strong><br>${q.admin_reply}</div>` : ''}
+    </div>`).join('');
+}
+
+function viewInvoice(id) {
+  currentInvId = id;
+  currentInv   = invoices.find(i => i.id === id);
+  if (!currentInv) return;
+  renderInvoicePreview(currentInv);
+  document.getElementById('inv-modal-title').textContent = `Invoice ${currentInv.invoice_number}`;
+  openModal('inv-modal');
+}
+
+function renderInvoicePreview(inv) {
+  const lines = JSON.parse(inv.line_items || '[]');
+  document.getElementById('inv-preview-content').innerHTML = `
+    <div class="doc-header">
+      <img src="../Current LOGO/After Canva/paytech-full-logo.png" style="height:44px;background:white;border-radius:999px;padding:4px 14px;border:1px solid #e2e8f0;">
+      <div style="text-align:right;">
+        <div class="doc-type">INVOICE</div>
+        <div class="doc-number">${inv.invoice_number}</div>
+        <div class="doc-number">Date: ${inv.invoice_date ? new Date(inv.invoice_date).toLocaleDateString('en-ZA') : '-'}</div>
+      </div>
+    </div>
+    <div class="doc-meta">
+      <div><h4>From</h4><p><strong>Paytech Consulting Solutions</strong><br>info@paytech.org.za<br>082 440 1937</p></div>
+      <div><h4>Period</h4><p><strong>${inv.period||'-'}</strong><br>Due: ${inv.due_date ? new Date(inv.due_date).toLocaleDateString('en-ZA') : '-'}<br><span class="badge ${statusBadge(inv.status)}">${inv.status}</span></p></div>
+    </div>
+    <table class="doc-table">
+      <thead><tr><th style="width:55%">Description</th><th>Qty</th><th>Unit Price</th><th style="text-align:right">Amount</th></tr></thead>
+      <tbody>${lines.map(l=>`<tr><td>${l.desc}</td><td>${l.qty}</td><td>R ${Number(l.price).toFixed(2)}</td><td style="text-align:right">R ${(l.qty*l.price).toFixed(2)}</td></tr>`).join('')}</tbody>
+    </table>
+    <div class="doc-totals">
+      <div class="doc-total-row"><span>Subtotal:</span><span>R ${Number(inv.subtotal||0).toFixed(2)}</span></div>
+      <div class="doc-total-row"><span>VAT (15%):</span><span>R ${Number(inv.vat||0).toFixed(2)}</span></div>
+      <div class="doc-total-row grand"><span>TOTAL DUE:</span><span>R ${Number(inv.total||0).toFixed(2)}</span></div>
+    </div>
+    ${inv.notes ? `<div style="margin-top:1.2rem;padding:0.9rem;background:#f8fafc;border-radius:8px;font-size:0.8rem;color:#475569;white-space:pre-line;">${inv.notes}</div>` : ''}
+    <div class="doc-footer">Paytech Consulting Solutions · info@paytech.org.za · 082 440 1937<br>South Africa's Payroll Specialists · PaySpace & Deel Local Certified</div>`;
+}
+
+function downloadInv() {
+  if (!currentInv) return;
+  html2pdf().set({ margin:10, filename:`${currentInv.invoice_number}.pdf`, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4'} })
+    .from(document.getElementById('inv-preview-content')).save();
+}
+
+function openQueryModal(invId) {
+  currentInvId = invId;
+  const inv = invoices.find(i => i.id === invId);
+  document.getElementById('query-inv-num').textContent = inv?.invoice_number || invId;
+  document.getElementById('q-subject').value = '';
+  document.getElementById('q-message').value = '';
+  closeModal('inv-modal');
+  openModal('query-modal');
+}
+
+async function submitQuery() {
+  const subject = document.getElementById('q-subject').value.trim();
+  const message = document.getElementById('q-message').value.trim();
+  if (!subject || !message) return toast('Please fill in all fields', 'error');
+  const { error } = await sb.from('invoice_queries').insert({
+    invoice_id: currentInvId, client_id: clientId,
+    user_id: (await sb.auth.getUser()).data.user.id,
+    subject, message, status: 'Open'
+  });
+  if (error) return toast(error.message, 'error');
+  closeModal('query-modal');
+  toast('Query submitted! We will respond shortly.', 'success');
+  await loadQueries();
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  window.location.href = '../login/';
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function statusBadge(s) { return {Paid:'badge-green',Draft:'badge-gray',Sent:'badge-blue',Overdue:'badge-red'}[s]||'badge-gray'; }
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show'+(type?' '+type:'');
+  setTimeout(()=>el.className='', 3200);
+}
+</script>
+</body>
+</html>

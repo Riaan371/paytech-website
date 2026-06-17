@@ -153,6 +153,21 @@ nav {
   color: var(--navy-dark) !important;
 }
 
+.nav-login {
+  border: 1.5px solid rgba(255,255,255,0.25) !important;
+  color: rgba(255,255,255,0.75) !important;
+  padding: 0.4rem 1.1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.82rem !important;
+  transition: background 0.2s, color 0.2s, border-color 0.2s !important;
+}
+.nav-login:hover {
+  background: rgba(255,255,255,0.1) !important;
+  color: white !important;
+  border-color: rgba(255,255,255,0.5) !important;
+}
+
 /* ── ANIMATION D: Rise up ── */
 @keyframes riseUp {
   0%   { opacity: 0; transform: translateY(32px); filter: blur(14px); }

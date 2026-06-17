@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consultant Portal | Paytech</title>
+  <link rel="icon" type="image/png" href="../Current LOGO/After Canva/paytech-icon-transparent.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --navy:#1B2048; --navy-dark:#0f1530; --green:#3AAB5C; --green-dim:#5dc97b;
+      --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0;
+      --gray-400:#94a3b8; --gray-600:#475569; --gray-800:#1e293b;
+      --shadow:0 1px 3px rgba(0,0,0,0.08); --shadow-md:0 4px 16px rgba(0,0,0,0.08);
+    }
+    body { font-family:'Inter',sans-serif; background:var(--gray-50); min-height:100vh; display:flex; }
+
+    /* SIDEBAR */
+    #sidebar { width:220px; min-height:100vh; background:var(--navy-dark); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; }
+    .sidebar-logo { padding:1.3rem 1rem; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .sidebar-logo img { height:30px; background:white; border-radius:999px; padding:4px 10px; }
+    .sidebar-label { font-size:0.58rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.3); padding:1rem 1rem 0.3rem; }
+    nav.snav { flex:1; padding:0.4rem 0.6rem; }
+    .nav-item { display:flex; align-items:center; gap:0.65rem; padding:0.65rem 0.85rem; border-radius:7px; color:rgba(255,255,255,0.6); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; margin-bottom:2px; }
+    .nav-item:hover { background:rgba(255,255,255,0.06); color:white; }
+    .nav-item.active { background:var(--green); color:white; }
+    .sidebar-footer { padding:1rem; border-top:1px solid rgba(255,255,255,0.08); }
+    .user-info { color:rgba(255,255,255,0.7); font-size:0.78rem; margin-bottom:0.5rem; }
+    .user-name { font-weight:600; color:white; }
+    #btn-logout { width:100%; padding:0.45rem; background:rgba(255,255,255,0.06); border:none; border-radius:6px; color:rgba(255,255,255,0.5); font-size:0.75rem; cursor:pointer; transition:background 0.2s; font-family:inherit; }
+    #btn-logout:hover { background:rgba(239,68,68,0.2); color:#fca5a5; }
+
+    /* MAIN */
+    #main { margin-left:220px; flex:1; min-height:100vh; }
+    .topbar { background:white; border-bottom:1px solid var(--gray-200); padding:1rem 1.8rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; box-shadow:var(--shadow); }
+    .topbar-title { font-size:1.1rem; font-weight:700; color:var(--navy); }
+
+    /* CLIENT SELECTOR */
+    .client-selector { background:white; border-radius:12px; box-shadow:var(--shadow-md); padding:1.4rem 1.8rem; margin:1.5rem; display:flex; align-items:center; gap:1rem; }
+    .client-selector label { font-size:0.82rem; font-weight:700; color:var(--navy); white-space:nowrap; }
+    .client-selector select { flex:1; padding:0.65rem 1rem; border:1.5px solid var(--gray-200); border-radius:8px; font-size:0.9rem; font-family:inherit; outline:none; color:var(--gray-800); }
+    .client-selector select:focus { border-color:var(--green); }
+
+    .page { display:none; padding:0 1.8rem 3rem; }
+    .page.active { display:block; }
+
+    .card { background:white; border-radius:12px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:1.4rem; }
+    .card-header { padding:1rem 1.4rem; border-bottom:1px solid var(--gray-100); display:flex; align-items:center; justify-content:space-between; }
+    .card-title  { font-size:0.95rem; font-weight:700; color:var(--navy); }
+
+    table { width:100%; border-collapse:collapse; }
+    th { text-align:left; font-size:0.68rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--gray-400); padding:0.7rem 1.2rem; background:var(--gray-50); border-bottom:1px solid var(--gray-100); }
+    td { padding:0.82rem 1.2rem; border-bottom:1px solid var(--gray-100); font-size:0.875rem; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--gray-50); }
+
+    .badge { display:inline-block; padding:0.2rem 0.65rem; border-radius:999px; font-size:0.68rem; font-weight:600; }
+    .badge-green { background:#dcfce7; color:#166534; }
+    .badge-amber { background:#fef3c7; color:#92400e; }
+    .badge-red   { background:#fee2e2; color:#991b1b; }
+    .badge-blue  { background:#dbeafe; color:#1e40af; }
+    .badge-gray  { background:var(--gray-100); color:var(--gray-600); }
+
+    .btn { display:inline-flex; align-items:center; gap:0.35rem; padding:0.45rem 1rem; border-radius:7px; font-size:0.8rem; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; font-family:inherit; white-space:nowrap; }
+    .btn-primary { background:var(--green); color:white; }
+    .btn-primary:hover { background:var(--green-dim); }
+    .btn-outline { background:white; color:var(--navy); border:1.5px solid var(--gray-200); }
+    .btn-outline:hover { border-color:var(--green); color:var(--green); }
+    .btn-danger  { background:#ef4444; color:white; }
+    .btn-sm { padding:0.32rem 0.7rem; font-size:0.75rem; }
+
+    /* MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+    .modal-overlay.open { display:flex; }
+    .modal { background:white; border-radius:16px; padding:2rem; width:90%; max-width:660px; max-height:90vh; overflow-y:auto; box-shadow:0 25px 60px rgba(0,0,0,0.25); }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.4rem; }
+    .modal-title  { font-size:1.05rem; font-weight:700; color:var(--navy); }
+    .modal-close  { width:30px; height:30px; border-radius:50%; border:none; background:var(--gray-100); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .modal-footer { margin-top:1.4rem; display:flex; gap:0.75rem; justify-content:flex-end; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    .form-group { display:flex; flex-direction:column; gap:0.32rem; }
+    .form-group.full { grid-column:1/-1; }
+    label { font-size:0.76rem; font-weight:600; color:var(--gray-600); }
+    input, select, textarea { padding:0.55rem 0.85rem; border:1.5px solid var(--gray-200); border-radius:7px; font-size:0.875rem; font-family:inherit; color:var(--gray-800); outline:none; transition:border-color 0.2s; width:100%; }
+    input:focus, select:focus, textarea:focus { border-color:var(--green); }
+    textarea { resize:vertical; min-height:75px; }
+
+    .line-items-table { width:100%; border-collapse:collapse; }
+    .line-items-table th { padding:0.4rem 0.5rem; text-align:left; font-size:0.7rem; color:var(--gray-400); border-bottom:1px solid var(--gray-200); }
+    .line-items-table td { padding:0.35rem 0.4rem; }
+    .line-items-table input { padding:0.35rem 0.55rem; font-size:0.82rem; }
+
+    .empty-state { text-align:center; padding:2.5rem; color:var(--gray-400); }
+    .empty-icon  { font-size:2rem; margin-bottom:0.5rem; }
+
+    /* Query badge in invoices table */
+    .query-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#f59e0b; margin-right:4px; }
+
+    #toast { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; background:var(--navy); color:white; padding:0.8rem 1.4rem; border-radius:9px; font-size:0.875rem; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.2); transform:translateY(80px); opacity:0; transition:all 0.3s; pointer-events:none; }
+    #toast.show    { transform:translateY(0); opacity:1; }
+    #toast.success { background:var(--green); }
+    #toast.error   { background:#ef4444; }
+
+    /* Client info card */
+    .client-info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; padding:1.2rem 1.4rem; }
+    .ci-item label { font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-400); display:block; margin-bottom:0.2rem; }
+    .ci-item span  { font-size:0.875rem; font-weight:600; color:var(--gray-800); }
+  </style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="sidebar-logo"><img src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" /></div>
+  <div class="sidebar-label">Consultant</div>
+  <nav class="snav">
+    <div class="nav-item active" onclick="showPage('invoices')"><span>🧾</span> Invoices</div>
+    <div class="nav-item" onclick="showPage('queries')"><span>💬</span> Client Queries</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">Logged in as<br><span class="user-name" id="user-name">—</span></div>
+    <button id="btn-logout" onclick="handleLogout()">⬅ Sign Out</button>
+  </div>
+</div>
+
+<div id="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Invoices</div>
+    <a href="../index.html" class="btn btn-outline btn-sm" target="_blank">🌐 Website</a>
+  </div>
+
+  <!-- CLIENT SELECTOR -->
+  <div class="client-selector">
+    <label>Select Client:</label>
+    <select id="client-select" onchange="onClientChange()">
+      <option value="">— Choose a client —</option>
+    </select>
+  </div>
+
+  <!-- CLIENT INFO STRIP -->
+  <div class="card" id="client-info-card" style="margin:0 1.8rem 1.2rem;display:none;">
+    <div class="client-info-grid" id="client-info-grid"></div>
+  </div>
+
+  <!-- INVOICES PAGE -->
+  <div class="page active" id="page-invoices">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+      <button class="btn btn-primary" id="new-inv-btn" onclick="openInvModal()" disabled>➕ New Invoice</button>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <thead><tr><th>#</th><th>Period</th><th>Amount</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="inv-tbody">
+            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👈</div><p>Select a client to view invoices</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUERIES PAGE -->
+  <div class="page" id="page-queries">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Client Queries</div></div>
+      <div id="queries-list" style="padding:1rem;">
+        <div class="empty-state"><div class="empty-icon">👈</div><p>Select a client to view their queries</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay" id="inv-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="inv-modal-title">Create Invoice</div>
+      <button class="modal-close" onclick="closeModal('inv-modal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Invoice Number</label><input id="inv-number" /></div>
+      <div class="form-group"><label>Period</label><input id="inv-period" /></div>
+      <div class="form-group"><label>Invoice Date</label><input id="inv-date" type="date" /></div>
+      <div class="form-group"><label>Due Date</label><input id="inv-due" type="date" /></div>
+      <div class="form-group"><label>Status</label>
+        <select id="inv-status"><option>Draft</option><option>Sent</option><option>Paid</option><option>Overdue</option></select>
+      </div>
+    </div>
+    <div style="margin:0.8rem 0;display:flex;justify-content:space-between;align-items:center;">
+      <strong style="font-size:0.85rem;">Line Items</strong>
+      <button class="btn btn-outline btn-sm" onclick="addLine()">+ Row</button>
+    </div>
+    <table class="line-items-table">
+      <thead><tr><th style="width:50%">Description</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead>
+      <tbody id="inv-lines"></tbody>
+    </table>
+    <div style="text-align:right;margin-top:0.8rem;font-size:0.85rem;">
+      Sub: <span id="inv-sub">R 0.00</span> &nbsp;|&nbsp; VAT: <span id="inv-vat">R 0.00</span> &nbsp;|&nbsp;
+      <strong style="font-size:1rem;color:var(--navy);">Total: <span id="inv-total">R 0.00</span></strong>
+    </div>
+    <div class="form-group full" style="margin-top:0.8rem;"><label>Notes / Payment Terms</label><textarea id="inv-notes"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('inv-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInvoice()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUERY REPLY MODAL -->
+<div class="modal-overlay" id="reply-modal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">Reply to Query</div>
+      <button class="modal-close" onclick="closeModal('reply-modal')">✕</button>
+    </div>
+    <div id="query-detail" style="background:var(--gray-50);border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:0.875rem;"></div>
+    <div class="form-group"><label>Your Reply</label><textarea id="reply-text" placeholder="Type your response..."></textarea></div>
+    <div class="form-group"><label>Update Status</label>
+      <select id="reply-status"><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Resolved">Resolved</option></select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('reply-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitReply()">📤 Send Reply</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://ehulmwyzqozxzykemhgp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodWxtd3l6cW96eHp5a2VtaGdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDY0NjcsImV4cCI6MjA5NTI4MjQ2N30.JdJn-ADMiXSmrSeNAdI2CFtZhWtV7q_qTtVGx_mNWQQ';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let myClients = [], selectedClientId = null, invoices = [], queries = [];
+let lines = [], currentQueryId = null, editingInvId = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '../login/'; return; }
+  const user = session.user;
+  document.getElementById('user-name').textContent = user.email;
+
+  const { data: role } = await sb.from('user_roles').select('role').eq('user_id', user.id).single();
+  if (!role || role.role === 'client') { window.location.href = '../portal/'; return; }
+  if (role.role === 'admin') { window.location.href = '../admin/'; return; }
+
+  // Load only assigned clients
+  const { data: cc } = await sb.from('consultant_clients').select('client_id').eq('consultant_id', user.id);
+  const ids = (cc||[]).map(r => r.client_id);
+  if (ids.length) {
+    const { data } = await sb.from('clients').select('*').in('id', ids).order('company_name');
+    myClients = data || [];
+  }
+  populateClientDropdown();
+  setDefaultDates();
+});
+
+function populateClientDropdown() {
+  const sel = document.getElementById('client-select');
+  sel.innerHTML = '<option value="">— Choose a client —</option>' +
+    myClients.map(c => `<option value="${c.id}">${c.company_name}</option>`).join('');
+}
+
+async function onClientChange() {
+  selectedClientId = document.getElementById('client-select').value;
+  if (!selectedClientId) {
+    document.getElementById('client-info-card').style.display = 'none';
+    document.getElementById('new-inv-btn').disabled = true;
+    return;
+  }
+  const client = myClients.find(c => c.id === selectedClientId);
+  if (client) showClientInfo(client);
+  document.getElementById('new-inv-btn').disabled = false;
+  await loadInvoices();
+  await loadQueries();
+}
+
+function showClientInfo(c) {
+  document.getElementById('client-info-card').style.display = 'block';
+  document.getElementById('client-info-grid').innerHTML = `
+    <div class="ci-item"><label>Company</label><span>${c.company_name}</span></div>
+    <div class="ci-item"><label>Contact</label><span>${c.contact_person||'-'}</span></div>
+    <div class="ci-item"><label>Email</label><span>${c.email||'-'}</span></div>
+    <div class="ci-item"><label>Service</label><span>${c.service_type||'-'}</span></div>
+    <div class="ci-item"><label>Monthly Fee</label><span>R ${Number(c.monthly_fee||0).toFixed(2)}</span></div>
+    <div class="ci-item"><label>Employees</label><span>${c.employees||'-'}</span></div>`;
+}
+
+async function loadInvoices() {
+  const { data } = await sb.from('invoices').select('*').eq('client_id', selectedClientId).order('invoice_date', { ascending: false });
+  invoices = data || [];
+  renderInvoices();
+}
+
+function renderInvoices() {
+  const tbody = document.getElementById('inv-tbody');
+  if (!invoices.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🧾</div><p>No invoices for this client yet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = invoices.map(i => `
+    <tr>
+      <td><strong>${i.invoice_number}</strong></td>
+      <td>${i.period||'-'}</td>
+      <td><strong>R ${Number(i.total||0).toFixed(2)}</strong></td>
+      <td>${i.due_date ? new Date(i.due_date).toLocaleDateString('en-ZA') : '-'}</td>
+      <td><span class="badge ${sbadge(i.status)}">${i.status}</span></td>
+      <td style="display:flex;gap:0.4rem;">
+        <button class="btn btn-outline btn-sm" onclick="editInvoice('${i.id}')">✏ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="markPaid('${i.id}')">✓ Paid</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function loadQueries() {
+  const { data } = await sb.from('invoice_queries').select('*, invoices(invoice_number)').eq('client_id', selectedClientId).order('created_at', { ascending: false });
+  queries = data || [];
+  renderQueries();
+}
+
+function renderQueries() {
+  const el = document.getElementById('queries-list');
+  if (!queries.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>No queries for this client.</p></div>`;
+    return;
+  }
+  el.innerHTML = queries.map(q => `
+    <div style="border:1px solid #e2e8f0;border-radius:10px;padding:1rem;margin-bottom:0.8rem;border-left:3px solid ${q.status==='Open'?'#f59e0b':q.status==='In Progress'?'#3b82f6':'#3AAB5C'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+        <strong style="font-size:0.9rem;">${q.subject}</strong>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <span class="badge ${q.status==='Open'?'badge-amber':q.status==='In Progress'?'badge-blue':'badge-green'}">${q.status}</span>
+          <button class="btn btn-outline btn-sm" onclick="openReply('${q.id}')">💬 Reply</button>
+        </div>
+      </div>
+      <div style="font-size:0.78rem;color:#94a3b8;margin-bottom:0.4rem;">Invoice ${q.invoices?.invoice_number||'?'} · ${new Date(q.created_at).toLocaleDateString('en-ZA')}</div>
+      <div style="font-size:0.85rem;color:#475569;">${q.message}</div>
+      ${q.admin_reply ? `<div style="margin-top:0.6rem;padding:0.6rem;background:#f0fdf4;border-radius:6px;font-size:0.8rem;border-left:2px solid var(--green);"><strong>Your reply:</strong> ${q.admin_reply}</div>` : ''}
+    </div>`).join('');
+}
+
+function openReply(queryId) {
+  currentQueryId = queryId;
+  const q = queries.find(x => x.id === queryId);
+  document.getElementById('query-detail').innerHTML = `<strong>${q.subject}</strong><br><span style="color:#94a3b8;font-size:0.8rem;">${q.message}</span>`;
+  document.getElementById('reply-text').value = q.admin_reply || '';
+  document.getElementById('reply-status').value = q.status;
+  openModal('reply-modal');
+}
+
+async function submitReply() {
+  const reply  = document.getElementById('reply-text').value.trim();
+  const status = document.getElementById('reply-status').value;
+  if (!reply) return toast('Please write a reply', 'error');
+  const { error } = await sb.from('invoice_queries').update({ admin_reply: reply, status, updated_at: new Date().toISOString() }).eq('id', currentQueryId);
+  if (error) return toast(error.message, 'error');
+  closeModal('reply-modal');
+  toast('Reply sent!', 'success');
+  await loadQueries();
+}
+
+// ── INVOICES ──
+let lines = [];
+
+function openInvModal() {
+  editingInvId = null;
+  lines = [{ desc: '', qty: 1, price: 0 }];
+  const client = myClients.find(c => c.id === selectedClientId);
+  if (client?.monthly_fee) lines = [{ desc: `${client.service_type} – ${new Date().toLocaleString('default',{month:'long',year:'numeric'})}`, qty: 1, price: client.monthly_fee }];
+  renderLines(); calcTotal();
+  document.getElementById('inv-modal-title').textContent = 'Create Invoice';
+  document.getElementById('inv-number').value = `INV-${String(invoices.length+1).padStart(3,'0')}`;
+  document.getElementById('inv-period').value = new Date().toLocaleString('default',{month:'long',year:'numeric'});
+  document.getElementById('inv-notes').value  = 'Payment due within 30 days.';
+  openModal('inv-modal');
+}
+
+function editInvoice(id) {
+  editingInvId = id;
+  const inv = invoices.find(i => i.id === id);
+  if (!inv) return;
+  lines = JSON.parse(inv.line_items || '[]');
+  renderLines(); calcTotal();
+  document.getElementById('inv-modal-title').textContent = 'Edit Invoice';
+  document.getElementById('inv-number').value = inv.invoice_number;
+  document.getElementById('inv-period').value  = inv.period || '';
+  document.getElementById('inv-date').value    = inv.invoice_date || '';
+  document.getElementById('inv-due').value     = inv.due_date || '';
+  document.getElementById('inv-status').value  = inv.status;
+  document.getElementById('inv-notes').value   = inv.notes || '';
+  openModal('inv-modal');
+}
+
+function addLine() { lines.push({desc:'',qty:1,price:0}); renderLines(); }
+function renderLines() {
+  document.getElementById('inv-lines').innerHTML = lines.map((l,i) => `
+    <tr>
+      <td><input value="${l.desc}" oninput="lines[${i}].desc=this.value" style="width:100%"></td>
+      <td><input type="number" value="${l.qty}" style="width:55px" oninput="lines[${i}].qty=+this.value;calcTotal()"></td>
+      <td><input type="number" value="${l.price}" style="width:85px" oninput="lines[${i}].price=+this.value;calcTotal()"></td>
+      <td style="font-size:0.82rem;">R ${(l.qty*l.price).toFixed(2)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="lines.splice(${i},1);renderLines();calcTotal()">✕</button></td>
+    </tr>`).join('');
+}
+function calcTotal() {
+  const sub = lines.reduce((s,l)=>s+l.qty*l.price,0);
+  document.getElementById('inv-sub').textContent   = `R ${sub.toFixed(2)}`;
+  document.getElementById('inv-vat').textContent   = `R ${(sub*0.15).toFixed(2)}`;
+  document.getElementById('inv-total').textContent = `R ${(sub*1.15).toFixed(2)}`;
+}
+
+async function saveInvoice() {
+  if (!selectedClientId) return toast('No client selected','error');
+  const sub = lines.reduce((s,l)=>s+l.qty*l.price,0);
+  const payload = {
+    client_id:      selectedClientId,
+    invoice_number: document.getElementById('inv-number').value,
+    period:         document.getElementById('inv-period').value,
+    invoice_date:   document.getElementById('inv-date').value,
+    due_date:       document.getElementById('inv-due').value,
+    status:         document.getElementById('inv-status').value,
+    subtotal: sub, vat: sub*0.15, total: sub*1.15,
+    line_items: JSON.stringify(lines),
+    notes: document.getElementById('inv-notes').value,
+  };
+  let error;
+  if (editingInvId) {
+    ({ error } = await sb.from('invoices').update(payload).eq('id', editingInvId));
+  } else {
+    ({ error } = await sb.from('invoices').insert(payload));
+  }
+  if (error) return toast(error.message,'error');
+  closeModal('inv-modal');
+  toast(editingInvId ? 'Invoice updated!' : 'Invoice created!','success');
+  await loadInvoices();
+}
+
+async function markPaid(id) {
+  await sb.from('invoices').update({status:'Paid'}).eq('id',id);
+  toast('Marked as paid','success');
+  await loadInvoices();
+}
+
+async function handleLogout() { await sb.auth.signOut(); window.location.href='../login/'; }
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  event.currentTarget.classList.add('active');
+  document.getElementById('page-title').textContent = {invoices:'Invoices',queries:'Client Queries'}[name]||name;
+}
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function sbadge(s) { return {Paid:'badge-green',Draft:'badge-gray',Sent:'badge-blue',Overdue:'badge-red'}[s]||'badge-gray'; }
+function setDefaultDates() {
+  const t = new Date().toISOString().split('T')[0];
+  const d = new Date(Date.now()+30*864e5).toISOString().split('T')[0];
+  document.getElementById('inv-date').value = t;
+  document.getElementById('inv-due').value  = d;
+}
+function toast(msg, type='') {
+  const el=document.getElementById('toast'); el.textContent=msg;
+  el.className='show'+(type?' '+type:'');
+  setTimeout(()=>el.className='',3000);
+}
+</script>
+</body>
+</html>

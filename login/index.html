@@ -128,9 +128,9 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodWxtd3l6cW96eHp5a2VtaGdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDY0NjcsImV4cCI6MjA5NTI4MjQ2N30.JdJn-ADMiXSmrSeNAdI2CFtZhWtV7q_qTtVGx_mNWQQ';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // If already logged in, redirect immediately
+    // If already logged in, sign out so user can choose their own credentials
     sb.auth.getSession().then(({ data: { session } }) => {
-      if (session) redirectByRole(session.user.id);
+      if (session) sb.auth.signOut();
     });
 
     document.getElementById('password').addEventListener('keydown', e => {

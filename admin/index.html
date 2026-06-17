@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Paytech Admin Portal</title>
   <link rel="icon" type="image/png" href="../Current LOGO/After Canva/paytech-icon-transparent.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1B2048" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Paytech Admin" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
   <style>
@@ -576,9 +581,18 @@
     </div>
     <div class="form-grid">
       <div class="form-group"><label>Client *</label>
-        <select id="inv-client"><option value="">-- Select Client --</option></select>
+        <select id="inv-client" onchange="toggleAdhoc('inv')"><option value="">-- Select Client --</option><option value="__adhoc__">✏ Ad-hoc / Type manually</option></select>
       </div>
       <div class="form-group"><label>Invoice Number</label><input id="inv-number" placeholder="INV-001" /></div>
+      <div id="inv-adhoc" style="display:none;grid-column:1/-1;display:none;">
+        <div class="form-grid" style="background:var(--gray-50);padding:1rem;border-radius:8px;border:1.5px dashed var(--gray-200);margin-top:0.5rem;">
+          <div class="form-group"><label>Company Name *</label><input id="inv-adhoc-company" placeholder="Client Company Name" /></div>
+          <div class="form-group"><label>Contact Email</label><input id="inv-adhoc-email" type="email" placeholder="email@company.co.za" /></div>
+          <div class="form-group"><label>Phone</label><input id="inv-adhoc-phone" placeholder="082 000 0000" /></div>
+          <div class="form-group"><label>VAT Number</label><input id="inv-adhoc-vat" placeholder="4123456789" /></div>
+          <div class="form-group full"><label>Address</label><input id="inv-adhoc-address" placeholder="123 Main St, Sandton" /></div>
+        </div>
+      </div>
       <div class="form-group"><label>Invoice Date</label><input id="inv-date" type="date" /></div>
       <div class="form-group"><label>Due Date</label><input id="inv-due" type="date" /></div>
       <div class="form-group"><label>Period (e.g. June 2026)</label><input id="inv-period" placeholder="June 2026" /></div>
@@ -625,9 +639,18 @@
     </div>
     <div class="form-grid">
       <div class="form-group"><label>Client *</label>
-        <select id="qt-client"><option value="">-- Select Client --</option></select>
+        <select id="qt-client" onchange="toggleAdhoc('qt')"><option value="">-- Select Client --</option><option value="__adhoc__">✏ Ad-hoc / Type manually</option></select>
       </div>
       <div class="form-group"><label>Quote Number</label><input id="qt-number" placeholder="QT-001" /></div>
+      <div id="qt-adhoc" style="display:none;grid-column:1/-1;">
+        <div class="form-grid" style="background:var(--gray-50);padding:1rem;border-radius:8px;border:1.5px dashed var(--gray-200);margin-top:0.5rem;">
+          <div class="form-group"><label>Company Name *</label><input id="qt-adhoc-company" placeholder="Client Company Name" /></div>
+          <div class="form-group"><label>Contact Email</label><input id="qt-adhoc-email" type="email" placeholder="email@company.co.za" /></div>
+          <div class="form-group"><label>Phone</label><input id="qt-adhoc-phone" placeholder="082 000 0000" /></div>
+          <div class="form-group"><label>VAT Number</label><input id="qt-adhoc-vat" placeholder="4123456789" /></div>
+          <div class="form-group full"><label>Address</label><input id="qt-adhoc-address" placeholder="123 Main St, Sandton" /></div>
+        </div>
+      </div>
       <div class="form-group"><label>Quote Date</label><input id="qt-date" type="date" /></div>
       <div class="form-group"><label>Valid Until</label><input id="qt-valid" type="date" /></div>
       <div class="form-group"><label>Service Type</label>
@@ -687,6 +710,14 @@
 
 <!-- TOAST -->
 <div id="toast"></div>
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:0.9rem 1.4rem;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);display:none;align-items:center;gap:1rem;z-index:9998;font-size:0.875rem;">
+  <img src="../Current LOGO/After Canva/paytech-icon-transparent.png" style="height:32px;background:white;border-radius:6px;padding:2px 6px;" />
+  <span>Install Paytech Admin as an app on your device</span>
+  <button onclick="installPWA()" style="background:var(--green);color:white;border:none;padding:0.45rem 1rem;border-radius:6px;font-weight:700;cursor:pointer;">Install</button>
+  <button onclick="document.getElementById('pwa-banner').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1.1rem;">✕</button>
+</div>
 
 <script>
 // ═══════════════════════════════════════════
@@ -1266,9 +1297,32 @@ function populateClientDropdowns() {
     const sel = document.getElementById(id);
     const cur = sel.value;
     sel.innerHTML = '<option value="">-- Select Client --</option>' +
+      '<option value="__adhoc__">✏ Ad-hoc / Type manually</option>' +
       clients.map(c=>`<option value="${c.id}">${c.company_name}</option>`).join('');
-    sel.value = cur;
+    if (cur) sel.value = cur;
   });
+}
+
+function toggleAdhoc(prefix) {
+  const val = document.getElementById(`${prefix}-client`).value;
+  const box = document.getElementById(`${prefix}-adhoc`);
+  box.style.display = val === '__adhoc__' ? 'block' : 'none';
+}
+
+function getAdhocClient(prefix) {
+  return {
+    company_name: document.getElementById(`${prefix}-adhoc-company`).value,
+    email:        document.getElementById(`${prefix}-adhoc-email`).value,
+    phone:        document.getElementById(`${prefix}-adhoc-phone`).value,
+    vat_number:   document.getElementById(`${prefix}-adhoc-vat`).value,
+    address:      document.getElementById(`${prefix}-adhoc-address`).value,
+  };
+}
+
+function resolveClient(prefix) {
+  const val = document.getElementById(`${prefix}-client`).value;
+  if (val === '__adhoc__') return getAdhocClient(prefix);
+  return clients.find(c => c.id === val) || null;
 }
 
 function showPage(name) {
@@ -1307,8 +1361,7 @@ function setDefaultDates() {
 
 function previewDocument(type) {
   if (type === 'invoice') {
-    const clientId = document.getElementById('inv-client').value;
-    const c = clients.find(x=>x.id===clientId);
+    const c = resolveClient('inv');
     const sub = invLines.reduce((s,l)=>s+l.qty*l.price,0);
     const doc = {
       invoice_number: document.getElementById('inv-number').value,
@@ -1323,8 +1376,7 @@ function previewDocument(type) {
     currentDocType = 'invoice'; currentDocData = doc;
     renderDocPreview(doc, 'INVOICE');
   } else {
-    const clientId = document.getElementById('qt-client').value;
-    const c = clients.find(x=>x.id===clientId);
+    const c = resolveClient('qt');
     const sub = qtLines.reduce((s,l)=>s+l.qty*l.price,0);
     const doc = {
       quote_number: document.getElementById('qt-number').value,
@@ -1340,6 +1392,29 @@ function previewDocument(type) {
   }
   openModal('preview-modal');
   document.getElementById('preview-title').textContent = type === 'invoice' ? 'Invoice Preview' : 'Quote Preview';
+}
+
+// ── PWA Install ──
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('pwa-banner').style.display = 'flex';
+});
+async function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('pwa-banner').style.display = 'none';
+  if (outcome === 'accepted') toast('App installed!', 'success');
+}
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-banner').style.display = 'none';
+  toast('Paytech Admin installed as app!', 'success');
+});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/admin/sw.js').catch(() => {});
 }
 
 function toast(msg, type = '') {

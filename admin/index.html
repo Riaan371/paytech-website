@@ -393,6 +393,9 @@
       <span class="nav-icon">💬</span> Queries
       <span class="nav-badge" id="badge-queries">0</span>
     </div>
+    <div class="nav-item" onclick="showPage('assign')">
+      <span class="nav-icon">🔗</span> Assign Clients
+    </div>
   </nav>
   <div class="sidebar-footer">
     <div class="sidebar-user">
@@ -571,6 +574,18 @@
       </div>
       <div id="admin-queries-list">
         <div class="empty-state"><div class="empty-icon">💬</div><p>No queries yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSIGN CLIENTS PAGE -->
+  <div class="page" id="page-assign">
+    <div style="padding:2rem;">
+      <div class="section-header">
+        <div class="section-title">Assign Clients to Consultants</div>
+      </div>
+      <div id="assign-content">
+        <div class="empty-state"><div class="empty-icon">🔗</div><p>Loading...</p></div>
       </div>
     </div>
   </div>
@@ -1451,10 +1466,74 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => { if (n.textContent.toLowerCase().includes(name.toLowerCase().slice(0,4))) n.classList.add('active'); });
-  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule', queries:'Client Queries' };
+  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule', queries:'Client Queries', assign:'Assign Clients' };
   if (name === 'queries') loadAdminQueries();
+  if (name === 'assign') loadAssignPage();
   document.getElementById('page-title').textContent = titles[name] || name;
   if (name === 'schedule') loadSchedule();
+}
+
+// ── ASSIGN CLIENTS ──
+async function loadAssignPage() {
+  const el = document.getElementById('assign-content');
+  el.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div>';
+
+  // Load all consultants
+  const { data: roles } = await sb.from('user_roles').select('user_id').eq('role', 'consultant');
+  if (!roles || !roles.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><p>No consultants found. Create a user with consultant role first.</p></div>';
+    return;
+  }
+  const consultantIds = roles.map(r => r.user_id);
+
+  // Load consultant emails from profiles or fallback approach
+  const { data: allClients } = await sb.from('clients').select('id, company_name').order('company_name');
+  const { data: allAssignments } = await sb.from('consultant_clients').select('consultant_id, client_id');
+
+  // Build per-consultant UI — we'll use user_id as label since we can't query auth.users directly
+  // Instead, load from a view or use the stored email in user_roles if available
+  const { data: userEmails } = await sb.from('user_roles').select('user_id, consultant_email:user_id').eq('role', 'consultant');
+
+  let html = '';
+  for (const r of roles) {
+    const cid = r.user_id;
+    const assigned = (allAssignments||[]).filter(a => a.consultant_id === cid).map(a => a.client_id);
+    const clientCheckboxes = (allClients||[]).map(c => {
+      const checked = assigned.includes(c.id) ? 'checked' : '';
+      return `<label style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.875rem;border:1px solid ${checked?'var(--green)':'var(--gray-200)'};background:${checked?'#f0fdf4':'white'};transition:all 0.15s;" id="lbl-${cid}-${c.id}">
+        <input type="checkbox" ${checked} onchange="toggleAssign('${cid}','${c.id}',this)" style="accent-color:var(--green);width:15px;height:15px;" />
+        ${c.company_name}
+      </label>`;
+    }).join('');
+    html += `
+      <div style="background:white;border-radius:12px;box-shadow:var(--shadow);padding:1.4rem 1.6rem;margin-bottom:1.2rem;">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--gray-100);">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">C</div>
+          <div>
+            <div style="font-weight:700;font-size:0.9rem;color:var(--navy);">Consultant</div>
+            <div style="font-size:0.75rem;color:var(--gray-400);">ID: ${cid.slice(0,8)}…</div>
+          </div>
+          <div style="margin-left:auto;font-size:0.78rem;color:var(--gray-400);">${assigned.length} client(s) assigned</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">${clientCheckboxes}</div>
+      </div>`;
+  }
+  el.innerHTML = html || '<div class="empty-state"><div class="empty-icon">👥</div><p>No clients available.</p></div>';
+}
+
+async function toggleAssign(consultantId, clientId, checkbox) {
+  const lbl = document.getElementById(`lbl-${consultantId}-${clientId}`);
+  if (checkbox.checked) {
+    const { error } = await sb.from('consultant_clients').insert({ consultant_id: consultantId, client_id: clientId });
+    if (error) { toast('Error: ' + error.message, 'error'); checkbox.checked = false; return; }
+    if (lbl) { lbl.style.borderColor = 'var(--green)'; lbl.style.background = '#f0fdf4'; }
+    toast('Client assigned', 'success');
+  } else {
+    const { error } = await sb.from('consultant_clients').delete().eq('consultant_id', consultantId).eq('client_id', clientId);
+    if (error) { toast('Error: ' + error.message, 'error'); checkbox.checked = true; return; }
+    if (lbl) { lbl.style.borderColor = 'var(--gray-200)'; lbl.style.background = 'white'; }
+    toast('Client removed', 'success');
+  }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }

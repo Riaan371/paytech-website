@@ -814,10 +814,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   setDefaultDates();
 
   const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    initApp();
+  if (!session) { window.location.href = '../login/'; return; }
+  const { data: roleData } = await sb.from('user_roles').select('role').eq('user_id', session.user.id).single();
+  if (!roleData || roleData.role !== 'admin') {
+    await sb.auth.signOut();
+    window.location.href = '../login/';
+    return;
   }
+  currentUser = session.user;
+  initApp();
 });
 
 async function handleLogin() {

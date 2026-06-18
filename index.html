@@ -35,12 +35,16 @@
     }
 
     .hero-icon {
-      width: 280px;
-      height: auto;
+      width: 240px;
+      height: 240px;
       object-fit: contain;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      padding: 0 28px;
       position: relative;
       z-index: 2;
-      filter: drop-shadow(0 4px 24px rgba(0,0,0,0.4));
     }
 
     /* ── HERO BRAND NAME ── */
@@ -211,6 +215,30 @@
       animation: wheelDrop 1.8s ease-in-out 3s infinite;
     }
 
+    /* ── HOME PAGE: CREAM BACKGROUND OVERRIDE ── */
+    .bg-wrap { display: none; }
+    .bg-overlay { background: #f5f0e8 !important; }
+    body { background: #f5f0e8; }
+
+    /* re-colour text for light background */
+    .hero-h1         { color: #1B2048; }
+    .hero-h1 strong  { color: var(--green); }
+    .hero-sub        { color: rgba(27,32,72,0.65); }
+    .hero-badge      { background: rgba(58,171,92,0.1); color: #2d8a47; border-color: rgba(58,171,92,0.3); }
+    .hero-phone      { color: rgba(27,32,72,0.5); }
+    .hero-phone a    { color: var(--green); }
+    .svc-label       { color: #2d8a47; }
+    .partners-label  { color: rgba(27,32,72,0.45); }
+    .partner-pill    { background: rgba(27,32,72,0.08); color: #1B2048; border-color: rgba(27,32,72,0.15); }
+    .scroll-hint     { color: rgba(27,32,72,0.4); }
+    nav              { border-bottom-color: rgba(27,32,72,0.1); }
+    nav a            { color: #1B2048; }
+    nav a:hover      { color: var(--green); }
+    footer           { border-top-color: rgba(27,32,72,0.12); }
+    footer, .footer-links a, .footer-copy { color: rgba(27,32,72,0.6); }
+    .service-strip   { border-color: rgba(27,32,72,0.12); }
+    .svc             { border-right-color: rgba(27,32,72,0.08); }
+
     /* ── WATERMARK ── */
     .watermark {
       position: absolute;
@@ -271,7 +299,9 @@
       <img class="watermark" src="Current LOGO/After Canva/paytech-full-logo.png" alt="" />
 
       <div class="icon-wrap rise rise-d0">
-        <img class="hero-icon" src="Current LOGO/After Canva/paytech-full-logo-transparent.png" alt="Paytech icon" />
+        <div class="ring-outer"></div>
+        <div class="ring-inner"></div>
+        <img class="hero-icon" src="Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech icon" />
       </div>
 
       <div class="hero-divider rise rise-d2"></div>

@@ -18,33 +18,53 @@
 
     .ring-outer {
       position: absolute;
-      inset: -40px;
+      inset: -50px;
       border-radius: 50%;
-      border: 1px solid rgba(58,171,92,0.28);
+      border: 1.5px solid rgba(58,171,92,0.30);
       animation: ringBreath 3.5s ease-in-out 2s infinite;
       pointer-events: none;
     }
 
     .ring-inner {
       position: absolute;
-      inset: -20px;
+      inset: -26px;
       border-radius: 50%;
-      border: 1.5px solid rgba(58,171,92,0.18);
+      border: 2px solid rgba(58,171,92,0.20);
       animation: ringBreath 3.5s ease-in-out 2.4s infinite;
       pointer-events: none;
     }
 
+    .ring-spin {
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(58,171,92,0.18);
+      animation: spinSlow 18s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
     .hero-icon {
-      width: 240px;
-      height: 240px;
+      width: 300px;
+      height: 300px;
       object-fit: contain;
       border-radius: 50%;
-      background: rgba(255,255,255,0.95);
+      background: #ffffff;
       border: 1px solid rgba(255,255,255,0.9);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-      padding: 0 28px;
+      box-shadow: 0 12px 48px rgba(27,32,72,0.13), 0 2px 8px rgba(58,171,92,0.10);
+      padding: 0 32px;
       position: relative;
       z-index: 2;
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-10px); }
     }
 
     /* ── HERO BRAND NAME ── */
@@ -301,6 +321,7 @@
       <div class="icon-wrap rise rise-d0">
         <div class="ring-outer"></div>
         <div class="ring-inner"></div>
+        <div class="ring-spin"></div>
         <img class="hero-icon" src="Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech icon" />
       </div>
 

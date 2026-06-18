@@ -116,8 +116,8 @@
   <div class="sidebar-logo"><img src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" /></div>
   <div class="sidebar-label">Consultant</div>
   <nav class="snav">
-    <div class="nav-item active" onclick="showPage('invoices')"><span>🧾</span> Invoices</div>
-    <div class="nav-item" onclick="showPage('jobcards')"><span>📋</span> Job Cards</div>
+    <div class="nav-item active" onclick="showPage('invoices',this)"><span>🧾</span> Invoices</div>
+    <div class="nav-item" onclick="showPage('jobcards',this)"><span>📋</span> Job Cards</div>
   </nav>
   <div class="sidebar-footer">
     <div class="user-info">Logged in as<br><span class="user-name" id="user-name">—</span></div>
@@ -708,12 +708,14 @@ async function loadJobCards() {
       <td><button class="btn btn-outline btn-sm" onclick='openJobCardModal(${JSON.stringify(jc)})'>Edit</button></td>
     </tr>`).join('');
 }
-function showPage(name) {
+function showPage(name, el) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById(`page-${name}`).classList.add('active');
-  event.currentTarget.classList.add('active');
+  const pg = document.getElementById(`page-${name}`);
+  if (pg) pg.classList.add('active');
+  if (el) el.classList.add('active');
   document.getElementById('page-title').textContent = {invoices:'Invoices',jobcards:'Job Cards',queries:'Client Queries'}[name]||name;
+  if (name === 'jobcards') loadJobCards();
 }
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }

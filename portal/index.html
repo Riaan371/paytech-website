@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('user-avatar').textContent = user.email[0].toUpperCase();
 
   // Get role + client_id
-  const { data: roleData } = await sb.from('user_roles').select('role, client_id').eq('user_id', user.id).single();
+  const { data: roleData } = await sb.from('profiles').select('role, client_id').eq('id', user.id).single();
   if (!roleData || roleData.role !== 'client') { window.location.href = '../login/'; return; }
   clientId = roleData.client_id;
 

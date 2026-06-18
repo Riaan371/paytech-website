@@ -830,7 +830,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '../login/'; return; }
-  const { data: roleData } = await sb.from('user_roles').select('role').eq('user_id', session.user.id).single();
+  const { data: roleData } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
   if (!roleData || roleData.role !== 'admin') {
     await sb.auth.signOut();
     window.location.href = '../login/';
@@ -1479,12 +1479,12 @@ async function loadAssignPage() {
   el.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div>';
 
   // Load all consultants
-  const { data: roles } = await sb.from('user_roles').select('user_id').eq('role', 'consultant');
+  const { data: roles } = await sb.from('profiles').select('id, email').eq('role', 'consultant');
   if (!roles || !roles.length) {
     el.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><p>No consultants found. Create a user with consultant role first.</p></div>';
     return;
   }
-  const consultantIds = roles.map(r => r.user_id);
+  const consultantIds = roles.map(r => r.id);
 
   // Load consultant emails from profiles or fallback approach
   const { data: allClients } = await sb.from('clients').select('id, company_name').order('company_name');
@@ -1492,11 +1492,9 @@ async function loadAssignPage() {
 
   // Build per-consultant UI — we'll use user_id as label since we can't query auth.users directly
   // Instead, load from a view or use the stored email in user_roles if available
-  const { data: userEmails } = await sb.from('user_roles').select('user_id, consultant_email:user_id').eq('role', 'consultant');
-
   let html = '';
   for (const r of roles) {
-    const cid = r.user_id;
+    const cid = r.id;
     const assigned = (allAssignments||[]).filter(a => a.consultant_id === cid).map(a => a.client_id);
     const clientCheckboxes = (allClients||[]).map(c => {
       const checked = assigned.includes(c.id) ? 'checked' : '';
@@ -1508,10 +1506,10 @@ async function loadAssignPage() {
     html += `
       <div style="background:white;border-radius:12px;box-shadow:var(--shadow);padding:1.4rem 1.6rem;margin-bottom:1.2rem;">
         <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--gray-100);">
-          <div style="width:34px;height:34px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">C</div>
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">${(r.email||'C')[0].toUpperCase()}</div>
           <div>
-            <div style="font-weight:700;font-size:0.9rem;color:var(--navy);">Consultant</div>
-            <div style="font-size:0.75rem;color:var(--gray-400);">ID: ${cid.slice(0,8)}…</div>
+            <div style="font-weight:700;font-size:0.9rem;color:var(--navy);">${r.email||'Consultant'}</div>
+            <div style="font-size:0.75rem;color:var(--gray-400);">Consultant</div>
           </div>
           <div style="margin-left:auto;font-size:0.78rem;color:var(--gray-400);">${assigned.length} client(s) assigned</div>
         </div>

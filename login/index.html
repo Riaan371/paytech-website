@@ -157,7 +157,7 @@
     }
 
     async function redirectByRole(userId) {
-      const { data } = await sb.from('user_roles').select('role').eq('user_id', userId).single();
+      const { data } = await sb.from('profiles').select('role').eq('id', userId).single();
       const role = data?.role || 'client';
       if (role === 'admin')      window.location.href = '../admin/';
       else if (role === 'consultant') window.location.href = '../consultant/';

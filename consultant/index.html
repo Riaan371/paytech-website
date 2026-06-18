@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const user = session.user;
   document.getElementById('user-name').textContent = user.email;
 
-  const { data: role } = await sb.from('user_roles').select('role').eq('user_id', user.id).single();
+  const { data: role } = await sb.from('profiles').select('role').eq('id', user.id).single();
   if (!role || role.role === 'client') { window.location.href = '../portal/'; return; }
   if (role.role === 'admin') { window.location.href = '../admin/'; return; }
 

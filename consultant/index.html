@@ -134,9 +134,13 @@
   <!-- CLIENT SELECTOR -->
   <div class="client-selector">
     <label>Select Client:</label>
-    <select id="client-select" onchange="onClientChange()">
-      <option value="">— Choose a client —</option>
-    </select>
+    <div class="client-search-wrap" id="cons-client-wrap" style="position:relative;flex:1;max-width:360px;">
+      <input type="text" id="cons-client-input" placeholder="Search client..." autocomplete="off"
+        style="width:100%;padding:0.55rem 0.9rem;border:1.5px solid #d1d5db;border-radius:8px;font-size:0.9rem;"
+        oninput="filterConsClient()" onfocus="filterConsClient()" />
+      <div id="cons-client-drop" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:999;max-height:220px;overflow-y:auto;"></div>
+      <input type="hidden" id="client-select" />
+    </div>
   </div>
 
   <!-- CLIENT INFO STRIP -->
@@ -259,10 +263,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function populateClientDropdown() {
-  const sel = document.getElementById('client-select');
-  sel.innerHTML = '<option value="">— Choose a client —</option>' +
-    myClients.map(c => `<option value="${c.id}">${c.company_name}</option>`).join('');
+  // search box replaces old select — no-op
 }
+
+function filterConsClient() {
+  const input = document.getElementById('cons-client-input');
+  const drop  = document.getElementById('cons-client-drop');
+  const q     = input.value.trim().toLowerCase();
+  const items = myClients.filter(c => !q || c.company_name.toLowerCase().includes(q));
+  if (!items.length) {
+    drop.innerHTML = '<div style="padding:9px 14px;color:#999;font-size:0.875rem;">No clients found</div>';
+  } else {
+    drop.innerHTML = items.map(c => {
+      const name = q ? c.company_name.replace(new RegExp(`(${q})`, 'gi'), '<mark style="background:rgba(59,130,246,0.15);border-radius:2px;padding:0 1px;">$1</mark>') : c.company_name;
+      return `<div onclick="selectConsClient('${c.id}','${c.company_name.replace(/'/g,"\\'")}') "
+        style="padding:9px 14px;cursor:pointer;font-size:0.875rem;border-bottom:1px solid #f3f4f6;"
+        onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background=''">${name}</div>`;
+    }).join('');
+  }
+  drop.style.display = 'block';
+}
+
+function selectConsClient(id, name) {
+  document.getElementById('client-select').value = id;
+  document.getElementById('cons-client-input').value = name;
+  document.getElementById('cons-client-drop').style.display = 'none';
+  onClientChange();
+}
+
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('cons-client-wrap');
+  const drop = document.getElementById('cons-client-drop');
+  if (wrap && drop && !wrap.contains(e.target)) drop.style.display = 'none';
+});
 
 async function onClientChange() {
   selectedClientId = document.getElementById('client-select').value;

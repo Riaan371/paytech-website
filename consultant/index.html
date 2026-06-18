@@ -117,6 +117,7 @@
   <div class="sidebar-label">Consultant</div>
   <nav class="snav">
     <div class="nav-item active" onclick="showPage('invoices')"><span>🧾</span> Invoices</div>
+    <div class="nav-item" onclick="showPage('jobcards')"><span>📋</span> Job Cards</div>
   </nav>
   <div class="sidebar-footer">
     <div class="user-info">Logged in as<br><span class="user-name" id="user-name">—</span></div>
@@ -145,6 +146,23 @@
   <!-- CLIENT INFO STRIP -->
   <div class="card" id="client-info-card" style="margin:0 1.8rem 1.2rem;display:none;">
     <div class="client-info-grid" id="client-info-grid"></div>
+  </div>
+
+  <!-- JOB CARDS PAGE -->
+  <div class="page" id="page-jobcards">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+      <button class="btn btn-primary" id="new-jc-btn" onclick="openJcModal()" disabled>➕ New Job Card</button>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Hours</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="jc-tbody">
+            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👈</div><p>Select a client to view job cards</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- INVOICES PAGE -->
@@ -217,6 +235,44 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('reply-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="submitReply()">📤 Send Reply</button>
+    </div>
+  </div>
+</div>
+
+<!-- JOB CARD MODAL -->
+<div class="modal-overlay" id="jc-modal">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-header">
+      <div class="modal-title" id="jc-modal-title">New Job Card</div>
+      <button class="modal-close" onclick="closeModal('jc-modal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date *</label><input id="jc-date" type="date" /></div>
+      <div class="form-group"><label>Consultation Type *</label>
+        <select id="jc-type">
+          <option value="Payroll Processing">Payroll Processing</option>
+          <option value="Compliance Check">Compliance Check</option>
+          <option value="System Setup">System Setup</option>
+          <option value="Training">Training</option>
+          <option value="Advisory">Advisory</option>
+          <option value="Audit Support">Audit Support</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Hours Spent</label><input id="jc-hours" type="number" min="0" step="0.5" placeholder="2.5" /></div>
+      <div class="form-group"><label>Status</label>
+        <select id="jc-status">
+          <option value="Completed">Completed</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Follow-up Required">Follow-up Required</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Description / Work Done *</label><textarea id="jc-description" placeholder="Describe what was done during this consultation..." rows="4"></textarea></div>
+      <div class="form-group full"><label>Notes / Follow-up Actions</label><textarea id="jc-notes" placeholder="Any follow-up actions or notes..." rows="3"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('jc-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveJobCard()">💾 Save Job Card</button>
     </div>
   </div>
 </div>
@@ -297,8 +353,9 @@ async function onClientChange() {
   const client = myClients.find(c => c.id === selectedClientId);
   if (client) showClientInfo(client);
   document.getElementById('new-inv-btn').disabled = false;
+  document.getElementById('new-jc-btn').disabled = false;
   await loadInvoices();
-  await loadQueries();
+  await loadJobCards();
 }
 
 function showClientInfo(c) {
@@ -310,6 +367,69 @@ function showClientInfo(c) {
     <div class="ci-item"><label>Service</label><span>${c.service_type||'-'}</span></div>
     <div class="ci-item"><label>Monthly Fee</label><span>R ${Number(c.monthly_fee||0).toFixed(2)}</span></div>
     <div class="ci-item"><label>Employees</label><span>${c.employees||'-'}</span></div>`;
+}
+
+async function loadJobCards() {
+  const { data } = await sb.from('job_cards').select('*')
+    .eq('client_id', selectedClientId)
+    .eq('consultant_id', currentUser.id)
+    .order('date', { ascending: false });
+  renderJobCards(data || []);
+}
+
+function renderJobCards(cards) {
+  const tb = document.getElementById('jc-tbody');
+  if (!cards.length) {
+    tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📋</div><p>No job cards yet for this client</p></div></td></tr>`;
+    return;
+  }
+  const statusColor = { 'Completed':'#16a34a', 'In Progress':'#d97706', 'Follow-up Required':'#dc2626' };
+  tb.innerHTML = cards.map(j => `
+    <tr>
+      <td>${j.date}</td>
+      <td>${j.type}</td>
+      <td style="max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${j.description}</td>
+      <td>${j.hours || '-'}</td>
+      <td><span style="color:${statusColor[j.status]||'#666'};font-weight:500;">${j.status}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick="deleteJobCard('${j.id}')">🗑</button></td>
+    </tr>`).join('');
+}
+
+function openJcModal() {
+  document.getElementById('jc-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('jc-description').value = '';
+  document.getElementById('jc-notes').value = '';
+  document.getElementById('jc-hours').value = '';
+  document.getElementById('jc-status').value = 'Completed';
+  document.getElementById('jc-modal').classList.add('open');
+}
+
+async function saveJobCard() {
+  const date  = document.getElementById('jc-date').value;
+  const type  = document.getElementById('jc-type').value;
+  const desc  = document.getElementById('jc-description').value.trim();
+  const hours = document.getElementById('jc-hours').value;
+  const status= document.getElementById('jc-status').value;
+  const notes = document.getElementById('jc-notes').value.trim();
+  if (!date || !desc) { showToast('Date and description are required','error'); return; }
+  const { error } = await sb.from('job_cards').insert({
+    consultant_id: currentUser.id,
+    client_id: selectedClientId,
+    date, type, description: desc,
+    hours: hours ? parseFloat(hours) : null,
+    status, notes
+  });
+  if (error) { showToast('Error saving job card: ' + error.message, 'error'); return; }
+  closeModal('jc-modal');
+  showToast('Job card saved!');
+  await loadJobCards();
+}
+
+async function deleteJobCard(id) {
+  if (!confirm('Delete this job card?')) return;
+  await sb.from('job_cards').delete().eq('id', id);
+  showToast('Deleted');
+  await loadJobCards();
 }
 
 async function loadInvoices() {

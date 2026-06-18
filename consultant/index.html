@@ -182,6 +182,24 @@
     </div>
   </div>
 
+  <!-- JOB CARDS PAGE -->
+  <div class="page" id="page-jobcards">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <div style="font-size:0.85rem;color:#64748b;">Log completed consultations per client</div>
+      <button class="btn btn-primary" id="new-jc-btn" onclick="openJobCardModal()" disabled>➕ New Job Card</button>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Hours</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="jc-tbody">
+            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👈</div><p>Select a client to view job cards</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- INVOICE MODAL -->
@@ -216,6 +234,48 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('inv-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveInvoice()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- JOB CARD MODAL -->
+<div class="modal-overlay" id="jc-modal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <div class="modal-title" id="jc-modal-title">New Job Card</div>
+      <button class="modal-close" onclick="closeModal('jc-modal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date *</label><input id="jc-date" type="date" /></div>
+      <div class="form-group"><label>Consultation Type *</label>
+        <select id="jc-type">
+          <option value="Payroll Processing">Payroll Processing</option>
+          <option value="Payroll Review">Payroll Review</option>
+          <option value="Compliance Check">Compliance Check</option>
+          <option value="System Setup">System Setup</option>
+          <option value="Training">Training</option>
+          <option value="Ad-hoc Support">Ad-hoc Support</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Hours Spent</label><input id="jc-hours" type="number" min="0" step="0.5" placeholder="e.g. 2.5" /></div>
+      <div class="form-group"><label>Status</label>
+        <select id="jc-status">
+          <option value="Completed">Completed</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Follow-up Required">Follow-up Required</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Description / Work Done *</label>
+        <textarea id="jc-description" rows="4" placeholder="Describe what was done during this consultation..."></textarea>
+      </div>
+      <div class="form-group full"><label>Notes (internal)</label>
+        <textarea id="jc-notes" rows="2" placeholder="Any internal notes..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('jc-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveJobCard()">💾 Save Job Card</button>
     </div>
   </div>
 </div>
@@ -588,12 +648,72 @@ async function markPaid(id) {
 }
 
 async function handleLogout() { await sb.auth.signOut(); window.location.href='../login/'; }
+
+let jobCards = [], editingJcId = null;
+
+function openJobCardModal(jc = null) {
+  editingJcId = jc ? jc.id : null;
+  document.getElementById('jc-modal-title').textContent = jc ? 'Edit Job Card' : 'New Job Card';
+  document.getElementById('jc-date').value        = jc ? jc.date : new Date().toISOString().split('T')[0];
+  document.getElementById('jc-type').value        = jc ? jc.type : 'Payroll Processing';
+  document.getElementById('jc-hours').value       = jc ? jc.hours : '';
+  document.getElementById('jc-status').value      = jc ? jc.status : 'Completed';
+  document.getElementById('jc-description').value = jc ? jc.description : '';
+  document.getElementById('jc-notes').value       = jc ? (jc.notes||'') : '';
+  openModal('jc-modal');
+}
+
+async function saveJobCard() {
+  const payload = {
+    consultant_id: (await sb.auth.getUser()).data.user.id,
+    client_id:     selectedClientId,
+    date:          document.getElementById('jc-date').value,
+    type:          document.getElementById('jc-type').value,
+    hours:         parseFloat(document.getElementById('jc-hours').value)||0,
+    status:        document.getElementById('jc-status').value,
+    description:   document.getElementById('jc-description').value,
+    notes:         document.getElementById('jc-notes').value,
+  };
+  if (!payload.date || !payload.description) { alert('Date and description are required.'); return; }
+  if (editingJcId) {
+    await sb.from('job_cards').update(payload).eq('id', editingJcId);
+  } else {
+    await sb.from('job_cards').insert(payload);
+  }
+  closeModal('jc-modal');
+  loadJobCards();
+}
+
+async function loadJobCards() {
+  const tbody = document.getElementById('jc-tbody');
+  if (!selectedClientId) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👈</div><p>Select a client to view job cards</p></div></td></tr>';
+    document.getElementById('new-jc-btn').disabled = true;
+    return;
+  }
+  document.getElementById('new-jc-btn').disabled = false;
+  const { data } = await sb.from('job_cards').select('*').eq('client_id', selectedClientId).order('date', { ascending: false });
+  jobCards = data || [];
+  if (!jobCards.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📋</div><p>No job cards yet for this client</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = jobCards.map(jc => `
+    <tr>
+      <td>${jc.date}</td>
+      <td>${jc.type}</td>
+      <td style="max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${jc.description}</td>
+      <td>${jc.hours}h</td>
+      <td><span class="badge ${jc.status==='Completed'?'badge-green':jc.status==='In Progress'?'badge-blue':'badge-amber'}">${jc.status}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick='openJobCardModal(${JSON.stringify(jc)})'>Edit</button></td>
+    </tr>`).join('');
+}
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   event.currentTarget.classList.add('active');
-  document.getElementById('page-title').textContent = {invoices:'Invoices',queries:'Client Queries'}[name]||name;
+  document.getElementById('page-title').textContent = {invoices:'Invoices',jobcards:'Job Cards',queries:'Client Queries'}[name]||name;
 }
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }

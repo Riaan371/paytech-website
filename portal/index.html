@@ -247,11 +247,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (role === 'admin') { window.location.href = '../admin/'; return; }
   if (role === 'consultant') { window.location.href = '../consultant/'; return; }
   if (role !== 'client') { window.location.href = '../login/'; return; }
-  const { data: profileData } = await sb.from('profiles').select('client_id').eq('id', user.id).single();
+
+  const { data: profileData, error: profileError } = await sb.from('profiles').select('client_id').eq('id', user.id).single();
+  console.log('[PORTAL] profile query:', profileData, profileError);
   clientId = profileData?.client_id;
 
+  if (!clientId) {
+    console.error('[PORTAL] No client_id found in profile. profileData:', profileData, 'profileError:', profileError);
+    document.getElementById('company-sub').textContent = 'ERROR: Profile not linked — contact admin (check browser console for details)';
+    document.getElementById('inv-tbody').innerHTML = `<tr><td colspan="6"><div class="empty-state"><p style="color:red;">Your account is not linked to a company. Please contact Paytech admin.</p></div></td></tr>`;
+    return;
+  }
+
   // Load client info
-  const { data: client } = await sb.from('clients').select('*').eq('id', clientId).single();
+  const { data: client, error: clientError } = await sb.from('clients').select('*').eq('id', clientId).single();
+  console.log('[PORTAL] client query:', client, clientError);
   if (client) {
     document.getElementById('company-name').textContent = client.company_name;
     document.getElementById('company-sub').textContent = `${client.service_type} · Paytech Client Portal`;

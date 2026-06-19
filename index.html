@@ -16,32 +16,7 @@
       margin-bottom: 1.6rem;
     }
 
-    .ring-outer {
-      position: absolute;
-      inset: -50px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(58,171,92,0.30);
-      animation: ringBreath 3.5s ease-in-out 2s infinite;
-      pointer-events: none;
-    }
-
-    .ring-inner {
-      position: absolute;
-      inset: -26px;
-      border-radius: 50%;
-      border: 2px solid rgba(58,171,92,0.20);
-      animation: ringBreath 3.5s ease-in-out 2.4s infinite;
-      pointer-events: none;
-    }
-
-    .ring-spin {
-      position: absolute;
-      inset: -14px;
-      border-radius: 50%;
-      border: 1.5px dashed rgba(58,171,92,0.18);
-      animation: spinSlow 18s linear infinite;
-      pointer-events: none;
-    }
+    .ring-outer, .ring-inner, .ring-spin { display: none; }
 
     @keyframes spinSlow {
       from { transform: rotate(0deg); }
@@ -65,7 +40,7 @@
       position: absolute;
       left: 0; right: 0;
       top: 0; bottom: 0;
-      background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.7) 8%, rgba(255,255,255,0.7) 22%, transparent 36%);
+      background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.7) 12%, rgba(255,255,255,0.7) 30%, transparent 44%);
       pointer-events: none;
       z-index: 0;
     }

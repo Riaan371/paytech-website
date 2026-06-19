@@ -99,6 +99,19 @@
     /* Query badge in invoices table */
     .query-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#f59e0b; margin-right:4px; }
 
+    /* JC View modal */
+    .jc-doc { font-family:'Inter',sans-serif; padding:1.5rem; }
+    .jc-doc-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--navy); }
+    .jc-doc-title { font-size:1.4rem; font-weight:800; color:var(--navy); }
+    .jc-doc-meta { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-bottom:1.2rem; }
+    .jc-doc-field label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-400); display:block; margin-bottom:0.2rem; }
+    .jc-doc-field span { font-size:0.875rem; font-weight:600; color:var(--gray-800); }
+    .jc-doc-section { margin-bottom:1rem; }
+    .jc-doc-section h4 { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-400); margin-bottom:0.5rem; }
+    .jc-doc-section p { font-size:0.875rem; color:var(--gray-800); line-height:1.6; white-space:pre-line; }
+    .jc-screenshots-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.8rem; margin-top:0.5rem; }
+    .jc-screenshots-grid img { width:100%; border-radius:6px; border:1px solid var(--gray-200); }
+
     #toast { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; background:var(--navy); color:white; padding:0.8rem 1.4rem; border-radius:9px; font-size:0.875rem; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.2); transform:translateY(80px); opacity:0; transition:all 0.3s; pointer-events:none; }
     #toast.show    { transform:translateY(0); opacity:1; }
     #toast.success { background:var(--green); }
@@ -259,6 +272,21 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('jc-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveJobCard()">💾 Save Job Card</button>
+    </div>
+  </div>
+</div>
+
+<!-- JOB CARD VIEW / PDF MODAL -->
+<div class="modal-overlay" id="jc-view-modal">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-header">
+      <div class="modal-title">Job Card</div>
+      <button class="modal-close" onclick="closeModal('jc-view-modal')">✕</button>
+    </div>
+    <div id="jc-doc-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('jc-view-modal')">Close</button>
+      <button class="btn btn-primary" onclick="downloadJcPdf()">⬇ Download PDF</button>
     </div>
   </div>
 </div>
@@ -545,24 +573,71 @@ function openJobCardModal(jc = null) {
 }
 
 async function saveJobCard() {
+  const date = document.getElementById('jc-date').value;
+  const desc = document.getElementById('jc-description').value;
+  if (!date || !desc) { toast('Date and description are required.', 'error'); return; }
+  const { data: { user } } = await sb.auth.getUser();
   const payload = {
-    consultant_id: (await sb.auth.getUser()).data.user.id,
+    consultant_id: user.id,
     client_id:     selectedClientId,
-    date:          document.getElementById('jc-date').value,
+    date,
     type:          document.getElementById('jc-type').value,
     hours:         parseFloat(document.getElementById('jc-hours').value)||0,
     status:        document.getElementById('jc-status').value,
-    description:   document.getElementById('jc-description').value,
+    description:   desc,
     notes:         document.getElementById('jc-notes').value,
   };
-  if (!payload.date || !payload.description) { alert('Date and description are required.'); return; }
   if (editingJcId) {
     await sb.from('job_cards').update(payload).eq('id', editingJcId);
   } else {
     await sb.from('job_cards').insert(payload);
   }
   closeModal('jc-modal');
+  toast('Job card saved!', 'success');
   loadJobCards();
+}
+
+let currentJc = null;
+function viewJobCard(jc) {
+  currentJc = jc;
+  const client = myClients.find(c => c.id === jc.client_id);
+  document.getElementById('jc-doc-content').innerHTML = `
+    <div class="jc-doc" id="jc-pdf-area">
+      <div class="jc-doc-header">
+        <div>
+          <img src="../Current LOGO/After Canva/paytech-full-logo.png" style="height:36px;background:white;border-radius:999px;padding:4px 12px;border:1px solid #e2e8f0;margin-bottom:0.5rem;">
+          <div class="jc-doc-title">JOB CARD</div>
+        </div>
+        <div style="text-align:right;font-size:0.8rem;color:#64748b;">
+          <div><strong>Date:</strong> ${jc.date}</div>
+          <div><strong>Client:</strong> ${client?.company_name || '-'}</div>
+          <div><strong>Status:</strong> ${jc.status}</div>
+        </div>
+      </div>
+      <div class="jc-doc-meta">
+        <div class="jc-doc-field"><label>Consultation Type</label><span>${jc.type}</span></div>
+        <div class="jc-doc-field"><label>Hours Spent</label><span>${jc.hours}h</span></div>
+        <div class="jc-doc-field"><label>Consultant</label><span>${document.getElementById('user-name').textContent}</span></div>
+        <div class="jc-doc-field"><label>Service</label><span>${client?.service_type || '-'}</span></div>
+      </div>
+      <div class="jc-doc-section">
+        <h4>Work Description</h4>
+        <p>${jc.description}</p>
+      </div>
+      ${jc.notes ? `<div class="jc-doc-section"><h4>Internal Notes</h4><p>${jc.notes}</p></div>` : ''}
+      <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid #e2e8f0;font-size:0.72rem;color:#94a3b8;text-align:center;">
+        Paytech Consulting Solutions · info@paytech.org.za · 082 440 1937
+      </div>
+    </div>`;
+  openModal('jc-view-modal');
+}
+
+function downloadJcPdf() {
+  if (!currentJc) return;
+  const client = myClients.find(c => c.id === currentJc.client_id);
+  const filename = `JobCard_${client?.company_name || 'Client'}_${currentJc.date}.pdf`.replace(/\s/g,'_');
+  html2pdf().set({ margin:10, filename, html2canvas:{ scale:2, useCORS:true }, jsPDF:{ unit:'mm', format:'a4' } })
+    .from(document.getElementById('jc-pdf-area')).save();
 }
 
 async function loadJobCards() {
@@ -586,7 +661,10 @@ async function loadJobCards() {
       <td style="max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${jc.description}</td>
       <td>${jc.hours}h</td>
       <td><span class="badge ${jc.status==='Completed'?'badge-green':jc.status==='In Progress'?'badge-blue':'badge-amber'}">${jc.status}</span></td>
-      <td><button class="btn btn-outline btn-sm" onclick='openJobCardModal(${JSON.stringify(jc)})'>Edit</button></td>
+      <td style="display:flex;gap:0.4rem;">
+        <button class="btn btn-outline btn-sm" onclick='openJobCardModal(${JSON.stringify(jc)})'>✏ Edit</button>
+        <button class="btn btn-outline btn-sm" onclick='viewJobCard(${JSON.stringify(jc)})'>📄 PDF</button>
+      </td>
     </tr>`).join('');
 }
 function showPage(name, el) {

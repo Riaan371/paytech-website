@@ -328,13 +328,19 @@ function viewInvoice(id) {
   currentInvId = id;
   currentInv   = invoices.find(i => i.id === id);
   if (!currentInv) return;
-  renderInvoicePreview(currentInv);
-  document.getElementById('inv-modal-title').textContent = `Invoice ${currentInv.invoice_number}`;
-  openModal('inv-modal');
+  try {
+    renderInvoicePreview(currentInv);
+    document.getElementById('inv-modal-title').textContent = `Invoice ${currentInv.invoice_number}`;
+    openModal('inv-modal');
+  } catch(e) {
+    toast('Could not open invoice: ' + e.message, 'error');
+    console.error(e);
+  }
 }
 
 function renderInvoicePreview(inv) {
-  const lines = JSON.parse(inv.line_items || '[]');
+  let lines = [];
+  try { lines = JSON.parse(inv.line_items || '[]'); } catch(e) { lines = []; }
   document.getElementById('inv-preview-content').innerHTML = `
     <div class="doc-header">
       <img src="../Current LOGO/After Canva/paytech-full-logo.png" style="height:44px;background:white;border-radius:999px;padding:4px 14px;border:1px solid #e2e8f0;">

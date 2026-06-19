@@ -59,10 +59,11 @@
     .hero-icon-bg {
       position: fixed;
       left: 0; right: 0;
-      top: 50%; transform: translateY(-160px);
-      height: 320px;
-      background: radial-gradient(ellipse 100vw 50% at 50% 50%, rgba(255,255,255,0.85) 5%, rgba(255,255,255,0.25) 40%, transparent 70%);
+      top: 50%; transform: translateY(-50%);
+      height: 100vh;
+      background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.7) 35%, rgba(255,255,255,0.7) 65%, transparent 100%);
       pointer-events: none;
+      z-index: 0;
     }
 
     .hero-icon {

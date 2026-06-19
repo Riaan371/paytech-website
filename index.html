@@ -57,11 +57,12 @@
     }
 
     .hero-icon-bg {
-      position: absolute;
-      inset: -20px 0;
-      background: #ffffff;
-      -webkit-mask-image: radial-gradient(ellipse 95% 70% at 50% 50%, black 20%, rgba(0,0,0,0.6) 55%, transparent 80%);
-      mask-image: radial-gradient(ellipse 95% 70% at 50% 50%, black 20%, rgba(0,0,0,0.6) 55%, transparent 80%);
+      position: fixed;
+      left: 0; right: 0;
+      top: 50%; transform: translateY(-160px);
+      height: 320px;
+      background: radial-gradient(ellipse 100% 50% at 50% 50%, rgba(255,255,255,0.85) 5%, rgba(255,255,255,0.25) 40%, transparent 70%);
+      pointer-events: none;
     }
 
     .hero-icon {

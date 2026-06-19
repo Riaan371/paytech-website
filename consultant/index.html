@@ -644,12 +644,14 @@ async function saveJobCard() {
     screenshots:   [...existingScreenshots, ...newUrls],
   };
 
+  let dbError;
   if (editingJcId) {
-    await sb.from('job_cards').update(payload).eq('id', editingJcId);
+    ({ error: dbError } = await sb.from('job_cards').update(payload).eq('id', editingJcId));
   } else {
-    await sb.from('job_cards').insert(payload);
+    ({ error: dbError } = await sb.from('job_cards').insert(payload));
   }
   btn.disabled = false; btn.textContent = '💾 Save Job Card';
+  if (dbError) { toast('Save failed: ' + dbError.message, 'error'); return; }
   closeModal('jc-modal');
   toast('Job card saved!', 'success');
   loadJobCards();

@@ -99,6 +99,14 @@
     /* Query badge in invoices table */
     .query-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#f59e0b; margin-right:4px; }
 
+    /* Screenshots */
+    .screenshot-drop { border:2px dashed var(--gray-200); border-radius:8px; padding:1rem; text-align:center; cursor:pointer; color:var(--gray-400); font-size:0.82rem; transition:border-color 0.2s; }
+    .screenshot-drop:hover { border-color:var(--green); color:var(--green); }
+    .screenshot-thumbs { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.6rem; }
+    .screenshot-thumb { position:relative; width:80px; height:80px; border-radius:6px; overflow:hidden; border:1px solid var(--gray-200); cursor:pointer; }
+    .screenshot-thumb img { width:100%; height:100%; object-fit:cover; }
+    .screenshot-thumb .remove-img { position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
+
     /* JC View modal */
     .jc-doc { font-family:'Inter',sans-serif; padding:1.5rem; }
     .jc-doc-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--navy); }
@@ -268,10 +276,18 @@
       <div class="form-group full"><label>Notes (internal)</label>
         <textarea id="jc-notes" rows="2" placeholder="Any internal notes..."></textarea>
       </div>
+      <div class="form-group full">
+        <label>Print Screens / Screenshots</label>
+        <div class="screenshot-drop" onclick="document.getElementById('jc-file-input').click()">
+          📸 Click to attach screenshots — PNG, JPG (multiple allowed)
+        </div>
+        <input type="file" id="jc-file-input" accept="image/*" multiple style="display:none" onchange="previewScreenshots(this.files)" />
+        <div class="screenshot-thumbs" id="jc-thumbs"></div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('jc-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveJobCard()">💾 Save Job Card</button>
+      <button class="btn btn-primary" id="jc-save-btn" onclick="saveJobCard()">💾 Save Job Card</button>
     </div>
   </div>
 </div>
@@ -558,10 +574,12 @@ async function markPaid(id) {
 
 async function handleLogout() { await sb.auth.signOut(); window.location.href='../login/'; }
 
-let jobCards = [], editingJcId = null;
+let jobCards = [], editingJcId = null, pendingFiles = [], existingScreenshots = [];
 
 function openJobCardModal(jc = null) {
   editingJcId = jc ? jc.id : null;
+  pendingFiles = [];
+  existingScreenshots = jc ? (jc.screenshots || []) : [];
   document.getElementById('jc-modal-title').textContent = jc ? 'Edit Job Card' : 'New Job Card';
   document.getElementById('jc-date').value        = jc ? jc.date : new Date().toISOString().split('T')[0];
   document.getElementById('jc-type').value        = jc ? jc.type : 'Payroll Processing';
@@ -569,13 +587,50 @@ function openJobCardModal(jc = null) {
   document.getElementById('jc-status').value      = jc ? jc.status : 'Completed';
   document.getElementById('jc-description').value = jc ? jc.description : '';
   document.getElementById('jc-notes').value       = jc ? (jc.notes||'') : '';
+  document.getElementById('jc-file-input').value  = '';
+  renderThumbs();
   openModal('jc-modal');
+}
+
+function previewScreenshots(files) {
+  pendingFiles = Array.from(files);
+  renderThumbs();
+}
+
+function renderThumbs() {
+  const thumbs = document.getElementById('jc-thumbs');
+  const existingHtml = existingScreenshots.map((url, i) => `
+    <div class="screenshot-thumb">
+      <img src="${url}" onclick="window.open('${url}','_blank')">
+      <button class="remove-img" onclick="existingScreenshots.splice(${i},1);renderThumbs()">✕</button>
+    </div>`).join('');
+  const pendingHtml = pendingFiles.map((file, i) => {
+    const url = URL.createObjectURL(file);
+    return `<div class="screenshot-thumb">
+      <img src="${url}">
+      <button class="remove-img" onclick="pendingFiles.splice(${i},1);renderThumbs()">✕</button>
+    </div>`;
+  }).join('');
+  thumbs.innerHTML = existingHtml + pendingHtml;
 }
 
 async function saveJobCard() {
   const date = document.getElementById('jc-date').value;
   const desc = document.getElementById('jc-description').value;
   if (!date || !desc) { toast('Date and description are required.', 'error'); return; }
+
+  const btn = document.getElementById('jc-save-btn');
+  btn.disabled = true; btn.textContent = '⏳ Saving...';
+
+  const newUrls = [];
+  for (const file of pendingFiles) {
+    const path = `jc/${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const { data: up, error: upErr } = await sb.storage.from('job-card-files').upload(path, file, { upsert: true });
+    if (upErr) { toast('Upload failed: ' + upErr.message, 'error'); btn.disabled = false; btn.textContent = '💾 Save Job Card'; return; }
+    const { data: { publicUrl } } = sb.storage.from('job-card-files').getPublicUrl(up.path);
+    newUrls.push(publicUrl);
+  }
+
   const { data: { user } } = await sb.auth.getUser();
   const payload = {
     consultant_id: user.id,
@@ -586,12 +641,15 @@ async function saveJobCard() {
     status:        document.getElementById('jc-status').value,
     description:   desc,
     notes:         document.getElementById('jc-notes').value,
+    screenshots:   [...existingScreenshots, ...newUrls],
   };
+
   if (editingJcId) {
     await sb.from('job_cards').update(payload).eq('id', editingJcId);
   } else {
     await sb.from('job_cards').insert(payload);
   }
+  btn.disabled = false; btn.textContent = '💾 Save Job Card';
   closeModal('jc-modal');
   toast('Job card saved!', 'success');
   loadJobCards();
@@ -625,6 +683,13 @@ function viewJobCard(jc) {
         <p>${jc.description}</p>
       </div>
       ${jc.notes ? `<div class="jc-doc-section"><h4>Internal Notes</h4><p>${jc.notes}</p></div>` : ''}
+      ${(jc.screenshots||[]).length ? `
+        <div class="jc-doc-section">
+          <h4>Screenshots (${jc.screenshots.length})</h4>
+          <div class="jc-screenshots-grid">
+            ${jc.screenshots.map(url => `<img src="${url}" style="width:100%;border-radius:6px;border:1px solid #e2e8f0;margin-bottom:0.5rem;">`).join('')}
+          </div>
+        </div>` : ''}
       <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid #e2e8f0;font-size:0.72rem;color:#94a3b8;text-align:center;">
         Paytech Consulting Solutions · info@paytech.org.za · 082 440 1937
       </div>

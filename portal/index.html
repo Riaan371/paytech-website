@@ -242,12 +242,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('user-avatar').textContent = user.email[0].toUpperCase();
 
   // Get role + client_id
-  const { data: roleData } = await sb.from('profiles').select('role, client_id').eq('id', user.id).single();
-  if (!roleData) { window.location.href = '../login/'; return; }
-  if (roleData.role === 'admin') { window.location.href = '../admin/'; return; }
-  if (roleData.role === 'consultant') { window.location.href = '../consultant/'; return; }
-  if (roleData.role !== 'client') { window.location.href = '../login/'; return; }
-  clientId = roleData.client_id;
+  const role = user.user_metadata?.role;
+  if (role === 'admin') { window.location.href = '../admin/'; return; }
+  if (role === 'consultant') { window.location.href = '../consultant/'; return; }
+  if (role !== 'client') { window.location.href = '../login/'; return; }
+  const { data: profileData } = await sb.from('profiles').select('client_id').eq('id', user.id).single();
+  clientId = profileData?.client_id;
 
   // Load client info
   const { data: client } = await sb.from('clients').select('*').eq('id', clientId).single();

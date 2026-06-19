@@ -830,8 +830,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '../login/'; return; }
-  const { data: roleData } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-  if (!roleData || roleData.role !== 'admin') {
+  const role = session.user.user_metadata?.role;
+  if (role !== 'admin') {
     window.location.href = '../login/';
     return;
   }

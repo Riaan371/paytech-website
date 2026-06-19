@@ -153,15 +153,14 @@
         load.style.display = 'none';
         return;
       }
-      await redirectByRole(data.user.id);
+      await redirectByRole(data.user);
     }
 
-    async function redirectByRole(userId) {
-      const { data } = await sb.from('profiles').select('role').eq('id', userId).single();
-      const role = data?.role || 'client';
-      if (role === 'admin')      window.location.href = '../admin/';
+    async function redirectByRole(user) {
+      const role = user.user_metadata?.role || 'client';
+      if (role === 'admin')           window.location.href = '../admin/';
       else if (role === 'consultant') window.location.href = '../consultant/';
-      else                        window.location.href = '../portal/';
+      else                            window.location.href = '../portal/';
     }
   </script>
 </body>

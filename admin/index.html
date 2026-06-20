@@ -343,6 +343,56 @@
       #sidebar, #topbar, .topbar-actions { display: none !important; }
       #main { margin: 0 !important; }
     }
+
+    /* ── MOBILE ── */
+    .mob-menu-btn {
+      display: none; background: none; border: none; cursor: pointer;
+      padding: 0.4rem; border-radius: 6px; color: var(--navy);
+    }
+    .mob-menu-btn span { display: block; width: 22px; height: 2px; background: currentColor; margin: 4px 0; border-radius: 2px; }
+    #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+
+    @media (max-width: 768px) {
+      body { display: block; }
+
+      .login-card { width: calc(100% - 2rem); padding: 2rem 1.4rem; margin: 1rem; }
+
+      #sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+        width: 240px;
+      }
+      #sidebar.open { transform: translateX(0); }
+      #sidebar-overlay.open { display: block; }
+
+      #main { margin-left: 0; }
+
+      .mob-menu-btn { display: block; }
+
+      .topbar { padding: 0.85rem 1rem; }
+      .topbar-title { font-size: 1rem; }
+
+      .page { padding: 1rem; }
+
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.2rem; }
+      .stat-value { font-size: 1.5rem; }
+
+      .form-grid { grid-template-columns: 1fr; }
+
+      table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+      .modal { padding: 1.4rem; border-radius: 12px; max-width: calc(100vw - 2rem); }
+      .modal-footer { flex-direction: column; }
+      .modal-footer .btn { width: 100%; justify-content: center; }
+
+      .card-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+
+      #toast { left: 1rem; right: 1rem; bottom: 1rem; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -409,10 +459,14 @@
   </div>
 </div>
 
+<div id="sidebar-overlay"></div>
 <!-- ═══════════════════════════════════ MAIN ═══════════════════════════════════ -->
 <div id="main">
   <div class="topbar">
-    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="mob-menu-btn" id="mob-menu-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+      <div class="topbar-title" id="page-title">Dashboard</div>
+    </div>
     <div class="topbar-actions">
       <span class="text-muted" id="topbar-date"></span>
       <a href="../index.html" class="btn btn-outline btn-sm" target="_blank">🌐 View Website</a>
@@ -1690,6 +1744,27 @@ function toast(msg, type = '') {
   el.textContent = msg;
   el.className = 'show' + (type ? ' '+type : '');
   setTimeout(() => el.className = '', 3000);
+}
+
+// Mobile sidebar toggle
+const mobBtn = document.getElementById('mob-menu-btn');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebar-overlay');
+if (mobBtn) {
+  mobBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+  document.querySelectorAll('#sidebar .nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  });
 }
 </script>
 </body>

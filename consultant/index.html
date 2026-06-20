@@ -129,6 +129,35 @@
     .client-info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; padding:1.2rem 1.4rem; }
     .ci-item label { font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-400); display:block; margin-bottom:0.2rem; }
     .ci-item span  { font-size:0.875rem; font-weight:600; color:var(--gray-800); }
+
+    /* ── MOBILE ── */
+    .mob-menu-btn { display:none; background:none; border:none; cursor:pointer; padding:0.4rem; border-radius:6px; color:var(--navy); }
+    .mob-menu-btn span { display:block; width:22px; height:2px; background:currentColor; margin:4px 0; border-radius:2px; }
+    #sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:99; }
+
+    @media (max-width: 768px) {
+      body { display:block; }
+      #sidebar { transform:translateX(-100%); transition:transform 0.3s; }
+      #sidebar.open { transform:translateX(0); }
+      #sidebar-overlay.open { display:block; }
+      #main { margin-left:0; }
+      .mob-menu-btn { display:block; }
+      .topbar { padding:0.85rem 1rem; }
+      .topbar-title { font-size:1rem; }
+      .client-selector { flex-direction:column; align-items:stretch; margin:1rem; padding:1rem; }
+      .page { padding:0 1rem 3rem; }
+      .form-grid { grid-template-columns:1fr; }
+      .client-info-grid { grid-template-columns:1fr 1fr; }
+      table { display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .modal { padding:1.4rem; max-width:calc(100vw - 2rem); }
+      .modal-footer { flex-direction:column; }
+      .modal-footer .btn { width:100%; justify-content:center; }
+      .card-header { flex-direction:column; align-items:flex-start; gap:0.5rem; }
+      #toast { left:1rem; right:1rem; bottom:1rem; text-align:center; }
+    }
+    @media (max-width: 480px) {
+      .client-info-grid { grid-template-columns:1fr; }
+    }
   </style>
 </head>
 <body>
@@ -146,9 +175,13 @@
   </div>
 </div>
 
+<div id="sidebar-overlay"></div>
 <div id="main">
   <div class="topbar">
-    <div class="topbar-title" id="page-title">Invoices</div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="mob-menu-btn" id="mob-menu-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+      <div class="topbar-title" id="page-title">Invoices</div>
+    </div>
     <a href="../index.html" class="btn btn-outline btn-sm" target="_blank">🌐 Website</a>
   </div>
 
@@ -756,6 +789,27 @@ function toast(msg, type='') {
   const el=document.getElementById('toast'); el.textContent=msg;
   el.className='show'+(type?' '+type:'');
   setTimeout(()=>el.className='',3000);
+}
+
+// Mobile sidebar toggle
+const mobBtn = document.getElementById('mob-menu-btn');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebar-overlay');
+if (mobBtn) {
+  mobBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+  document.querySelectorAll('#sidebar .nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  });
 }
 </script>
 </body>

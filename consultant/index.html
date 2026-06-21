@@ -380,13 +380,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (role === 'admin') { window.location.href = '../admin/'; return; }
   if (role !== 'consultant') { window.location.href = '../login/'; return; }
 
-  // Load only assigned clients
-  const { data: cc } = await sb.from('consultant_clients').select('client_id').eq('consultant_id', user.id);
-  const ids = (cc||[]).map(r => r.client_id);
-  if (ids.length) {
-    const { data } = await sb.from('clients').select('*').in('id', ids).order('company_name');
-    myClients = data || [];
-  }
+  // Load all clients
+  const { data } = await sb.from('clients').select('*').order('company_name');
+  myClients = data || [];
   populateClientDropdown();
   setDefaultDates();
 });

@@ -151,6 +151,7 @@
       btn.disabled = true;
       load.style.display = 'block';
 
+      await sb.auth.signOut();
       const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
       if (error) {
         err.textContent = 'Invalid email or password. Please try again.';

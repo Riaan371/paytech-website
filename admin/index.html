@@ -1231,9 +1231,13 @@ async function markPaid(id) {
 
 async function deleteInvoice(id) {
   if (!confirm('Delete this invoice?')) return;
-  await sb.from('invoices').delete().eq('id', id);
-  toast('Invoice deleted');
+  // Delete any linked queries first (foreign key)
+  await sb.from('invoice_queries').delete().eq('invoice_id', id);
+  const { error } = await sb.from('invoices').delete().eq('id', id);
+  if (error) return toast('Error: ' + error.message, 'error');
+  toast('Invoice deleted', 'success');
   await loadInvoices();
+  updateDashboard();
 }
 
 function viewInvoice(id) {

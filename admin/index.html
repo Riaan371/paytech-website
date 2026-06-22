@@ -534,12 +534,29 @@
           <button class="btn btn-primary" onclick="openClientModal()">➕ Add Client</button>
         </div>
       </div>
-      <div class="card">
+      <!-- Tabs -->
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+        <button id="tab-active" class="btn btn-primary btn-sm" onclick="switchClientTab('active')">Active Clients</button>
+        <button id="tab-archived" class="btn btn-outline btn-sm" onclick="switchClientTab('archived')">🗄 Archived</button>
+      </div>
+      <!-- Active clients -->
+      <div id="clients-active-panel" class="card">
         <div class="card-body">
           <table>
             <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>Service</th><th>Monthly Fee</th><th>Actions</th></tr></thead>
             <tbody id="clients-table-body">
               <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:3rem;">Loading clients...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Archived clients -->
+      <div id="clients-archived-panel" class="card" style="display:none;">
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Service</th><th>Actions</th></tr></thead>
+            <tbody id="archived-clients-table-body">
+              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -874,7 +891,7 @@ const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── State ──
-let clients = [], invoices = [], quotes = [], currentUser = null;
+let clients = [], archivedClients = [], invoices = [], quotes = [], currentUser = null;
 let currentDocType = null, currentDocData = null;
 
 // ── Init ──
@@ -934,9 +951,12 @@ async function loadAll() {
 // CLIENTS
 // ═══════════════════════════════════════════
 async function loadClients() {
-  const { data } = await sb.from('clients').select('*').order('company_name');
-  clients = data || [];
+  const { data: active } = await sb.from('clients').select('*').or('archived.is.null,archived.eq.false').order('company_name');
+  clients = active || [];
+  const { data: arch } = await sb.from('clients').select('*').eq('archived', true).order('company_name');
+  archivedClients = arch || [];
   renderClientsTable();
+  renderArchivedTable();
   populateClientDropdowns();
 }
 
@@ -969,6 +989,45 @@ function renderClientsTable(filter = '') {
 
 function filterClients() {
   renderClientsTable(document.getElementById('client-search').value.toLowerCase());
+}
+
+function renderArchivedTable() {
+  const tbody = document.getElementById('archived-clients-table-body');
+  if (!archivedClients.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🗄</div><p>No archived clients.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = archivedClients.map(c => `
+    <tr style="opacity:0.75;">
+      <td><strong>${c.company_name}</strong></td>
+      <td>${c.contact_person||'-'}</td>
+      <td><a href="mailto:${c.email}" style="color:var(--green);text-decoration:none;">${c.email||'-'}</a></td>
+      <td><span class="badge badge-gray">${c.service_type||'-'}</span></td>
+      <td>
+        <div class="flex gap-2">
+          <button class="btn btn-outline btn-sm" onclick="restoreClient('${c.id}')">↩ Restore</button>
+          <button class="btn btn-danger btn-sm" onclick="permanentDeleteClient('${c.id}')">🗑 Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function switchClientTab(tab) {
+  const activePanel   = document.getElementById('clients-active-panel');
+  const archivedPanel = document.getElementById('clients-archived-panel');
+  const tabActive     = document.getElementById('tab-active');
+  const tabArchived   = document.getElementById('tab-archived');
+  if (tab === 'active') {
+    activePanel.style.display = '';
+    archivedPanel.style.display = 'none';
+    tabActive.className   = 'btn btn-primary btn-sm';
+    tabArchived.className = 'btn btn-outline btn-sm';
+  } else {
+    activePanel.style.display = 'none';
+    archivedPanel.style.display = '';
+    tabActive.className   = 'btn btn-outline btn-sm';
+    tabArchived.className = 'btn btn-primary btn-sm';
+  }
 }
 
 function openClientModal(id = null) {
@@ -1031,10 +1090,29 @@ async function saveClient() {
 }
 
 async function deleteClient(id) {
-  if (!confirm('Delete this client? This cannot be undone.')) return;
-  await sb.from('clients').delete().eq('id', id);
-  toast('Client deleted');
+  if (!confirm('Archive this client? They will be hidden from active lists but all historical data is preserved.')) return;
+  const { error } = await sb.from('clients').update({ archived: true }).eq('id', id);
+  if (error) return toast('Error: ' + error.message, 'error');
+  toast('Client archived', 'success');
   await loadClients();
+  updateDashboard();
+}
+
+async function restoreClient(id) {
+  const { error } = await sb.from('clients').update({ archived: false }).eq('id', id);
+  if (error) return toast('Error: ' + error.message, 'error');
+  toast('Client restored to active', 'success');
+  await loadClients();
+  updateDashboard();
+}
+
+async function permanentDeleteClient(id) {
+  if (!confirm('PERMANENTLY delete this client? This cannot be undone and will remove all linked data.')) return;
+  const { error } = await sb.from('clients').delete().eq('id', id);
+  if (error) return toast('Error: ' + error.message, 'error');
+  toast('Client permanently deleted');
+  await loadClients();
+  updateDashboard();
 }
 
 // ═══════════════════════════════════════════

@@ -1,0 +1,17 @@
+/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/admin/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/portal/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/consultant/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/login/*
+  Cache-Control: no-cache, no-store, must-revalidate

@@ -951,10 +951,10 @@ async function loadAll() {
 // CLIENTS
 // ═══════════════════════════════════════════
 async function loadClients() {
-  const { data: active } = await sb.from('clients').select('*').or('archived.is.null,archived.eq.false').order('company_name');
-  clients = active || [];
-  const { data: arch } = await sb.from('clients').select('*').eq('archived', true).order('company_name');
-  archivedClients = arch || [];
+  const { data, error } = await sb.from('clients').select('*').order('company_name');
+  const all = data || [];
+  clients         = all.filter(c => !c.archived);
+  archivedClients = all.filter(c =>  c.archived);
   renderClientsTable();
   renderArchivedTable();
   populateClientDropdowns();

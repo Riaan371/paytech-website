@@ -383,6 +383,23 @@
 
       .form-grid { grid-template-columns: 1fr; }
 
+      .responsive-table thead { display: none; }
+      .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
+      .responsive-table tr {
+        border-bottom: 8px solid var(--gray-50);
+        padding: 0.8rem 1rem;
+      }
+      .responsive-table td {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 0.4rem 0; border-bottom: none; text-align: right;
+      }
+      .responsive-table td::before {
+        content: attr(data-label);
+        font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 0.06em; color: var(--gray-400); text-align: left;
+        margin-right: 1rem;
+      }
+
       table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
       .modal { padding: 1.4rem; border-radius: 12px; max-width: calc(100vw - 2rem); }
@@ -621,7 +638,7 @@
       <div class="card" style="margin-bottom:1.5rem;">
         <div class="card-header"><div class="card-title">Recurring Clients</div></div>
         <div class="card-body">
-          <table>
+          <table class="responsive-table">
             <thead><tr><th>Client</th><th>Service</th><th>Monthly Fee</th><th>Day of Month</th><th>Next Invoice</th><th>Status</th></tr></thead>
             <tbody id="schedule-table-body">
               <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading schedule...</td></tr>
@@ -1393,12 +1410,12 @@ function loadSchedule() {
     const alreadyInvoiced = invoices.some(i => i.client_id === c.id && i.period === `${now.toLocaleString('default',{month:'long'})} ${now.getFullYear()}`);
     return `
     <tr>
-      <td><strong>${c.company_name}</strong></td>
-      <td>${c.service_type}</td>
-      <td><strong>R ${Number(c.monthly_fee).toFixed(2)}</strong></td>
-      <td>Day ${day}</td>
-      <td>${next.toLocaleDateString('en-ZA')}</td>
-      <td><span class="badge ${alreadyInvoiced ? 'badge-green' : 'badge-amber'}">${alreadyInvoiced ? '✓ Done' : 'Pending'}</span></td>
+      <td data-label="Client"><strong>${c.company_name}</strong></td>
+      <td data-label="Service">${c.service_type}</td>
+      <td data-label="Monthly Fee"><strong>R ${Number(c.monthly_fee).toFixed(2)}</strong></td>
+      <td data-label="Day of Month">Day ${day}</td>
+      <td data-label="Next Invoice">${next.toLocaleDateString('en-ZA')}</td>
+      <td data-label="Status"><span class="badge ${alreadyInvoiced ? 'badge-green' : 'badge-amber'}">${alreadyInvoiced ? '✓ Done' : 'Pending'}</span></td>
     </tr>`;
   }).join('');
 }

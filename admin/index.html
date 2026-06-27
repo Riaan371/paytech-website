@@ -369,13 +369,17 @@
 
       .mob-menu-btn { display: block; }
 
-      .topbar { padding: 0.85rem 1rem; }
+      .topbar { padding: 0.85rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
       .topbar-title { font-size: 1rem; }
+      .topbar-actions { width: 100%; justify-content: space-between; }
+      #topbar-date { font-size: 0.72rem; text-align: left; }
 
       .page { padding: 1rem; }
 
       .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.2rem; }
       .stat-value { font-size: 1.5rem; }
+
+      .dash-grid { grid-template-columns: 1fr !important; }
 
       .form-grid { grid-template-columns: 1fr; }
 
@@ -498,7 +502,7 @@
           <div class="stat-sub">This month</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;">
+      <div class="dash-grid" style="display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;">
         <div class="card">
           <div class="card-header">
             <div class="card-title">Recent Invoices</div>

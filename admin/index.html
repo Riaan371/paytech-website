@@ -353,8 +353,8 @@
     #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
 
     @media (max-width: 768px) {
-      body { display: block; overflow-x: hidden; max-width: 100vw; }
-      #main, .page { max-width: 100vw; overflow-x: hidden; }
+      body { display: block; }
+      #main, .page { max-width: 100vw; box-sizing: border-box; }
 
       .login-card { width: calc(100% - 2rem); padding: 2rem 1.4rem; margin: 1rem; }
 

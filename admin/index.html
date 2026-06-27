@@ -353,7 +353,8 @@
     #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
 
     @media (max-width: 768px) {
-      body { display: block; }
+      body { display: block; overflow-x: hidden; max-width: 100vw; }
+      #main, .page { max-width: 100vw; overflow-x: hidden; }
 
       .login-card { width: calc(100% - 2rem); padding: 2rem 1.4rem; margin: 1rem; }
 
@@ -1661,9 +1662,9 @@ async function loadAssignPage() {
     const assigned = (allAssignments||[]).filter(a => a.consultant_id === cid).map(a => a.client_id);
     const clientCheckboxes = (allClients||[]).map(c => {
       const checked = assigned.includes(c.id) ? 'checked' : '';
-      return `<label style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.875rem;border:1px solid ${checked?'var(--green)':'var(--gray-200)'};background:${checked?'#f0fdf4':'white'};transition:all 0.15s;" id="lbl-${cid}-${c.id}">
-        <input type="checkbox" ${checked} onchange="toggleAssign('${cid}','${c.id}',this)" style="accent-color:var(--green);width:15px;height:15px;" />
-        ${c.company_name}
+      return `<label style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.875rem;border:1px solid ${checked?'var(--green)':'var(--gray-200)'};background:${checked?'#f0fdf4':'white'};transition:all 0.15s;max-width:100%;box-sizing:border-box;" id="lbl-${cid}-${c.id}">
+        <input type="checkbox" ${checked} onchange="toggleAssign('${cid}','${c.id}',this)" style="accent-color:var(--green);width:15px;height:15px;flex-shrink:0;" />
+        <span style="overflow-wrap:anywhere;">${c.company_name}</span>
       </label>`;
     }).join('');
     html += `

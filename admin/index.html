@@ -408,6 +408,11 @@
 
       .card-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 
+      .section-header { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+      .section-header .flex { flex-wrap: wrap; width: 100%; }
+      .search-input { width: 100%; flex: 1 1 auto; }
+      .section-header .btn { width: 100%; justify-content: center; }
+
       #toast { left: 1rem; right: 1rem; bottom: 1rem; text-align: center; }
     }
 
@@ -563,7 +568,7 @@
       <!-- Active clients -->
       <div id="clients-active-panel" class="card">
         <div class="card-body">
-          <table>
+          <table class="responsive-table">
             <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>Service</th><th>Monthly Fee</th><th>Actions</th></tr></thead>
             <tbody id="clients-table-body">
               <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:3rem;">Loading clients...</td></tr>
@@ -574,7 +579,7 @@
       <!-- Archived clients -->
       <div id="clients-archived-panel" class="card" style="display:none;">
         <div class="card-body">
-          <table>
+          <table class="responsive-table">
             <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Service</th><th>Actions</th></tr></thead>
             <tbody id="archived-clients-table-body">
               <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>
@@ -597,7 +602,7 @@
       </div>
       <div class="card">
         <div class="card-body">
-          <table>
+          <table class="responsive-table">
             <thead><tr><th>#</th><th>Client</th><th>Amount</th><th>Period</th><th>Status</th><th>Due Date</th><th>Actions</th></tr></thead>
             <tbody id="invoices-table-body">
               <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:3rem;">Loading invoices...</td></tr>
@@ -617,7 +622,7 @@
       </div>
       <div class="card">
         <div class="card-body">
-          <table>
+          <table class="responsive-table">
             <thead><tr><th>#</th><th>Client</th><th>Amount</th><th>Valid Until</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="quotes-table-body">
               <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading quotes...</td></tr>
@@ -992,13 +997,13 @@ function renderClientsTable(filter = '') {
   }
   tbody.innerHTML = rows.map(c => `
     <tr>
-      <td><strong>${c.company_name}</strong></td>
-      <td>${c.contact_person||'-'}</td>
-      <td><a href="mailto:${c.email}" style="color:var(--green);text-decoration:none;">${c.email||'-'}</a></td>
-      <td>${c.phone||'-'}</td>
-      <td><span class="badge badge-blue">${c.service_type||'-'}</span></td>
-      <td><strong>R ${Number(c.monthly_fee||0).toFixed(2)}</strong></td>
-      <td>
+      <td data-label="Company"><strong>${c.company_name}</strong></td>
+      <td data-label="Contact">${c.contact_person||'-'}</td>
+      <td data-label="Email"><a href="mailto:${c.email}" style="color:var(--green);text-decoration:none;">${c.email||'-'}</a></td>
+      <td data-label="Phone">${c.phone||'-'}</td>
+      <td data-label="Service"><span class="badge badge-blue">${c.service_type||'-'}</span></td>
+      <td data-label="Monthly Fee"><strong>R ${Number(c.monthly_fee||0).toFixed(2)}</strong></td>
+      <td data-label="Actions">
         <div class="flex gap-2">
           <button class="btn btn-outline btn-sm" onclick="editClient('${c.id}')">✏</button>
           <button class="btn btn-primary btn-sm" onclick="quickInvoice('${c.id}')">🧾</button>
@@ -1020,11 +1025,11 @@ function renderArchivedTable() {
   }
   tbody.innerHTML = archivedClients.map(c => `
     <tr style="opacity:0.75;">
-      <td><strong>${c.company_name}</strong></td>
-      <td>${c.contact_person||'-'}</td>
-      <td><a href="mailto:${c.email}" style="color:var(--green);text-decoration:none;">${c.email||'-'}</a></td>
-      <td><span class="badge badge-gray">${c.service_type||'-'}</span></td>
-      <td>
+      <td data-label="Company"><strong>${c.company_name}</strong></td>
+      <td data-label="Contact">${c.contact_person||'-'}</td>
+      <td data-label="Email"><a href="mailto:${c.email}" style="color:var(--green);text-decoration:none;">${c.email||'-'}</a></td>
+      <td data-label="Service"><span class="badge badge-gray">${c.service_type||'-'}</span></td>
+      <td data-label="Actions">
         <div class="flex gap-2">
           <button class="btn btn-outline btn-sm" onclick="restoreClient('${c.id}')">↩ Restore</button>
           <button class="btn btn-danger btn-sm" onclick="permanentDeleteClient('${c.id}')">🗑 Delete</button>
@@ -1156,13 +1161,13 @@ function renderInvoicesTable(filter = '') {
   }
   tbody.innerHTML = rows.map(i => `
     <tr>
-      <td><strong>${i.invoice_number}</strong></td>
-      <td>${i.clients?.company_name||'Unknown'}</td>
-      <td><strong>R ${Number(i.total||0).toFixed(2)}</strong></td>
-      <td>${i.period||'-'}</td>
-      <td><span class="badge ${statusBadge(i.status)}">${i.status}</span></td>
-      <td>${i.due_date ? new Date(i.due_date).toLocaleDateString('en-ZA') : '-'}</td>
-      <td>
+      <td data-label="#"><strong>${i.invoice_number}</strong></td>
+      <td data-label="Client">${i.clients?.company_name||'Unknown'}</td>
+      <td data-label="Amount"><strong>R ${Number(i.total||0).toFixed(2)}</strong></td>
+      <td data-label="Period">${i.period||'-'}</td>
+      <td data-label="Status"><span class="badge ${statusBadge(i.status)}">${i.status}</span></td>
+      <td data-label="Due Date">${i.due_date ? new Date(i.due_date).toLocaleDateString('en-ZA') : '-'}</td>
+      <td data-label="Actions">
         <div class="flex gap-2">
           <button class="btn btn-outline btn-sm" onclick="viewInvoice('${i.id}')">👁</button>
           <button class="btn btn-primary btn-sm" onclick="emailInvoice('${i.id}')">📧</button>
@@ -1298,12 +1303,12 @@ function renderQuotesTable() {
   }
   tbody.innerHTML = quotes.map(q => `
     <tr>
-      <td><strong>${q.quote_number}</strong></td>
-      <td>${q.clients?.company_name||'Unknown'}</td>
-      <td><strong>R ${Number(q.total||0).toFixed(2)}</strong></td>
-      <td>${q.valid_until ? new Date(q.valid_until).toLocaleDateString('en-ZA') : '-'}</td>
-      <td><span class="badge ${statusBadge(q.status)}">${q.status}</span></td>
-      <td>
+      <td data-label="#"><strong>${q.quote_number}</strong></td>
+      <td data-label="Client">${q.clients?.company_name||'Unknown'}</td>
+      <td data-label="Amount"><strong>R ${Number(q.total||0).toFixed(2)}</strong></td>
+      <td data-label="Valid Until">${q.valid_until ? new Date(q.valid_until).toLocaleDateString('en-ZA') : '-'}</td>
+      <td data-label="Status"><span class="badge ${statusBadge(q.status)}">${q.status}</span></td>
+      <td data-label="Actions">
         <div class="flex gap-2">
           <button class="btn btn-outline btn-sm" onclick="viewQuote('${q.id}')">👁</button>
           <button class="btn btn-primary btn-sm" onclick="emailQuote('${q.id}')">📧</button>

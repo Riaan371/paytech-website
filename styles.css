@@ -109,13 +109,13 @@ nav {
 }
 
 .nav-logo img {
-  height: 38px;
+  height: 48px;
   width: auto;
   display: block;
-  background: rgba(255,255,255,0.95);
+  background: #ffffff;
   border-radius: 999px;
-  padding: 6px 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  padding: 8px 20px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.25);
   position: relative;
 }
 

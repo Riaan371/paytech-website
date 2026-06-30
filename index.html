@@ -277,6 +277,137 @@
     }
 
 
+    /* ══════════════════════════════════════
+       UPGRADE PACK — all 5 visual upgrades
+       ══════════════════════════════════════ */
+
+    /* 01 — Background glow orbs */
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(72px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-orb-1 {
+      width: 520px; height: 420px;
+      background: rgba(58,171,92,0.13);
+      top: -80px; left: -120px;
+      animation: orbDrift 8s ease-in-out infinite alternate;
+    }
+    .hero-orb-2 {
+      width: 400px; height: 380px;
+      background: rgba(27,32,72,0.6);
+      bottom: -60px; right: -100px;
+      animation: orbDrift 10s ease-in-out 2s infinite alternate-reverse;
+    }
+    .hero-orb-3 {
+      width: 300px; height: 260px;
+      background: rgba(58,171,92,0.07);
+      top: 40%; right: 5%;
+      animation: orbDrift 7s ease-in-out 1s infinite alternate;
+    }
+    @keyframes orbDrift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(18px, -22px) scale(1.06); }
+    }
+
+    /* 02 — Glassmorphism cards */
+    .hero-svc-card {
+      background: rgba(255,255,255,0.055) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      border-top: 3px solid #3AAB5C !important;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hero-svc-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.45), 0 0 32px rgba(58,171,92,0.2), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+    }
+    .hero-svc-title { color: #ffffff !important; }
+    .hero-svc-sub   { color: rgba(210,225,245,0.65) !important; }
+    .sars-text      { color: rgba(210,225,245,0.8) !important; }
+    .growth-sub     { color: rgba(210,225,245,0.5) !important; }
+
+    /* 03 — Shimmer gradient on headline */
+    @keyframes headlineShimmer {
+      0%   { background-position: -300% center; }
+      100% { background-position: 300% center; }
+    }
+    .hero-h1 strong {
+      background: linear-gradient(90deg, #3AAB5C 0%, #3AAB5C 30%, #8eeaaa 50%, #3AAB5C 70%, #3AAB5C 100%);
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: headlineShimmer 4s linear infinite;
+    }
+
+    /* 04 — Green glow bloom behind cards */
+    .cards-glow-wrap {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .cards-glow-wrap::before {
+      content: '';
+      position: absolute;
+      top: 20%; left: 50%;
+      transform: translateX(-50%);
+      width: 70%; height: 60%;
+      background: radial-gradient(ellipse, rgba(58,171,92,0.18) 0%, transparent 70%);
+      filter: blur(30px);
+      pointer-events: none;
+      animation: glowBreathe 4s ease-in-out infinite;
+      z-index: 0;
+    }
+    @keyframes glowBreathe {
+      0%,100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+      50%      { opacity: 1;   transform: translateX(-50%) scale(1.08); }
+    }
+    .cards-glow-wrap .hero-service-cards { position: relative; z-index: 1; }
+
+    /* 05 — Shimmer CTA button + glow shadow */
+    @keyframes btnShimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .hero-cta a.btn-primary {
+      background: linear-gradient(90deg, #2d8f4e 0%, #3AAB5C 25%, #6dd98a 50%, #3AAB5C 75%, #2d8f4e 100%) !important;
+      background-size: 200% auto !important;
+      animation: btnShimmer 3s linear infinite;
+      box-shadow: 0 4px 24px rgba(58,171,92,0.45), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+    }
+    .hero-cta a.btn-primary:hover {
+      box-shadow: 0 6px 32px rgba(58,171,92,0.65), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+    }
+
+    /* Flow pill travelling shimmer */
+    .hero-flow-pill { position: relative; overflow: hidden; }
+    .hero-flow-pill::after {
+      content: '';
+      position: absolute; top: 0; bottom: 0; left: -60px; width: 40px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+      animation: pillSweep 3s linear infinite;
+    }
+    .hero-flow-pill:nth-child(1)::after { animation-delay: 0s; }
+    .hero-flow-pill:nth-child(3)::after { animation-delay: 0.6s; }
+    .hero-flow-pill:nth-child(5)::after { animation-delay: 1.2s; }
+    .hero-flow-pill:nth-child(7)::after { animation-delay: 1.8s; }
+    @keyframes pillSweep { from{left:-60px} to{left:120px} }
+
+    /* Badge breathing glow */
+    .hero-badge {
+      animation: badgeGlow 3s ease-in-out infinite;
+    }
+    @keyframes badgeGlow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(58,171,92,0); }
+      50%      { box-shadow: 0 0 0 8px rgba(58,171,92,0.08); }
+    }
+
     /* ── WATERMARK ── */
     .watermark {
       position: absolute;
@@ -325,13 +456,19 @@
     <!-- HERO -->
     <section class="hero">
 
+      <!-- Background glow orbs -->
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+
       <div class="hero-badge rise rise-d1">
         <span class="badge-dot"></span>
         South Africa's Payroll Specialists
       </div>
 
       <!-- SERVICE CARDS -->
-      <div class="hero-service-cards rise rise-d4">
+      <div class="cards-glow-wrap rise rise-d4">
+      <div class="hero-service-cards">
 
         <!-- CARD 1: Payroll & HR — SARS compliance checklist -->
         <div class="hero-svc-card">
@@ -404,6 +541,7 @@
           <div class="hero-svc-sub">Expert payroll consulting, compliance advice and full outsourcing — so you focus on growth.</div>
         </div>
 
+      </div>
       </div>
 
       <h1 class="hero-h1 rise rise-d5">

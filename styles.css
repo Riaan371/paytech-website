@@ -109,7 +109,7 @@ nav {
 }
 
 .nav-logo img {
-  height: 48px;
+  height: 68px;
   width: auto;
   display: block;
   background: #ffffff;
@@ -657,7 +657,7 @@ body.page-quote {
    SMALL MOBILE  ≤ 480px
    ═══════════════════════════════════════ */
 @media (max-width: 480px) {
-  .nav-logo img { height: 30px; }
+  .nav-logo img { height: 44px; }
   main { padding: 0 1rem 2.5rem; }
   .page-header { padding: 2rem 1rem 1.2rem; }
 }

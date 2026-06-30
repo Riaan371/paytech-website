@@ -107,14 +107,15 @@
       display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#fff;
     }
     @keyframes checkPop {
-      0%,60%{background:transparent;border-color:rgba(58,171,92,0.3);}
-      80%{background:#3AAB5C;transform:scale(1.25);}
-      100%{background:#3AAB5C;transform:scale(1);}
+      0%,20%{ background:transparent; border-color:rgba(58,171,92,0.3); transform:scale(1); }
+      28%   { background:#3AAB5C; transform:scale(1.18); }
+      33%,80%{ background:#3AAB5C; transform:scale(1); border-color:#3AAB5C; }
+      92%,100%{ background:transparent; border-color:rgba(58,171,92,0.3); transform:scale(1); }
     }
-    .sd1{animation:checkPop 0.35s ease 0.4s both infinite;}
-    .sd2{animation:checkPop 0.35s ease 1.0s both infinite;}
-    .sd3{animation:checkPop 0.35s ease 1.6s both infinite;}
-    .sd4{animation:checkPop 0.35s ease 2.2s both infinite;}
+    .sd1{ animation:checkPop 8s ease 0s    infinite; }
+    .sd2{ animation:checkPop 8s ease 1.4s  infinite; }
+    .sd3{ animation:checkPop 8s ease 2.8s  infinite; }
+    .sd4{ animation:checkPop 8s ease 4.2s  infinite; }
     .sars-text { font-size:0.72rem;color:#475569;text-align:left; }
 
     /* T1 — Fingerprint scan */

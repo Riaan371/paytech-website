@@ -65,11 +65,15 @@
     }
 
     .hero-sub {
-      font-size: clamp(0.88rem, 1.4vw, 1rem);
+      font-size: clamp(0.82rem, 1.2vw, 0.95rem);
       color: rgba(210,225,245,0.65);
       line-height: 1.7;
-      max-width: 480px;
+      max-width: 900px;
+      white-space: nowrap;
       margin-bottom: 1.6rem;
+    }
+    @media (max-width: 768px) {
+      .hero-sub { white-space: normal; max-width: 100%; }
     }
 
     /* ── SERVICE CARDS ── */

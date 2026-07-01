@@ -400,6 +400,30 @@
       50%      { box-shadow: 0 0 0 8px rgba(58,171,92,0.08); }
     }
 
+    /* ── SCENE FLOW ANIMATION ── */
+    .scene-wrap { width:100%; max-width:920px; margin-bottom:1.6rem; }
+    .scene-stage { position:relative; height:220px; overflow:hidden; }
+    .sc { position:absolute; inset:0; display:flex; align-items:center; gap:2rem; padding:0 0.5rem; opacity:0; transition:opacity 0.65s ease; pointer-events:none; }
+    .sc.sc-active { opacity:1; pointer-events:auto; }
+    .sc-svg { flex-shrink:0; width:295px; height:175px; }
+    .sc-label { display:flex; flex-direction:column; gap:0.42rem; text-align:left; }
+    .sc-step { font-size:0.63rem; color:#3AAB5C; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; }
+    .sc-title { font-size:1.45rem; font-weight:800; color:#fff; line-height:1.15; }
+    .sc-sub { font-size:0.78rem; color:rgba(210,225,245,0.6); line-height:1.65; max-width:295px; }
+    .sc-tags { display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.2rem; }
+    .sc-tag { font-size:0.65rem; background:rgba(58,171,92,0.12); border:1px solid rgba(58,171,92,0.25); color:#3AAB5C; padding:0.16rem 0.55rem; border-radius:999px; }
+    .sc-progress { display:flex; justify-content:center; gap:0.5rem; margin-top:0.65rem; }
+    .sc-dot { width:26px; height:3px; border-radius:2px; background:rgba(255,255,255,0.14); cursor:pointer; transition:background 0.3s,width 0.3s; }
+    .sc-dot.active { background:#3AAB5C; width:42px; }
+    @keyframes fadeRow { 0%,8%{opacity:0;transform:translateY(3px)} 20%,80%{opacity:1;transform:translateY(0)} 92%,100%{opacity:0} }
+    .rw { animation:fadeRow 5s ease infinite; opacity:0; }
+    .d1{animation-delay:0.2s} .d2{animation-delay:0.7s} .d3{animation-delay:1.2s} .d4{animation-delay:1.7s}
+    @media(max-width:680px){
+      .scene-stage{height:auto;min-height:180px}
+      .sc{position:static;flex-direction:column;}
+      .sc-svg{width:100%;max-width:280px;height:auto;}
+    }
+
     /* ── WATERMARK ── */
     .watermark {
       position: absolute;
@@ -546,16 +570,305 @@
       </div>
       </div>
 
-      <!-- INTEGRATION FLOW -->
-      <div class="hero-flow rise rise-d5">
-        <span class="hero-flow-pill">Clocking</span>
-        <span class="hero-flow-arrow">→</span>
-        <span class="hero-flow-pill">Payroll</span>
-        <span class="hero-flow-arrow">→</span>
-        <span class="hero-flow-pill">Accounting</span>
-        <span class="hero-flow-arrow">→</span>
-        <span class="hero-flow-pill">Reports</span>
-        <span class="hero-flow-label">&nbsp;— all integrated</span>
+      <!-- SCENE FLOW ANIMATION -->
+      <div class="scene-wrap rise rise-d5">
+        <div class="scene-stage">
+
+          <!-- SCENE 1: Time & Attendance -->
+          <div class="sc sc-active">
+            <svg class="sc-svg" viewBox="0 0 295 175" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="90" cy="90" rx="65" ry="55" fill="rgba(58,171,92,0.05)"/>
+              <!-- kiosk -->
+              <rect x="205" y="22" width="70" height="132" rx="9" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+              <rect x="214" y="32" width="52" height="34" rx="4" fill="rgba(58,171,92,0.1)" stroke="rgba(58,171,92,0.3)" stroke-width="1"/>
+              <text x="240" y="52" text-anchor="middle" fill="#3AAB5C" font-size="14" font-family="monospace" font-weight="700">08:47</text>
+              <text x="240" y="62" text-anchor="middle" fill="rgba(58,171,92,0.5)" font-size="5" font-family="sans-serif" letter-spacing="0.5">CLOCKED IN</text>
+              <!-- fingerprint pad -->
+              <rect x="216" y="82" width="48" height="48" rx="6" fill="rgba(58,171,92,0.08)" stroke="rgba(58,171,92,0.4)" stroke-width="1.5"/>
+              <ellipse cx="240" cy="106" rx="14" ry="17" stroke="rgba(58,171,92,0.55)" stroke-width="1.2" fill="none"/>
+              <ellipse cx="240" cy="106" rx="9" ry="12" stroke="rgba(58,171,92,0.45)" stroke-width="1.2" fill="none"/>
+              <ellipse cx="240" cy="106" rx="4" ry="7" stroke="rgba(58,171,92,0.38)" stroke-width="1.2" fill="none"/>
+              <!-- scan line -->
+              <rect x="216" y="82" width="48" height="2.5" rx="1" fill="#3AAB5C" opacity="0.85">
+                <animate attributeName="y" values="82;130;82" dur="2.4s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.85;0.25;0.85" dur="2.4s" repeatCount="indefinite"/>
+              </rect>
+              <!-- verified badge -->
+              <circle cx="240" cy="152" r="11" fill="#3AAB5C">
+                <animate attributeName="r" values="0;0;13;11;11;0;0" keyTimes="0;0.45;0.55;0.6;0.85;0.92;1" dur="5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0;1;1;1;0;0" keyTimes="0;0.45;0.55;0.6;0.85;0.92;1" dur="5s" repeatCount="indefinite"/>
+              </circle>
+              <polyline points="233,152 238,157 248,144" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                <animate attributeName="opacity" values="0;0;0;1;1;0;0" keyTimes="0;0.5;0.6;0.65;0.85;0.92;1" dur="5s" repeatCount="indefinite"/>
+              </polyline>
+              <!-- person head -->
+              <circle cx="82" cy="44" r="20" fill="#3AAB5C"/>
+              <circle cx="75" cy="40" r="3.5" fill="rgba(0,0,0,0.22)"/>
+              <circle cx="89" cy="40" r="3.5" fill="rgba(0,0,0,0.22)"/>
+              <path d="M75 51 Q82 57 90 51" stroke="rgba(0,0,0,0.22)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <!-- hair -->
+              <path d="M62 42 Q64 26 82 24 Q100 26 102 42" stroke="rgba(0,0,0,0.18)" stroke-width="4" fill="rgba(0,0,0,0.1)" stroke-linecap="round"/>
+              <!-- torso -->
+              <rect x="68" y="64" width="28" height="50" rx="9" fill="rgba(255,255,255,0.13)"/>
+              <!-- arm extended to scanner -->
+              <path d="M96 80 Q155 92 212 107" stroke="rgba(255,255,255,0.75)" stroke-width="5" stroke-linecap="round" fill="none"/>
+              <circle cx="215" cy="108" r="6" fill="rgba(255,255,255,0.5)"/>
+              <!-- other arm -->
+              <line x1="68" y1="80" x2="50" y2="102" stroke="rgba(255,255,255,0.68)" stroke-width="4.5" stroke-linecap="round"/>
+              <!-- legs -->
+              <line x1="78" y1="114" x2="70" y2="158" stroke="rgba(255,255,255,0.68)" stroke-width="5" stroke-linecap="round"/>
+              <line x1="88" y1="114" x2="96" y2="158" stroke="rgba(255,255,255,0.68)" stroke-width="5" stroke-linecap="round"/>
+              <line x1="70" y1="158" x2="55" y2="161" stroke="rgba(255,255,255,0.55)" stroke-width="4" stroke-linecap="round"/>
+              <line x1="96" y1="158" x2="111" y2="161" stroke="rgba(255,255,255,0.55)" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+            <div class="sc-label">
+              <span class="sc-step">Step 01</span>
+              <span class="sc-title">Time &amp; Attendance</span>
+              <span class="sc-sub">Employees clock in biometrically. Every minute tracked accurately and pushed straight into payroll.</span>
+              <div class="sc-tags"><span class="sc-tag">Biometric</span><span class="sc-tag">Real-time</span><span class="sc-tag">Auto-sync</span></div>
+            </div>
+          </div>
+
+          <!-- SCENE 2: Payroll Processing -->
+          <div class="sc">
+            <svg class="sc-svg" viewBox="0 0 295 175" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- desk -->
+              <rect x="18" y="134" width="190" height="7" rx="3" fill="rgba(255,255,255,0.07)"/>
+              <rect x="40" y="141" width="8" height="22" rx="4" fill="rgba(255,255,255,0.05)"/>
+              <rect x="150" y="141" width="8" height="22" rx="4" fill="rgba(255,255,255,0.05)"/>
+              <!-- laptop base -->
+              <rect x="44" y="105" width="118" height="30" rx="5" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+              <rect x="56" y="111" width="44" height="4" rx="2" fill="rgba(255,255,255,0.07)"/>
+              <rect x="56" y="118" width="44" height="4" rx="2" fill="rgba(255,255,255,0.07)"/>
+              <!-- laptop screen -->
+              <rect x="50" y="44" width="106" height="67" rx="5" fill="rgba(10,20,50,0.96)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+              <!-- screen header -->
+              <rect x="53" y="47" width="100" height="9" rx="2" fill="rgba(58,171,92,0.15)"/>
+              <text x="70" y="54" fill="rgba(58,171,92,0.9)" font-size="5" font-family="monospace" font-weight="700">EMPLOYEE</text>
+              <text x="105" y="54" fill="rgba(58,171,92,0.9)" font-size="5" font-family="monospace" font-weight="700">SALARY</text>
+              <text x="132" y="54" fill="rgba(58,171,92,0.9)" font-size="5" font-family="monospace" font-weight="700">STATUS</text>
+              <!-- data rows -->
+              <g class="rw d1">
+                <text x="55" y="65" fill="rgba(255,255,255,0.82)" font-size="5" font-family="monospace">J. Smith</text>
+                <text x="104" y="65" fill="rgba(255,255,255,0.82)" font-size="5" font-family="monospace">R28 500</text>
+                <rect x="131" y="60" width="16" height="7" rx="2" fill="rgba(58,171,92,0.25)"/>
+                <text x="132" y="66" fill="#3AAB5C" font-size="4.5" font-family="monospace">PAID</text>
+              </g>
+              <g class="rw d2">
+                <text x="55" y="75" fill="rgba(255,255,255,0.82)" font-size="5" font-family="monospace">A. Patel</text>
+                <text x="104" y="75" fill="rgba(255,255,255,0.82)" font-size="5" font-family="monospace">R42 000</text>
+                <rect x="131" y="70" width="16" height="7" rx="2" fill="rgba(58,171,92,0.25)"/>
+                <text x="132" y="76" fill="#3AAB5C" font-size="4.5" font-family="monospace">PAID</text>
+              </g>
+              <g class="rw d3">
+                <text x="55" y="85" fill="rgba(255,255,255,0.82)" font-size="5" font-family="monospace">K. Dube</text>
+                <text x="104" y="85" fill="rgba(255,255,255,0.82)" font-size="5" font-family="monospace">R35 750</text>
+                <rect x="131" y="80" width="16" height="7" rx="2" fill="rgba(58,171,92,0.25)"/>
+                <text x="132" y="86" fill="#3AAB5C" font-size="4.5" font-family="monospace">PAID</text>
+              </g>
+              <g class="rw d4">
+                <text x="55" y="95" fill="rgba(255,255,255,0.82)" font-size="5" font-family="monospace">T. Nkosi</text>
+                <text x="104" y="95" fill="rgba(255,255,255,0.82)" font-size="5" font-family="monospace">R51 200</text>
+                <rect x="131" y="90" width="16" height="7" rx="2" fill="rgba(58,171,92,0.25)"/>
+                <text x="132" y="96" fill="#3AAB5C" font-size="4.5" font-family="monospace">PAID</text>
+              </g>
+              <line x1="50" y1="105" x2="156" y2="105" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <!-- person sitting -->
+              <circle cx="222" cy="68" r="20" fill="#3AAB5C"/>
+              <circle cx="215" cy="64" r="3.5" fill="rgba(0,0,0,0.22)"/>
+              <circle cx="229" cy="64" r="3.5" fill="rgba(0,0,0,0.22)"/>
+              <path d="M215 75 Q222 80 230 75" stroke="rgba(0,0,0,0.22)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <rect x="208" y="88" width="28" height="48" rx="9" fill="rgba(255,255,255,0.13)"/>
+              <!-- arms reaching to keyboard -->
+              <path d="M208 100 Q162 120 130 122" stroke="rgba(255,255,255,0.72)" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <path d="M236 100 Q196 118 165 121" stroke="rgba(255,255,255,0.72)" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <circle cx="128" cy="123" r="5.5" fill="rgba(255,255,255,0.44)"/>
+              <circle cx="163" cy="122" r="5.5" fill="rgba(255,255,255,0.44)"/>
+              <!-- data particles flowing left -->
+              <circle r="2.5" fill="#3AAB5C">
+                <animate attributeName="cx" values="205;160;120" dur="1.8s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="88;82;76" dur="1.8s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.4;0" dur="1.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle r="2" fill="#3AAB5C">
+                <animate attributeName="cx" values="205;160;120" dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="94;88;82" dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.6;0.3;0" dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+              </circle>
+              <circle r="1.5" fill="#3AAB5C">
+                <animate attributeName="cx" values="205;160;120" dur="1.8s" begin="1.2s" repeatCount="indefinite"/>
+                <animate attributeName="cy" values="82;76;70" dur="1.8s" begin="1.2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.5;0.2;0" dur="1.8s" begin="1.2s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+            <div class="sc-label">
+              <span class="sc-step">Step 02</span>
+              <span class="sc-title">Payroll Processing</span>
+              <span class="sc-sub">Clock data flows directly into payroll. Salaries calculated, SARS compliant, paid on time — every time.</span>
+              <div class="sc-tags"><span class="sc-tag">SARS Compliant</span><span class="sc-tag">PaySpace</span><span class="sc-tag">Auto-calc</span></div>
+            </div>
+          </div>
+
+          <!-- SCENE 3: Accounting -->
+          <div class="sc">
+            <svg class="sc-svg" viewBox="0 0 295 175" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- desk -->
+              <rect x="16" y="134" width="200" height="7" rx="3" fill="rgba(255,255,255,0.07)"/>
+              <rect x="32" y="141" width="8" height="22" rx="4" fill="rgba(255,255,255,0.05)"/>
+              <rect x="158" y="141" width="8" height="22" rx="4" fill="rgba(255,255,255,0.05)"/>
+              <!-- monitor -->
+              <rect x="88" y="26" width="132" height="100" rx="6" fill="rgba(10,20,50,0.96)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+              <rect x="144" y="126" width="24" height="12" rx="2" fill="rgba(255,255,255,0.06)"/>
+              <rect x="130" y="136" width="52" height="5" rx="2" fill="rgba(255,255,255,0.05)"/>
+              <!-- ledger header -->
+              <rect x="91" y="29" width="126" height="11" rx="2" fill="rgba(58,171,92,0.15)"/>
+              <text x="125" y="37" text-anchor="middle" fill="rgba(58,171,92,0.9)" font-size="6" font-family="monospace" font-weight="700">DEBIT</text>
+              <line x1="155" y1="29" x2="155" y2="122" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+              <text x="186" y="37" text-anchor="middle" fill="rgba(58,171,92,0.9)" font-size="6" font-family="monospace" font-weight="700">CREDIT</text>
+              <!-- rows -->
+              <g class="rw d1">
+                <text x="93" y="52" fill="rgba(255,255,255,0.55)" font-size="5" font-family="monospace">Salaries</text>
+                <text x="116" y="52" fill="rgba(255,255,255,0.88)" font-size="5.5" font-family="monospace">85 400</text>
+                <text x="158" y="52" fill="rgba(255,255,255,0.88)" font-size="5.5" font-family="monospace">85 400</text>
+              </g>
+              <g class="rw d2">
+                <text x="93" y="63" fill="rgba(255,255,255,0.55)" font-size="5" font-family="monospace">PAYE</text>
+                <text x="116" y="63" fill="rgba(255,255,255,0.88)" font-size="5.5" font-family="monospace">18 200</text>
+                <text x="158" y="63" fill="rgba(255,255,255,0.88)" font-size="5.5" font-family="monospace">18 200</text>
+              </g>
+              <g class="rw d3">
+                <text x="93" y="74" fill="rgba(255,255,255,0.55)" font-size="5" font-family="monospace">UIF</text>
+                <text x="116" y="74" fill="rgba(255,255,255,0.88)" font-size="5.5" font-family="monospace">4 250</text>
+                <text x="158" y="74" fill="rgba(255,255,255,0.88)" font-size="5.5" font-family="monospace">4 250</text>
+              </g>
+              <g class="rw d4">
+                <text x="93" y="85" fill="rgba(255,255,255,0.55)" font-size="5" font-family="monospace">SDL</text>
+                <text x="116" y="85" fill="rgba(255,255,255,0.88)" font-size="5.5" font-family="monospace">1 050</text>
+                <text x="158" y="85" fill="rgba(255,255,255,0.88)" font-size="5.5" font-family="monospace">1 050</text>
+              </g>
+              <!-- total line -->
+              <line x1="91" y1="91" x2="215" y2="91" stroke="rgba(58,171,92,0.35)" stroke-width="1"/>
+              <text x="93" y="101" fill="rgba(58,171,92,0.9)" font-size="5.5" font-family="monospace" font-weight="700">TOTAL</text>
+              <text x="114" y="101" fill="#3AAB5C" font-size="5.5" font-family="monospace" font-weight="700">108 900</text>
+              <text x="156" y="101" fill="#3AAB5C" font-size="5.5" font-family="monospace" font-weight="700">108 900</text>
+              <!-- balanced -->
+              <rect x="91" y="107" width="70" height="12" rx="4" fill="rgba(58,171,92,0.15)" stroke="rgba(58,171,92,0.4)" stroke-width="1">
+                <animate attributeName="opacity" values="0;0;0;1;1;0;0" keyTimes="0;0.35;0.5;0.6;0.88;0.94;1" dur="5s" repeatCount="indefinite"/>
+              </rect>
+              <text x="126" y="116" text-anchor="middle" fill="#3AAB5C" font-size="6" font-family="monospace" font-weight="700">
+                <animate attributeName="opacity" values="0;0;0;1;1;0;0" keyTimes="0;0.35;0.5;0.6;0.88;0.94;1" dur="5s" repeatCount="indefinite"/>
+                ✓ BALANCED
+              </text>
+              <!-- person at desk -->
+              <circle cx="50" cy="66" r="20" fill="#3AAB5C"/>
+              <circle cx="43" cy="62" r="3.5" fill="rgba(0,0,0,0.22)"/>
+              <circle cx="57" cy="62" r="3.5" fill="rgba(0,0,0,0.22)"/>
+              <path d="M43 73 Q50 77 58 73" stroke="rgba(0,0,0,0.22)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <!-- glasses -->
+              <rect x="38" y="58" width="10" height="7" rx="3" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1.3"/>
+              <rect x="50" y="58" width="10" height="7" rx="3" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1.3"/>
+              <line x1="48" y1="61.5" x2="50" y2="61.5" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+              <rect x="36" y="86" width="28" height="50" rx="9" fill="rgba(255,255,255,0.13)"/>
+              <!-- arms toward monitor -->
+              <path d="M64 98 Q74 114 88 120" stroke="rgba(255,255,255,0.72)" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <path d="M36 98 Q60 118 84 122" stroke="rgba(255,255,255,0.72)" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+              <circle cx="89" cy="121" r="5.5" fill="rgba(255,255,255,0.42)"/>
+              <circle cx="85" cy="123" r="5.5" fill="rgba(255,255,255,0.42)"/>
+            </svg>
+            <div class="sc-label">
+              <span class="sc-step">Step 03</span>
+              <span class="sc-title">Accounting</span>
+              <span class="sc-sub">Payroll journals auto-sync to your accounts. Debits match credits — fully reconciled, zero manual effort.</span>
+              <div class="sc-tags"><span class="sc-tag">Auto-sync</span><span class="sc-tag">Reconciled</span><span class="sc-tag">SARS Ready</span></div>
+            </div>
+          </div>
+
+          <!-- SCENE 4: Reports & Insights -->
+          <div class="sc">
+            <svg class="sc-svg" viewBox="0 0 295 175" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- dashboard frame -->
+              <rect x="10" y="12" width="275" height="154" rx="9" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+              <rect x="10" y="12" width="275" height="20" rx="9" fill="rgba(58,171,92,0.1)"/>
+              <rect x="10" y="22" width="275" height="10" fill="rgba(58,171,92,0.1)"/>
+              <circle cx="22" cy="22" r="4" fill="rgba(255,255,255,0.14)"/>
+              <circle cx="34" cy="22" r="4" fill="rgba(255,255,255,0.09)"/>
+              <circle cx="46" cy="22" r="4" fill="rgba(255,255,255,0.06)"/>
+              <text x="148" y="26" text-anchor="middle" fill="rgba(255,255,255,0.38)" font-size="6.5" font-family="sans-serif" letter-spacing="1">PAYTECH DASHBOARD</text>
+              <!-- KPI cards -->
+              <rect x="16" y="38" width="58" height="28" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <text x="45" y="47" text-anchor="middle" fill="rgba(255,255,255,0.38)" font-size="5" font-family="sans-serif">Total Staff</text>
+              <text x="45" y="60" text-anchor="middle" fill="#3AAB5C" font-size="12" font-family="monospace" font-weight="700">247</text>
+              <rect x="80" y="38" width="58" height="28" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <text x="109" y="47" text-anchor="middle" fill="rgba(255,255,255,0.38)" font-size="5" font-family="sans-serif">Payroll Run</text>
+              <text x="109" y="60" text-anchor="middle" fill="#3AAB5C" font-size="10" font-family="monospace" font-weight="700">R2.4M</text>
+              <rect x="144" y="38" width="58" height="28" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <text x="173" y="47" text-anchor="middle" fill="rgba(255,255,255,0.38)" font-size="5" font-family="sans-serif">Compliance</text>
+              <text x="173" y="60" text-anchor="middle" fill="#3AAB5C" font-size="12" font-family="monospace" font-weight="700">100%</text>
+              <rect x="208" y="38" width="70" height="28" rx="5" fill="rgba(58,171,92,0.1)" stroke="rgba(58,171,92,0.25)" stroke-width="1"/>
+              <text x="243" y="47" text-anchor="middle" fill="rgba(58,171,92,0.65)" font-size="5" font-family="sans-serif">SARS Status</text>
+              <text x="243" y="60" text-anchor="middle" fill="#3AAB5C" font-size="9" font-family="monospace" font-weight="700">✓ Filed</text>
+              <!-- bar chart -->
+              <text x="16" y="82" fill="rgba(255,255,255,0.26)" font-size="5.5" font-family="sans-serif">Monthly payroll cost</text>
+              <rect x="20" y="158" width="20" height="0" rx="2" fill="#3AAB5C" opacity="0.55">
+                <animate attributeName="height" values="0;36;36;0" keyTimes="0;0.2;0.8;1" dur="5s" repeatCount="indefinite"/>
+                <animate attributeName="y" values="158;122;122;158" keyTimes="0;0.2;0.8;1" dur="5s" repeatCount="indefinite"/>
+              </rect>
+              <text x="30" y="164" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="5" font-family="sans-serif">Jan</text>
+              <rect x="46" y="158" width="20" height="0" rx="2" fill="#3AAB5C" opacity="0.62">
+                <animate attributeName="height" values="0;44;44;0" keyTimes="0;0.22;0.8;1" dur="5s" repeatCount="indefinite"/>
+                <animate attributeName="y" values="158;114;114;158" keyTimes="0;0.22;0.8;1" dur="5s" repeatCount="indefinite"/>
+              </rect>
+              <text x="56" y="164" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="5" font-family="sans-serif">Feb</text>
+              <rect x="72" y="158" width="20" height="0" rx="2" fill="#3AAB5C" opacity="0.7">
+                <animate attributeName="height" values="0;38;38;0" keyTimes="0;0.24;0.8;1" dur="5s" repeatCount="indefinite"/>
+                <animate attributeName="y" values="158;120;120;158" keyTimes="0;0.24;0.8;1" dur="5s" repeatCount="indefinite"/>
+              </rect>
+              <text x="82" y="164" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="5" font-family="sans-serif">Mar</text>
+              <rect x="98" y="158" width="20" height="0" rx="2" fill="#3AAB5C" opacity="0.78">
+                <animate attributeName="height" values="0;52;52;0" keyTimes="0;0.26;0.8;1" dur="5s" repeatCount="indefinite"/>
+                <animate attributeName="y" values="158;106;106;158" keyTimes="0;0.26;0.8;1" dur="5s" repeatCount="indefinite"/>
+              </rect>
+              <text x="108" y="164" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="5" font-family="sans-serif">Apr</text>
+              <rect x="124" y="158" width="20" height="0" rx="2" fill="#3AAB5C" opacity="0.86">
+                <animate attributeName="height" values="0;46;46;0" keyTimes="0;0.28;0.8;1" dur="5s" repeatCount="indefinite"/>
+                <animate attributeName="y" values="158;112;112;158" keyTimes="0;0.28;0.8;1" dur="5s" repeatCount="indefinite"/>
+              </rect>
+              <text x="134" y="164" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="5" font-family="sans-serif">May</text>
+              <rect x="150" y="158" width="20" height="0" rx="2" fill="#3AAB5C" opacity="0.95">
+                <animate attributeName="height" values="0;58;58;0" keyTimes="0;0.3;0.8;1" dur="5s" repeatCount="indefinite"/>
+                <animate attributeName="y" values="158;100;100;158" keyTimes="0;0.3;0.8;1" dur="5s" repeatCount="indefinite"/>
+              </rect>
+              <text x="160" y="164" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="5" font-family="sans-serif">Jun</text>
+              <!-- line chart -->
+              <text x="186" y="82" fill="rgba(255,255,255,0.26)" font-size="5.5" font-family="sans-serif">Growth trend</text>
+              <polyline points="186,155 204,142 220,128 238,114 255,100 272,84" fill="none" stroke="#3AAB5C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="220" stroke-dashoffset="220">
+                <animate attributeName="stroke-dashoffset" values="220;0;0;220" keyTimes="0;0.35;0.8;1" dur="5s" repeatCount="indefinite"/>
+              </polyline>
+              <circle cx="272" cy="84" r="5" fill="#3AAB5C">
+                <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.3;0.38;0.8;0.88;1" dur="5s" repeatCount="indefinite"/>
+                <animate attributeName="r" values="5;5;5;7;5" keyTimes="0;0.38;0.55;0.67;0.8" dur="5s" repeatCount="indefinite"/>
+              </circle>
+              <text x="272" y="78" text-anchor="middle" fill="#3AAB5C" font-size="10" font-weight="700">
+                <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.3;0.38;0.8;0.88;1" dur="5s" repeatCount="indefinite"/>
+                ↑
+              </text>
+            </svg>
+            <div class="sc-label">
+              <span class="sc-step">Step 04</span>
+              <span class="sc-title">Reports &amp; Insights</span>
+              <span class="sc-sub">Live dashboards, compliance reports and payroll analytics — all in one place, always up to date.</span>
+              <div class="sc-tags"><span class="sc-tag">Live Data</span><span class="sc-tag">Analytics</span><span class="sc-tag">SARS Reports</span></div>
+            </div>
+          </div>
+
+        </div>
+        <!-- progress dots -->
+        <div class="sc-progress">
+          <div class="sc-dot active" onclick="scGoTo(0)"></div>
+          <div class="sc-dot" onclick="scGoTo(1)"></div>
+          <div class="sc-dot" onclick="scGoTo(2)"></div>
+          <div class="sc-dot" onclick="scGoTo(3)"></div>
+        </div>
       </div>
 
       <!-- CTA BUTTONS -->
@@ -588,6 +901,23 @@
 
   </div>
 
+  <script>
+    // Scene cycling
+    (function(){
+      var scenes = document.querySelectorAll('.sc');
+      var dots   = document.querySelectorAll('.sc-dot');
+      var cur = 0;
+      function goTo(n){
+        scenes[cur].classList.remove('sc-active');
+        dots[cur].classList.remove('active');
+        cur = n;
+        scenes[cur].classList.add('sc-active');
+        dots[cur].classList.add('active');
+      }
+      window.scGoTo = function(n){ clearInterval(timer); goTo(n); timer = setInterval(function(){ goTo((cur+1)%4); }, 5000); };
+      var timer = setInterval(function(){ goTo((cur+1)%4); }, 5000);
+    })();
+  </script>
   <script>
     // Hamburger menu
     const toggle = document.getElementById('navToggle');

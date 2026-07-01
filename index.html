@@ -391,6 +391,31 @@
     .hero-flow-pill:nth-child(7)::after { animation-delay: 1.8s; }
     @keyframes pillSweep { from{left:-60px} to{left:120px} }
 
+    /* ── WORKFLOW VIDEO ── */
+    .hero-video-wrap {
+      width: 100%;
+      max-width: 920px;
+      margin-bottom: 1.6rem;
+    }
+    .hero-video-pills {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+    }
+    .hero-video {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(58,171,92,0.28);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+      display: block;
+    }
+    @media (max-width: 680px) {
+      .hero-video { border-radius: 10px; }
+    }
+
     /* Badge breathing glow */
     .hero-badge {
       animation: badgeGlow 3s ease-in-out infinite;
@@ -570,16 +595,21 @@
       </div>
       </div>
 
-      <!-- INTEGRATION FLOW -->
-      <div class="hero-flow rise rise-d5">
-        <span class="hero-flow-pill">Clocking</span>
-        <span class="hero-flow-arrow">→</span>
-        <span class="hero-flow-pill">Payroll</span>
-        <span class="hero-flow-arrow">→</span>
-        <span class="hero-flow-pill">Accounting</span>
-        <span class="hero-flow-arrow">→</span>
-        <span class="hero-flow-pill">Reports</span>
-        <span class="hero-flow-label">&nbsp;— all integrated</span>
+      <!-- INTEGRATION FLOW VIDEO -->
+      <div class="hero-video-wrap rise rise-d5">
+        <div class="hero-video-pills">
+          <span class="hero-flow-pill">Clocking</span>
+          <span class="hero-flow-arrow">→</span>
+          <span class="hero-flow-pill">Payroll</span>
+          <span class="hero-flow-arrow">→</span>
+          <span class="hero-flow-pill">Accounting</span>
+          <span class="hero-flow-arrow">→</span>
+          <span class="hero-flow-pill">Reports</span>
+          <span class="hero-flow-label">&nbsp;— all integrated</span>
+        </div>
+        <video class="hero-video" autoplay muted loop playsinline>
+          <source src="workflow_demo.mp4" type="video/mp4">
+        </video>
       </div>
 
       <!-- CTA BUTTONS -->

@@ -157,24 +157,51 @@
     .growth-note { font-size:0.7rem;color:#3AAB5C;font-weight:600; }
     .growth-sub  { font-size:0.67rem;color:#94a3b8; }
 
-    /* ── INTEGRATION FLOW ── */
-    .hero-flow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-bottom: 1.6rem;
+    /* ── WORKFLOW STEP PLAYER ── */
+    .wf-player { width:100%; max-width:920px; margin-bottom:1.6rem; }
+    .wf-steps { display:flex; align-items:stretch; gap:8px; }
+    .wf-div { align-self:center; flex-shrink:0; color:rgba(58,171,92,0.55); font-size:0.95rem; font-weight:700; padding:0 2px; }
+    .wf-step {
+      flex:1; min-width:0;
+      border-radius:12px; overflow:hidden;
+      border:1px solid rgba(255,255,255,0.08);
+      border-top:3px solid rgba(255,255,255,0.07);
+      background:rgba(255,255,255,0.025);
+      transition:flex 0.45s cubic-bezier(0.4,0,0.2,1), border-color 0.3s, box-shadow 0.3s;
+      cursor:pointer; display:flex; flex-direction:column;
     }
-    .hero-flow-pill {
-      font-size: 0.71rem;
-      color: rgba(255,255,255,0.65);
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 999px;
-      padding: 0.22rem 0.7rem;
-      letter-spacing: 0.03em;
+    .wf-step.wf-active {
+      flex:4; border-top-color:#3AAB5C;
+      border-color:rgba(58,171,92,0.3);
+      box-shadow:0 8px 32px rgba(58,171,92,0.12);
     }
+    .wf-lbl {
+      padding:10px 12px 8px; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:3px; flex:1;
+    }
+    .wf-step.wf-active .wf-lbl { align-items:flex-start; flex:0 0 auto; padding:10px 14px 8px; }
+    .wf-n { font-size:0.58rem; font-weight:700; color:#3AAB5C; letter-spacing:0.14em; }
+    .wf-t {
+      font-size:0.8rem; font-weight:700; color:rgba(255,255,255,0.9);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    }
+    .wf-step:not(.wf-active) .wf-t { opacity:0.38; font-size:0.68rem; }
+    .wf-vw { display:none; overflow:hidden; flex:1; }
+    .wf-step.wf-active .wf-vw { display:block; }
+    .wf-vw video { width:100%; display:block; }
+    .wf-cap { display:none; font-size:0.7rem; color:rgba(58,171,92,0.8); padding:6px 14px 8px; line-height:1.4; }
+    .wf-step.wf-active .wf-cap { display:block; }
+    .wf-pb { height:3px; background:rgba(58,171,92,0.12); display:none; flex-shrink:0; }
+    .wf-step.wf-active .wf-pb { display:block; }
+    .wf-pf { height:100%; background:#3AAB5C; width:0%; }
+    @media (max-width:680px) {
+      .wf-steps { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+      .wf-div { display:none; }
+      .wf-step.wf-active { grid-column:1 / -1; }
+      .wf-step { min-height:52px; }
+    }
+
+    /* ── INTEGRATION FLOW (legacy pills, kept for reference) ── */
     .hero-flow-arrow { font-size: 0.72rem; color: #3AAB5C; font-weight: 700; }
     .hero-flow-label { font-size: 0.71rem; color: rgba(255,255,255,0.35); }
 
@@ -391,30 +418,6 @@
     .hero-flow-pill:nth-child(7)::after { animation-delay: 1.8s; }
     @keyframes pillSweep { from{left:-60px} to{left:120px} }
 
-    /* ── WORKFLOW VIDEO ── */
-    .hero-video-wrap {
-      width: 100%;
-      max-width: 920px;
-      margin-bottom: 1.6rem;
-    }
-    .hero-video-pills {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-bottom: 0.75rem;
-    }
-    .hero-video {
-      width: 100%;
-      border-radius: 14px;
-      border: 1px solid rgba(58,171,92,0.28);
-      box-shadow: 0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
-      display: block;
-    }
-    @media (max-width: 680px) {
-      .hero-video { border-radius: 10px; }
-    }
 
     /* Badge breathing glow */
     .hero-badge {
@@ -595,21 +598,45 @@
       </div>
       </div>
 
-      <!-- INTEGRATION FLOW VIDEO -->
-      <div class="hero-video-wrap rise rise-d5">
-        <div class="hero-video-pills">
-          <span class="hero-flow-pill">Clocking</span>
-          <span class="hero-flow-arrow">→</span>
-          <span class="hero-flow-pill">Payroll</span>
-          <span class="hero-flow-arrow">→</span>
-          <span class="hero-flow-pill">Accounting</span>
-          <span class="hero-flow-arrow">→</span>
-          <span class="hero-flow-pill">Reports</span>
-          <span class="hero-flow-label">&nbsp;— all integrated</span>
+      <!-- INTEGRATION STEP PLAYER -->
+      <div class="wf-player rise rise-d5">
+        <div class="wf-steps" id="wfSteps">
+
+          <div class="wf-step wf-active" data-wi="0">
+            <div class="wf-lbl"><span class="wf-n">01</span><span class="wf-t">Clocking</span></div>
+            <div class="wf-vw"><video id="wfv0" src="clip_clocking.mp4" muted playsinline preload="auto"></video></div>
+            <div class="wf-cap">Real-time employee time &amp; attendance</div>
+            <div class="wf-pb"><div class="wf-pf" id="wfp0"></div></div>
+          </div>
+
+          <div class="wf-div">→</div>
+
+          <div class="wf-step" data-wi="1">
+            <div class="wf-lbl"><span class="wf-n">02</span><span class="wf-t">Payroll</span></div>
+            <div class="wf-vw"><video id="wfv1" src="clip_payroll.mp4" muted playsinline preload="auto"></video></div>
+            <div class="wf-cap">Automated, compliant payroll processing</div>
+            <div class="wf-pb"><div class="wf-pf" id="wfp1"></div></div>
+          </div>
+
+          <div class="wf-div">→</div>
+
+          <div class="wf-step" data-wi="2">
+            <div class="wf-lbl"><span class="wf-n">03</span><span class="wf-t">Accounting</span></div>
+            <div class="wf-vw"><video id="wfv2" src="clip_accounting.mp4" muted playsinline preload="auto"></video></div>
+            <div class="wf-cap">Integrated financial records — zero manual entry</div>
+            <div class="wf-pb"><div class="wf-pf" id="wfp2"></div></div>
+          </div>
+
+          <div class="wf-div">→</div>
+
+          <div class="wf-step" data-wi="3">
+            <div class="wf-lbl"><span class="wf-n">04</span><span class="wf-t">Reports</span></div>
+            <div class="wf-vw"><video id="wfv3" src="clip_reports.mp4" muted playsinline preload="auto"></video></div>
+            <div class="wf-cap">Live dashboards &amp; SARS-ready compliance reporting</div>
+            <div class="wf-pb"><div class="wf-pf" id="wfp3"></div></div>
+          </div>
+
         </div>
-        <video class="hero-video" autoplay muted loop playsinline>
-          <source src="workflow_demo.mp4" type="video/mp4">
-        </video>
       </div>
 
       <!-- CTA BUTTONS -->
@@ -658,6 +685,42 @@
         });
       });
     }
+  </script>
+  <script>
+    // Workflow step accordion player
+    (function() {
+      const steps = Array.from(document.querySelectorAll('#wfSteps .wf-step'));
+      const vids  = steps.map((_, i) => document.getElementById('wfv' + i));
+      const fills = steps.map((_, i) => document.getElementById('wfp' + i));
+      let cur = 0, raf;
+
+      function goTo(idx) {
+        cancelAnimationFrame(raf);
+        cur = idx;
+        steps.forEach((s, i) => s.classList.toggle('wf-active', i === idx));
+        vids.forEach((v, i) => {
+          if (!v) return;
+          if (i === idx) { v.currentTime = 0; v.play().catch(function(){}); }
+          else { v.pause(); v.currentTime = 0; if (fills[i]) fills[i].style.width = '0%'; }
+        });
+        tick();
+      }
+
+      function tick() {
+        var v = vids[cur], f = fills[cur];
+        if (v && f && v.duration) f.style.width = (v.currentTime / v.duration * 100) + '%';
+        raf = requestAnimationFrame(tick);
+      }
+
+      vids.forEach(function(v, i) {
+        if (v) v.addEventListener('ended', function() { goTo((i + 1) % steps.length); });
+      });
+      steps.forEach(function(s, i) {
+        s.addEventListener('click', function() { if (i !== cur) goTo(i); });
+      });
+
+      goTo(0);
+    })();
   </script>
   <script>
     const slides = document.querySelectorAll('.bg-slide');

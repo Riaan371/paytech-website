@@ -157,48 +157,136 @@
     .growth-note { font-size:0.7rem;color:#3AAB5C;font-weight:600; }
     .growth-sub  { font-size:0.67rem;color:#94a3b8; }
 
-    /* ── WORKFLOW STEP PLAYER ── */
-    .wf-player { width:100%; max-width:920px; margin-bottom:1.6rem; }
-    .wf-steps { display:flex; align-items:stretch; gap:8px; }
-    .wf-div { align-self:center; flex-shrink:0; color:rgba(58,171,92,0.55); font-size:0.95rem; font-weight:700; padding:0 2px; }
-    .wf-step {
-      flex:1; min-width:0;
-      border-radius:12px; overflow:hidden;
-      border:1px solid rgba(255,255,255,0.08);
-      border-top:3px solid rgba(255,255,255,0.07);
-      background:rgba(255,255,255,0.025);
-      transition:flex 0.45s cubic-bezier(0.4,0,0.2,1), border-color 0.3s, box-shadow 0.3s;
-      cursor:pointer; display:flex; flex-direction:column;
+    /* ── SEAMLESS FLOW ANIMATION ── */
+    .sf-wrap { width:100%; max-width:920px; margin-bottom:1.6rem; background:rgba(8,12,30,0.6); border:1px solid rgba(58,171,92,0.14); border-radius:18px; padding:1.3rem 1rem 1rem; }
+    .sf-hdg { text-align:center; font-size:0.66rem; font-weight:700; letter-spacing:0.2em; color:rgba(255,255,255,0.42); text-transform:uppercase; margin-bottom:0.85rem; }
+    .sf-hdg em { color:#3AAB5C; font-style:normal; }
+    .sf-lbls { display:flex; align-items:flex-start; margin-bottom:0.7rem; }
+    .sf-slbl { flex:1; display:flex; align-items:flex-start; gap:0.35rem; }
+    .sf-sn { width:20px; height:20px; border-radius:50%; border:1.5px solid #3AAB5C; color:#3AAB5C; font-size:0.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+    .sf-st b { font-size:0.58rem; font-weight:700; color:white; letter-spacing:0.07em; display:block; }
+    .sf-st small { font-size:0.5rem; color:rgba(255,255,255,0.32); line-height:1.35; display:block; }
+    .sf-sar { color:rgba(58,171,92,0.32); font-size:0.75rem; flex-shrink:0; padding:3px 1px 0; }
+    .sf-panels { display:flex; align-items:stretch; }
+    .sf-panel { flex:1; min-width:0; background:rgba(255,255,255,0.026); border:1px solid rgba(255,255,255,0.062); border-radius:11px; padding:0.6rem 0.48rem 0.5rem; position:relative; overflow:hidden; display:flex; flex-direction:column; gap:0.38rem; min-height:268px; }
+    .sf-panel::before { content:''; position:absolute; width:110px; height:110px; border-radius:50%; background:rgba(58,171,92,0.09); filter:blur(30px); top:12px; left:50%; transform:translateX(-50%); animation:sfOrb 4s ease-in-out infinite; pointer-events:none; }
+    .sf-panels .sf-panel:nth-child(3)::before { animation-delay:1s; }
+    .sf-panels .sf-panel:nth-child(5)::before { animation-delay:2s; }
+    .sf-panels .sf-panel:nth-child(7)::before { animation-delay:3s; }
+    @keyframes sfOrb { 0%,100%{opacity:0.45;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.28)} }
+    .sf-panel > * { position:relative; z-index:1; }
+    .sf-con { flex:0 0 32px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+    .sf-con-a { color:rgba(58,171,92,0.52); font-size:0.9rem; font-weight:700; }
+    .sf-cd { width:5px; height:5px; border-radius:50%; background:#3AAB5C; animation:sfcd 1.4s ease-in-out infinite; }
+    .sf-cd:nth-child(3) { animation-delay:0.35s; }
+    .sf-cd:nth-child(4) { animation-delay:0.7s; }
+    @keyframes sfcd { 0%,100%{opacity:0.1;transform:scale(0.62)} 50%{opacity:1;transform:scale(1)} }
+    .sf-ptit { font-size:0.5rem; font-weight:700; letter-spacing:0.14em; color:rgba(255,255,255,0.35); text-align:center; text-transform:uppercase; }
+    /* P1 Clocking */
+    .sf-devo { display:flex; justify-content:center; margin:0.05rem 0; }
+    .sf-dev { width:76px; background:linear-gradient(155deg,#192238 0%,#090f1e 100%); border:1px solid rgba(58,171,92,0.3); border-radius:10px; padding:0.42rem; animation:sfDG 2.5s ease-in-out infinite; }
+    @keyframes sfDG { 0%,100%{box-shadow:0 0 12px rgba(58,171,92,0.08)} 50%{box-shadow:0 0 22px rgba(58,171,92,0.26)} }
+    .sf-scr { background:#050c18; border-radius:5px; padding:0.26rem; text-align:center; margin-bottom:0.32rem; }
+    .sf-ct { font-size:0.88rem; font-weight:700; color:#3AAB5C; font-family:monospace; }
+    .sf-ap { font-size:0.42rem; color:rgba(58,171,92,0.48); }
+    .sf-ci2 { font-size:0.44rem; color:#3AAB5C; font-weight:700; margin-top:2px; }
+    .sf-fpw { position:relative; padding:0.08rem; }
+    .sf-fpw svg { width:100%; display:block; }
+    .sf-fpscan { position:absolute; left:3px; right:3px; height:2px; background:linear-gradient(90deg,transparent,rgba(58,171,92,0.82),transparent); animation:sfScan 2.2s ease-in-out infinite; box-shadow:0 0 5px rgba(58,171,92,0.45); }
+    @keyframes sfScan { 0%,100%{top:3px;opacity:0} 8%{opacity:1} 85%{opacity:1;top:calc(100% - 3px)} 96%{opacity:0} }
+    .sf-live { flex:1; }
+    .sf-lhdr { font-size:0.46rem; color:rgba(255,255,255,0.36); letter-spacing:0.1em; display:flex; align-items:center; gap:3px; margin-bottom:0.26rem; }
+    .sf-ldot { width:5px; height:5px; background:#3AAB5C; border-radius:50%; animation:sfLD 1.1s ease infinite; }
+    @keyframes sfLD { 0%,100%{opacity:1} 50%{opacity:0.18} }
+    .sf-lr { display:flex; align-items:center; gap:3px; padding:1.5px 0; border-bottom:1px solid rgba(255,255,255,0.032); animation:sfLR 8s ease infinite; }
+    .sf-lr:nth-child(2) { animation-delay:0s; }
+    .sf-lr:nth-child(3) { animation-delay:0.5s; }
+    .sf-lr:nth-child(4) { animation-delay:1s; }
+    .sf-lr:nth-child(5) { animation-delay:1.5s; }
+    @keyframes sfLR { 0%,4%{opacity:0;transform:translateY(-3px)} 14%,84%{opacity:1;transform:none} 96%,100%{opacity:0} }
+    .sf-av { width:13px; height:13px; border-radius:50%; background:rgba(58,171,92,0.13); border:1px solid rgba(58,171,92,0.28); color:#3AAB5C; font-size:0.34rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sf-ln { flex:1; font-size:0.46rem; color:rgba(255,255,255,0.55); }
+    .sf-la { font-size:0.42rem; color:#3AAB5C; }
+    .sf-lc { font-size:0.46rem; color:rgba(255,255,255,0.33); margin-top:0.26rem; }
+    .sf-lc b { color:#3AAB5C; font-size:0.68rem; }
+    /* P2 Payroll */
+    .sf-ring-a { display:flex; justify-content:center; position:relative; }
+    .sf-rsvg { width:84px; height:84px; display:block; }
+    .sf-rb { animation:sfRing 9s ease-in-out infinite; }
+    @keyframes sfRing { 0%,4%{stroke-dashoffset:213.6} 60%,80%{stroke-dashoffset:0} 97%,100%{stroke-dashoffset:213.6} }
+    .sf-rpct { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:0.95rem; font-weight:700; color:#3AAB5C; font-family:monospace; text-align:center; }
+    .sf-rsub { font-size:0.36rem; display:block; color:rgba(255,255,255,0.3); font-family:inherit; }
+    .sf-proc { font-size:0.48rem; color:rgba(255,255,255,0.28); text-align:center; letter-spacing:0.08em; }
+    .sf-cl { display:flex; flex-direction:column; gap:2.5px; flex:1; }
+    .sf-cii { display:flex; align-items:center; gap:3px; font-size:0.48rem; color:rgba(255,255,255,0.62); opacity:0; animation:sfCI 9s ease infinite; }
+    .sf-cii:nth-child(1) { animation-delay:1s; }
+    .sf-cii:nth-child(2) { animation-delay:1.9s; }
+    .sf-cii:nth-child(3) { animation-delay:2.8s; }
+    .sf-cii:nth-child(4) { animation-delay:3.7s; }
+    .sf-cii:nth-child(5) { animation-delay:4.6s; }
+    @keyframes sfCI { 0%,6%{opacity:0} 18%,82%{opacity:1} 95%,100%{opacity:0} }
+    .sf-cb2 { width:10px; height:10px; border-radius:2px; border:1px solid rgba(58,171,92,0.35); background:rgba(58,171,92,0.16); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.38rem; color:#3AAB5C; }
+    /* P3 Accounting */
+    .sf-glt { width:100%; border-collapse:collapse; flex:1; }
+    .sf-glt thead th { font-size:0.42rem; color:rgba(255,255,255,0.26); font-weight:600; padding:2px 1px; border-bottom:1px solid rgba(255,255,255,0.055); text-align:left; }
+    .sf-glt tbody tr { opacity:0; animation:sfRow 10s ease infinite; }
+    .sf-glt tbody tr:nth-child(1) { animation-delay:0.3s; }
+    .sf-glt tbody tr:nth-child(2) { animation-delay:1s; }
+    .sf-glt tbody tr:nth-child(3) { animation-delay:1.7s; }
+    .sf-glt tbody tr:nth-child(4) { animation-delay:2.4s; }
+    .sf-glt tbody tr:nth-child(5) { animation-delay:3.1s; }
+    @keyframes sfRow { 0%,2%{opacity:0;transform:translateX(-5px)} 15%,77%{opacity:1;transform:none} 93%,100%{opacity:0} }
+    .sf-glt td { font-size:0.42rem; color:rgba(255,255,255,0.48); padding:2px 1px; border-bottom:1px solid rgba(255,255,255,0.038); }
+    .sf-dbt { color:#3AAB5C !important; font-weight:600; }
+    .sf-crd { color:rgba(58,171,92,0.6) !important; }
+    .sf-pst { background:rgba(58,171,92,0.07); border:1px solid rgba(58,171,92,0.18); border-radius:7px; padding:0.28rem 0.36rem; display:flex; gap:0.28rem; align-items:flex-start; opacity:0; animation:sfPst 10s ease infinite 4.2s; }
+    @keyframes sfPst { 0%,33%{opacity:0;transform:translateY(4px)} 47%,80%{opacity:1;transform:none} 95%,100%{opacity:0} }
+    .sf-pck { color:#3AAB5C; font-size:0.75rem; line-height:1; flex-shrink:0; }
+    .sf-pst b { font-size:0.48rem; color:white; display:block; }
+    .sf-pst small { font-size:0.42rem; color:rgba(255,255,255,0.36); }
+    /* P4 Reporting */
+    .sf-csvg { width:100%; height:66px; display:block; overflow:visible; }
+    .sf-cln { animation:sfCLine 7s ease-in-out infinite; }
+    @keyframes sfCLine { 0%,8%{stroke-dashoffset:240} 65%,86%{stroke-dashoffset:0} 100%{stroke-dashoffset:240} }
+    .sf-cdot2 { animation:sfCDot 1.5s ease-in-out infinite; }
+    @keyframes sfCDot { 0%,100%{r:3} 50%{r:5.5} }
+    .sf-rb2 { display:flex; gap:0.38rem; align-items:center; flex:1; }
+    .sf-kpi { flex:1; }
+    .sf-kv { font-size:1.35rem; font-weight:700; color:#3AAB5C; font-family:monospace; line-height:1; }
+    .sf-kl { font-size:0.42rem; color:rgba(255,255,255,0.3); letter-spacing:0.1em; margin-top:2px; }
+    .sf-kg { font-size:0.48rem; color:#3AAB5C; margin-top:3px; }
+    .sf-dn { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px; }
+    .sf-dls { font-size:0.42rem; color:rgba(255,255,255,0.36); }
+    .sf-dls div { display:flex; align-items:center; gap:3px; margin-top:2px; }
+    .sf-dls span { width:6px; height:6px; border-radius:1px; display:inline-block; flex-shrink:0; }
+    /* Timeline */
+    .sf-tl { display:flex; flex-direction:column; gap:0.28rem; margin-top:0.8rem; padding:0 0.2rem; }
+    .sf-tlr { display:flex; align-items:center; }
+    .sf-tln { width:8px; height:8px; border-radius:50%; border:1.5px solid #3AAB5C; background:#1B2048; flex-shrink:0; animation:sfTLN 12s ease-in-out infinite; }
+    .sf-tln:nth-child(1) { animation-delay:0s; }
+    .sf-tln:nth-child(3) { animation-delay:3s; }
+    .sf-tln:nth-child(5) { animation-delay:6s; }
+    .sf-tln:nth-child(7) { animation-delay:9s; }
+    @keyframes sfTLN { 0%,3%{background:#3AAB5C;box-shadow:0 0 10px rgba(58,171,92,0.8)} 16%,100%{background:#1B2048;box-shadow:none} }
+    .sf-tls { flex:1; height:2px; background:rgba(58,171,92,0.13); position:relative; overflow:hidden; }
+    .sf-tls::after { content:''; position:absolute; top:0; left:-50px; width:50px; height:100%; background:linear-gradient(90deg,transparent,#3AAB5C,transparent); animation:sfTLS 12s ease-in-out infinite; }
+    .sf-tlr .sf-tls:nth-child(4)::after { animation-delay:3s; }
+    .sf-tlr .sf-tls:nth-child(6)::after { animation-delay:6s; }
+    @keyframes sfTLS { 0%,1%{left:-50px;opacity:1} 11%{left:100%;opacity:0} 12%,100%{left:-50px;opacity:0} 0%{opacity:1} }
+    .sf-tll { display:flex; justify-content:space-between; font-size:0.48rem; font-weight:700; letter-spacing:0.11em; color:rgba(58,171,92,0.6); }
+    /* Footer */
+    .sf-foot { display:flex; align-items:center; gap:0.65rem; margin-top:0.7rem; padding-top:0.7rem; border-top:1px solid rgba(255,255,255,0.052); }
+    .sf-fic { color:#3AAB5C; font-size:1.3rem; flex-shrink:0; line-height:1; }
+    .sf-foot b { font-size:0.64rem; color:white; letter-spacing:0.07em; display:block; }
+    .sf-foot p { font-size:0.54rem; color:rgba(255,255,255,0.33); margin:0; margin-top:2px; line-height:1.5; }
+    @media (max-width:720px) {
+      .sf-panels { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+      .sf-con { display:none; }
+      .sf-lbls { display:none; }
+      .sf-panel { min-height:220px; }
     }
-    .wf-step.wf-active {
-      flex:4; border-top-color:#3AAB5C;
-      border-color:rgba(58,171,92,0.3);
-      box-shadow:0 8px 32px rgba(58,171,92,0.12);
-    }
-    .wf-lbl {
-      padding:10px 12px 8px; display:flex; flex-direction:column;
-      align-items:center; justify-content:center; gap:3px; flex:1;
-    }
-    .wf-step.wf-active .wf-lbl { align-items:flex-start; flex:0 0 auto; padding:10px 14px 8px; }
-    .wf-n { font-size:0.58rem; font-weight:700; color:#3AAB5C; letter-spacing:0.14em; }
-    .wf-t {
-      font-size:0.8rem; font-weight:700; color:rgba(255,255,255,0.9);
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
-    }
-    .wf-step:not(.wf-active) .wf-t { opacity:0.38; font-size:0.68rem; }
-    .wf-vw { display:none; overflow:hidden; flex:1; }
-    .wf-step.wf-active .wf-vw { display:block; }
-    .wf-vw video { width:100%; display:block; }
-    .wf-cap { display:none; font-size:0.7rem; color:rgba(58,171,92,0.8); padding:6px 14px 8px; line-height:1.4; }
-    .wf-step.wf-active .wf-cap { display:block; }
-    .wf-pb { height:3px; background:rgba(58,171,92,0.12); display:none; flex-shrink:0; }
-    .wf-step.wf-active .wf-pb { display:block; }
-    .wf-pf { height:100%; background:#3AAB5C; width:0%; }
-    @media (max-width:680px) {
-      .wf-steps { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-      .wf-div { display:none; }
-      .wf-step.wf-active { grid-column:1 / -1; }
-      .wf-step { min-height:52px; }
+    @media (max-width:480px) {
+      .sf-panels { grid-template-columns:1fr; }
     }
 
     /* ── INTEGRATION FLOW (legacy pills, kept for reference) ── */
@@ -598,45 +686,158 @@
       </div>
       </div>
 
-      <!-- INTEGRATION STEP PLAYER -->
-      <div class="wf-player rise rise-d5">
-        <div class="wf-steps" id="wfSteps">
+      <!-- SEAMLESS FLOW ANIMATION -->
+      <div class="sf-wrap rise rise-d5">
 
-          <div class="wf-step wf-active" data-wi="0">
-            <div class="wf-lbl"><span class="wf-n">01</span><span class="wf-t">Clocking</span></div>
-            <div class="wf-vw"><video id="wfv0" src="clip_clocking.mp4" muted playsinline preload="auto"></video></div>
-            <div class="wf-cap">Real-time employee time &amp; attendance</div>
-            <div class="wf-pb"><div class="wf-pf" id="wfp0"></div></div>
-          </div>
+        <p class="sf-hdg">A SEAMLESS FLOW. <em>ACCURATE RESULTS.</em></p>
 
-          <div class="wf-div">→</div>
-
-          <div class="wf-step" data-wi="1">
-            <div class="wf-lbl"><span class="wf-n">02</span><span class="wf-t">Payroll</span></div>
-            <div class="wf-vw"><video id="wfv1" src="clip_payroll.mp4" muted playsinline preload="auto"></video></div>
-            <div class="wf-cap">Automated, compliant payroll processing</div>
-            <div class="wf-pb"><div class="wf-pf" id="wfp1"></div></div>
-          </div>
-
-          <div class="wf-div">→</div>
-
-          <div class="wf-step" data-wi="2">
-            <div class="wf-lbl"><span class="wf-n">03</span><span class="wf-t">Accounting</span></div>
-            <div class="wf-vw"><video id="wfv2" src="clip_accounting.mp4" muted playsinline preload="auto"></video></div>
-            <div class="wf-cap">Integrated financial records — zero manual entry</div>
-            <div class="wf-pb"><div class="wf-pf" id="wfp2"></div></div>
-          </div>
-
-          <div class="wf-div">→</div>
-
-          <div class="wf-step" data-wi="3">
-            <div class="wf-lbl"><span class="wf-n">04</span><span class="wf-t">Reports</span></div>
-            <div class="wf-vw"><video id="wfv3" src="clip_reports.mp4" muted playsinline preload="auto"></video></div>
-            <div class="wf-cap">Live dashboards &amp; SARS-ready compliance reporting</div>
-            <div class="wf-pb"><div class="wf-pf" id="wfp3"></div></div>
-          </div>
-
+        <div class="sf-lbls">
+          <div class="sf-slbl"><div class="sf-sn">1</div><div class="sf-st"><b>CLOCKING</b><small>Capture time in real time</small></div></div>
+          <div class="sf-sar">›</div>
+          <div class="sf-slbl"><div class="sf-sn">2</div><div class="sf-st"><b>PAYROLL</b><small>Process time into pay</small></div></div>
+          <div class="sf-sar">›</div>
+          <div class="sf-slbl"><div class="sf-sn">3</div><div class="sf-st"><b>ACCOUNTING</b><small>Post results to the ledger</small></div></div>
+          <div class="sf-sar">›</div>
+          <div class="sf-slbl"><div class="sf-sn">4</div><div class="sf-st"><b>REPORTING</b><small>Turn data into insight</small></div></div>
         </div>
+
+        <div class="sf-panels">
+
+          <!-- Panel 1: Clocking -->
+          <div class="sf-panel">
+            <div class="sf-ptit">Clocking</div>
+            <div class="sf-devo">
+              <div class="sf-dev">
+                <div class="sf-scr">
+                  <div class="sf-ct" id="sfT">08:30</div>
+                  <div class="sf-ap">AM</div>
+                  <div class="sf-ci2">✓ Check In</div>
+                </div>
+                <div class="sf-fpw">
+                  <svg viewBox="0 0 54 52" fill="none">
+                    <path d="M27 4C15 4 6 13 6 25C6 37 14 46 24 48" stroke="rgba(58,171,92,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M10 24Q18 15 28 19Q37 23 35 32" stroke="#3AAB5C" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    <path d="M9 30Q17 20 28 24Q37 28 36 38" stroke="#3AAB5C" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    <path d="M11 36Q19 26 28 30Q37 34 35 43" stroke="#3AAB5C" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    <path d="M15 42Q22 32 29 36Q36 40 34 48" stroke="rgba(58,171,92,0.48)" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                  </svg>
+                  <div class="sf-fpscan"></div>
+                </div>
+              </div>
+            </div>
+            <div class="sf-live">
+              <div class="sf-lhdr"><div class="sf-ldot"></div>LIVE ACTIVITY</div>
+              <div class="sf-lr"><div class="sf-av">JM</div><div class="sf-ln">Jessica M.</div><div class="sf-la">In 08:30</div></div>
+              <div class="sf-lr"><div class="sf-av">TK</div><div class="sf-ln">Thabo K.</div><div class="sf-la">In 08:31</div></div>
+              <div class="sf-lr"><div class="sf-av">LS</div><div class="sf-ln">Lindiwe S.</div><div class="sf-la">Out 17:01</div></div>
+              <div class="sf-lr"><div class="sf-av">MB</div><div class="sf-ln">Michael B.</div><div class="sf-la">In 08:32</div></div>
+              <div class="sf-lc"><b id="sfC">312</b> Clocked In</div>
+            </div>
+          </div>
+
+          <div class="sf-con"><div class="sf-con-a">›</div><div class="sf-cd"></div><div class="sf-cd"></div><div class="sf-cd"></div></div>
+
+          <!-- Panel 2: Payroll -->
+          <div class="sf-panel">
+            <div class="sf-ptit">Payroll</div>
+            <div class="sf-ring-a">
+              <svg class="sf-rsvg" viewBox="0 0 86 86">
+                <circle cx="43" cy="43" r="34" fill="none" stroke="rgba(58,171,92,0.1)" stroke-width="7"/>
+                <circle cx="43" cy="43" r="34" fill="none" stroke="#3AAB5C" stroke-width="7"
+                  stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+                  transform="rotate(-90 43 43)" class="sf-rb"/>
+              </svg>
+              <div class="sf-rpct"><span id="sfP">0</span>%<span class="sf-rsub">complete</span></div>
+            </div>
+            <div class="sf-proc">Processing payroll...</div>
+            <div class="sf-cl">
+              <div class="sf-cii"><div class="sf-cb2">✓</div>Time &amp; Attendance</div>
+              <div class="sf-cii"><div class="sf-cb2">✓</div>Earnings Calculation</div>
+              <div class="sf-cii"><div class="sf-cb2">✓</div>Deductions</div>
+              <div class="sf-cii"><div class="sf-cb2">✓</div>Taxes &amp; PAYE</div>
+              <div class="sf-cii"><div class="sf-cb2">✓</div>Net Pay Calculation</div>
+            </div>
+          </div>
+
+          <div class="sf-con"><div class="sf-con-a">›</div><div class="sf-cd"></div><div class="sf-cd"></div><div class="sf-cd"></div></div>
+
+          <!-- Panel 3: Accounting -->
+          <div class="sf-panel">
+            <div class="sf-ptit">Accounting</div>
+            <table class="sf-glt">
+              <thead><tr><th>Acct</th><th>Description</th><th>Debit</th><th>Credit</th></tr></thead>
+              <tbody>
+                <tr><td>5000</td><td>Salaries</td><td class="sf-dbt">R1,250,000</td><td>—</td></tr>
+                <tr><td>2100</td><td>PAYE Payable</td><td>—</td><td class="sf-crd">R350,000</td></tr>
+                <tr><td>2110</td><td>UIF Payable</td><td>—</td><td class="sf-crd">R12,500</td></tr>
+                <tr><td>2120</td><td>SDL Payable</td><td>—</td><td class="sf-crd">R7,500</td></tr>
+                <tr><td>2200</td><td>Net Pay</td><td>—</td><td class="sf-crd">R880,000</td></tr>
+              </tbody>
+            </table>
+            <div class="sf-pst">
+              <div class="sf-pck">✓</div>
+              <div><b>Journals Posted</b><small>Payroll posted to general ledger.</small></div>
+            </div>
+          </div>
+
+          <div class="sf-con"><div class="sf-con-a">›</div><div class="sf-cd"></div><div class="sf-cd"></div><div class="sf-cd"></div></div>
+
+          <!-- Panel 4: Reporting -->
+          <div class="sf-panel">
+            <div class="sf-ptit">Reporting</div>
+            <svg class="sf-csvg" viewBox="0 0 170 62" preserveAspectRatio="none">
+              <defs><linearGradient id="sfGr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3AAB5C" stop-opacity="0.2"/><stop offset="100%" stop-color="#3AAB5C" stop-opacity="0"/></linearGradient></defs>
+              <text x="0" y="10" fill="rgba(255,255,255,0.22)" font-size="7" font-family="monospace">R2M</text>
+              <text x="0" y="26" fill="rgba(255,255,255,0.22)" font-size="7" font-family="monospace">R1M</text>
+              <polygon points="22,54 52,44 82,35 112,22 142,11 166,3 166,60 22,60" fill="url(#sfGr)"/>
+              <polyline points="22,54 52,44 82,35 112,22 142,11 166,3" fill="none" stroke="#3AAB5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="240" stroke-dashoffset="240" class="sf-cln"/>
+              <circle cx="166" cy="3" r="3" fill="#3AAB5C" class="sf-cdot2"/>
+              <text x="20" y="62" fill="rgba(255,255,255,0.18)" font-size="6" font-family="monospace">JAN</text>
+              <text x="50" y="62" fill="rgba(255,255,255,0.18)" font-size="6" font-family="monospace">FEB</text>
+              <text x="80" y="62" fill="rgba(255,255,255,0.18)" font-size="6" font-family="monospace">MAR</text>
+              <text x="109" y="62" fill="rgba(255,255,255,0.18)" font-size="6" font-family="monospace">APR</text>
+              <text x="138" y="62" fill="rgba(255,255,255,0.18)" font-size="6" font-family="monospace">MAY</text>
+              <text x="162" y="62" fill="rgba(255,255,255,0.18)" font-size="6" font-family="monospace">JUN</text>
+            </svg>
+            <div class="sf-rb2">
+              <div class="sf-kpi">
+                <div class="sf-kv">256</div>
+                <div class="sf-kl">HEADCOUNT</div>
+                <div class="sf-kg">↑ 5% vs last month</div>
+              </div>
+              <div class="sf-dn">
+                <svg width="58" height="58" viewBox="0 0 58 58">
+                  <circle cx="29" cy="29" r="22" fill="none" stroke="#3AAB5C" stroke-width="11" stroke-dasharray="83 55" stroke-dashoffset="0" transform="rotate(-90 29 29)"/>
+                  <circle cx="29" cy="29" r="22" fill="none" stroke="rgba(58,171,92,0.46)" stroke-width="11" stroke-dasharray="33 105" stroke-dashoffset="-83" transform="rotate(-90 29 29)"/>
+                  <circle cx="29" cy="29" r="22" fill="none" stroke="rgba(58,171,92,0.24)" stroke-width="11" stroke-dasharray="22 116" stroke-dashoffset="-116" transform="rotate(-90 29 29)"/>
+                </svg>
+                <div class="sf-dls">
+                  <div><span style="background:#3AAB5C"></span>Salaries</div>
+                  <div><span style="background:rgba(58,171,92,0.46)"></span>Benefits</div>
+                  <div><span style="background:rgba(58,171,92,0.24)"></span>Other</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- .sf-panels -->
+
+        <!-- Bottom timeline -->
+        <div class="sf-tl">
+          <div class="sf-tlr">
+            <div class="sf-tln"></div><div class="sf-tls"></div>
+            <div class="sf-tln"></div><div class="sf-tls"></div>
+            <div class="sf-tln"></div><div class="sf-tls"></div>
+            <div class="sf-tln"></div>
+          </div>
+          <div class="sf-tll"><span>CAPTURE</span><span>PROCESS</span><span>POST</span><span>ANALYZE</span></div>
+        </div>
+
+        <div class="sf-foot">
+          <div class="sf-fic">∞</div>
+          <div><b>CONNECTED. AUTOMATED. ACCURATE.</b><p>From time capture to insight — a seamless, end-to-end payroll process.</p></div>
+        </div>
+
       </div>
 
       <!-- CTA BUTTONS -->
@@ -687,39 +888,28 @@
     }
   </script>
   <script>
-    // Workflow step accordion player
-    (function() {
-      const steps = Array.from(document.querySelectorAll('#wfSteps .wf-step'));
-      const vids  = steps.map((_, i) => document.getElementById('wfv' + i));
-      const fills = steps.map((_, i) => document.getElementById('wfp' + i));
-      let cur = 0, raf;
-
-      function goTo(idx) {
-        cancelAnimationFrame(raf);
-        cur = idx;
-        steps.forEach((s, i) => s.classList.toggle('wf-active', i === idx));
-        vids.forEach((v, i) => {
-          if (!v) return;
-          if (i === idx) { v.currentTime = 0; v.play().catch(function(){}); }
-          else { v.pause(); v.currentTime = 0; if (fills[i]) fills[i].style.width = '0%'; }
-        });
-        tick();
+    // Seamless flow animation counters
+    (function(){
+      var times=['08:28','08:29','08:30','08:31','08:32','08:33'];
+      var ti=2;
+      setInterval(function(){
+        ti=(ti+1)%times.length;
+        var e=document.getElementById('sfT');
+        if(e)e.textContent=times[ti];
+      },2200);
+      var ps=Date.now();
+      function upP(){
+        var e=document.getElementById('sfP');
+        if(e){
+          var t=(Date.now()-ps)%9000;
+          var p=0;
+          if(t>360&&t<5400)p=Math.min(100,Math.round((t-360)/50.4));
+          else if(t>=5400&&t<7200)p=100;
+          e.textContent=p;
+        }
+        requestAnimationFrame(upP);
       }
-
-      function tick() {
-        var v = vids[cur], f = fills[cur];
-        if (v && f && v.duration) f.style.width = (v.currentTime / v.duration * 100) + '%';
-        raf = requestAnimationFrame(tick);
-      }
-
-      vids.forEach(function(v, i) {
-        if (v) v.addEventListener('ended', function() { goTo((i + 1) % steps.length); });
-      });
-      steps.forEach(function(s, i) {
-        s.addEventListener('click', function() { if (i !== cur) goTo(i); });
-      });
-
-      goTo(0);
+      upP();
     })();
   </script>
   <script>

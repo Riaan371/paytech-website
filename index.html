@@ -158,25 +158,26 @@
     .growth-sub  { font-size:0.67rem;color:#94a3b8; }
 
     /* ── SEAMLESS FLOW ANIMATION ── */
-    .sf-wrap { width:100%; max-width:920px; margin-bottom:1.6rem; background:rgba(8,12,30,0.6); border:1px solid rgba(58,171,92,0.14); border-radius:18px; padding:1.3rem 1rem 1rem; }
+    .sf-wrap { width:100%; max-width:1100px; margin-bottom:1.6rem; background:radial-gradient(ellipse at 50% 28%, rgba(10,18,50,0.92) 0%, rgba(3,6,18,0.97) 100%); border:1px solid rgba(58,171,92,0.1); border-radius:22px; padding:1.6rem 1.2rem 1.3rem; }
     .sf-hdg { text-align:center; font-size:0.66rem; font-weight:700; letter-spacing:0.2em; color:rgba(255,255,255,0.42); text-transform:uppercase; margin-bottom:0.85rem; }
     .sf-hdg em { color:#3AAB5C; font-style:normal; }
     .sf-lbls { display:flex; align-items:flex-start; margin-bottom:0.7rem; }
-    .sf-slbl { flex:1; display:flex; align-items:flex-start; gap:0.35rem; }
+    .sf-slbl { flex:1; display:flex; align-items:flex-start; gap:0.38rem; }
+    .sf-ico { font-size:1.05rem; flex-shrink:0; line-height:1; margin-top:1px; filter:drop-shadow(0 0 4px currentColor); }
     .sf-sn { width:20px; height:20px; border-radius:50%; border:1.5px solid #3AAB5C; color:#3AAB5C; font-size:0.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
-    .sf-st b { font-size:0.58rem; font-weight:700; color:white; letter-spacing:0.07em; display:block; }
+    .sf-st b { font-size:0.6rem; font-weight:700; color:white; letter-spacing:0.08em; display:block; }
     .sf-st small { font-size:0.5rem; color:rgba(255,255,255,0.32); line-height:1.35; display:block; }
-    .sf-sar { color:rgba(58,171,92,0.32); font-size:0.75rem; flex-shrink:0; padding:3px 1px 0; }
+    .sf-sar { color:rgba(58,171,92,0.32); font-size:0.9rem; flex-shrink:0; padding:2px 1px 0; }
     .sf-panels { display:flex; align-items:stretch; }
-    .sf-panel { flex:1; min-width:0; background:rgba(255,255,255,0.026); border:1px solid rgba(255,255,255,0.062); border-radius:11px; padding:0.6rem 0.48rem 0.5rem; position:relative; overflow:hidden; display:flex; flex-direction:column; gap:0.38rem; min-height:268px; }
-    .sf-panel::before { content:''; position:absolute; width:110px; height:110px; border-radius:50%; background:rgba(58,171,92,0.09); filter:blur(30px); top:12px; left:50%; transform:translateX(-50%); animation:sfOrb 4s ease-in-out infinite; pointer-events:none; }
+    .sf-panel { flex:1; min-width:0; background:linear-gradient(160deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.018) 100%); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:0.75rem 0.55rem 0.65rem; position:relative; overflow:hidden; display:flex; flex-direction:column; gap:0.42rem; min-height:350px; }
+    .sf-panel::before { content:''; position:absolute; width:200px; height:200px; border-radius:50%; background:rgba(58,171,92,0.09); filter:blur(55px); top:-30px; left:50%; transform:translateX(-50%); animation:sfOrb 4s ease-in-out infinite; pointer-events:none; }
     .sf-panels .sf-panel:nth-child(3)::before { animation-delay:1s; }
     .sf-panels .sf-panel:nth-child(5)::before { animation-delay:2s; }
     .sf-panels .sf-panel:nth-child(7)::before { animation-delay:3s; }
-    @keyframes sfOrb { 0%,100%{opacity:0.45;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.28)} }
+    @keyframes sfOrb { 0%,100%{opacity:0.55;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.65)} }
     .sf-panel > * { position:relative; z-index:1; }
-    .sf-con { flex:0 0 44px; display:flex; align-items:center; justify-content:center; }
-    .sf-asv { width:44px; height:80px; display:block; overflow:visible; animation:sfAG 2s ease-in-out infinite; }
+    .sf-con { flex:0 0 58px; display:flex; align-items:center; justify-content:center; }
+    .sf-asv { width:58px; height:96px; display:block; overflow:visible; animation:sfAG 2s ease-in-out infinite; }
     @keyframes sfAG { 0%,100%{filter:drop-shadow(0 0 3px rgba(58,171,92,0.7)) drop-shadow(0 0 9px rgba(58,171,92,0.35))} 50%{filter:drop-shadow(0 0 7px #3AAB5C) drop-shadow(0 0 18px rgba(58,171,92,0.65))} }
     .sf-arr-p { opacity:0; animation:sfPt 1.4s ease-in-out infinite; }
     .sf-arr-p:nth-of-type(2) { animation-delay:0.28s; }
@@ -293,9 +294,9 @@
     .sf-ca1 { --pc:#3AAB5C; --pcr:58,171,92; }
     .sf-ca2 { --pc:#2E9EE8; --pcr:46,158,232; }
     .sf-ca3 { --pc:#8B5CF6; --pcr:139,92,246; }
-    .sf-panel { opacity:0; transform:perspective(700px) rotateY(-65deg); transform-origin:left center; transition:opacity 0.6s ease, transform 0.65s cubic-bezier(0.34,1.2,0.64,1); }
-    .sf-panel.sf-on { opacity:1; transform:perspective(700px) rotateY(0deg); border-color:rgba(var(--pcr),0.28) !important; box-shadow:0 4px 32px rgba(var(--pcr),0.15); }
-    .sf-panel::before { background:rgba(var(--pcr),0.09) !important; }
+    .sf-panel { opacity:0; transform:perspective(900px) rotateY(-75deg) scale(0.86); transform-origin:left center; transition:opacity 0.65s ease, transform 0.9s cubic-bezier(0.34,1.06,0.64,1); }
+    .sf-panel.sf-on { opacity:1; transform:perspective(900px) rotateY(0deg) scale(1); border-color:rgba(var(--pcr),0.45) !important; box-shadow:0 0 100px 28px rgba(var(--pcr),0.16), 0 20px 70px rgba(var(--pcr),0.3), 0 50px 110px -8px rgba(var(--pcr),0.2), 0 0 0 1px rgba(var(--pcr),0.28), inset 0 1px 0 rgba(var(--pcr),0.12); }
+    .sf-panel::before { width:220px !important; height:220px !important; background:rgba(var(--pcr),0.16) !important; filter:blur(60px) !important; top:-30px !important; }
     .sf-ct { color:var(--pc) !important; }
     .sf-ap { color:rgba(var(--pcr),0.5) !important; }
     .sf-ci2 { color:var(--pc) !important; }
@@ -321,14 +322,18 @@
     .sf-slbl:nth-child(3) .sf-sn { border-color:#2E9EE8; color:#2E9EE8; }
     .sf-slbl:nth-child(5) .sf-sn { border-color:#8B5CF6; color:#8B5CF6; }
     .sf-slbl:nth-child(7) .sf-sn { border-color:#10BED6; color:#10BED6; }
+    .sf-slbl:nth-child(1) .sf-ico { color:#3AAB5C; }
+    .sf-slbl:nth-child(3) .sf-ico { color:#2E9EE8; }
+    .sf-slbl:nth-child(5) .sf-ico { color:#8B5CF6; }
+    .sf-slbl:nth-child(7) .sf-ico { color:#10BED6; }
     .sf-sar:nth-child(2) { color:rgba(58,171,92,0.38) !important; }
     .sf-sar:nth-child(4) { color:rgba(46,158,232,0.38) !important; }
     .sf-sar:nth-child(6) { color:rgba(139,92,246,0.38) !important; }
-    .sf-con { position:relative; overflow:visible; }
+    .sf-con { position:relative; overflow:visible; flex:0 0 58px !important; }
     .sf-con::after { content:''; position:absolute; height:4px; width:200%; top:calc(50% - 2px); left:-50%; transform:translateX(-150%); border-radius:2px; pointer-events:none; z-index:10; background:radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.95) 0%, var(--pc) 60%, transparent 100%); opacity:0; }
     .sf-con.sf-fire::after { animation:sfFireBeam 0.6s ease-out forwards; }
     @keyframes sfFireBeam { 0%{transform:translateX(-150%);opacity:1} 80%{transform:translateX(80%);opacity:0.7} 100%{transform:translateX(100%);opacity:0} }
-    .sf-asv { filter:drop-shadow(0 0 4px var(--pc)) drop-shadow(0 0 10px rgba(var(--pcr),0.45)) !important; animation:sfAP 2s ease-in-out infinite !important; }
+    .sf-asv { width:58px !important; height:96px !important; filter:drop-shadow(0 0 6px var(--pc)) drop-shadow(0 0 20px rgba(var(--pcr),0.6)) !important; animation:sfAP 2s ease-in-out infinite !important; }
     @keyframes sfAP { 0%,100%{opacity:0.7} 50%{opacity:1} }
     .sf-con .sf-arr-p { fill:var(--pc) !important; }
     .sf-con .sf-arr-sk { fill:rgba(var(--pcr),0.85) !important; }
@@ -336,7 +341,7 @@
       .sf-panels { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
       .sf-con { display:none; }
       .sf-lbls { display:none; }
-      .sf-panel { min-height:220px; opacity:1 !important; transform:none !important; }
+      .sf-panel { min-height:190px; opacity:1 !important; transform:none !important; }
     }
     @media (max-width:480px) {
       .sf-panels { grid-template-columns:1fr; }
@@ -745,13 +750,13 @@
         <p class="sf-hdg">A SEAMLESS FLOW. <em>ACCURATE RESULTS.</em></p>
 
         <div class="sf-lbls">
-          <div class="sf-slbl"><div class="sf-sn">1</div><div class="sf-st"><b>CLOCKING</b><small>Capture time in real time</small></div></div>
+          <div class="sf-slbl"><div class="sf-ico">◉</div><div class="sf-sn">1</div><div class="sf-st"><b>CLOCKING</b><small>Capture time in real time</small></div></div>
           <div class="sf-sar">›</div>
-          <div class="sf-slbl"><div class="sf-sn">2</div><div class="sf-st"><b>PAYROLL</b><small>Process time into pay</small></div></div>
+          <div class="sf-slbl"><div class="sf-ico">$</div><div class="sf-sn">2</div><div class="sf-st"><b>PAYROLL</b><small>Process time into pay</small></div></div>
           <div class="sf-sar">›</div>
-          <div class="sf-slbl"><div class="sf-sn">3</div><div class="sf-st"><b>ACCOUNTING</b><small>Post results to the ledger</small></div></div>
+          <div class="sf-slbl"><div class="sf-ico">≡</div><div class="sf-sn">3</div><div class="sf-st"><b>ACCOUNTING</b><small>Post results to the ledger</small></div></div>
           <div class="sf-sar">›</div>
-          <div class="sf-slbl"><div class="sf-sn">4</div><div class="sf-st"><b>REPORTING</b><small>Turn data into insight</small></div></div>
+          <div class="sf-slbl"><div class="sf-ico">▦</div><div class="sf-sn">4</div><div class="sf-st"><b>REPORTING</b><small>Turn data into insight</small></div></div>
         </div>
 
         <div class="sf-panels">

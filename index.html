@@ -636,6 +636,59 @@
       75%  { transform: translateY(10px); opacity: 0; }
       100% { transform: translateY(0);    opacity: 0; }
     }
+
+    /* ── OUR VALUES (bottom of home page) ── */
+    .values-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 4.5rem;
+      text-align: center;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin-top: 2.5rem;
+    }
+
+    .value-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 1.6rem 1.4rem;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .value-card:hover { border-color: rgba(58,171,92,0.3); }
+
+    .value-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.8rem;
+    }
+
+    .value-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+
+    .value-desc {
+      font-size: 0.82rem;
+      color: rgba(210,225,245,0.65);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .values-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .values-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -989,6 +1042,37 @@
       </div>
 
     </section>
+
+    <!-- OUR VALUES -->
+    <div class="values-section">
+      <span class="section-label">What drives us</span>
+      <h2 style="font-size:2rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.5rem;color:#ffffff;">Our Values</h2>
+      <p style="color:rgba(210,225,245,0.65);max-width:480px;margin:0 auto;font-size:0.95rem;line-height:1.7;">
+        Every business we serve is built on trust. These are the principles that guide everything we do.
+      </p>
+      <div class="values-grid">
+        <div class="value-card">
+          <span class="value-icon">🎯</span>
+          <div class="value-title">Accuracy First</div>
+          <p class="value-desc">Payroll errors cost businesses time and money. We get it right, every time.</p>
+        </div>
+        <div class="value-card">
+          <span class="value-icon">🤝</span>
+          <div class="value-title">Partnership</div>
+          <p class="value-desc">We don't just process payroll — we become a trusted extension of your team.</p>
+        </div>
+        <div class="value-card">
+          <span class="value-icon">⚖️</span>
+          <div class="value-title">Compliance</div>
+          <p class="value-desc">Always up to date with South African labour law and tax legislation.</p>
+        </div>
+        <div class="value-card">
+          <span class="value-icon">💡</span>
+          <div class="value-title">Innovation</div>
+          <p class="value-desc">Embracing the best payroll technology so your business stays ahead.</p>
+        </div>
+      </div>
+    </div>
 
     <!-- FOOTER -->
     <footer>

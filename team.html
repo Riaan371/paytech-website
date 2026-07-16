@@ -53,6 +53,8 @@
     .svc-block:last-of-type { border-bottom: none; padding-bottom: 0; }
 
     .svc-block:nth-of-type(even) { flex-direction: row-reverse; }
+    .svc-block--long { align-items: flex-start; }
+    .svc-block--long .svc-visual { padding-top: 0.4rem; }
 
     .svc-visual {
       flex: 0 0 220px;
@@ -126,46 +128,49 @@
       flex-shrink: 0;
     }
 
-    .values-section {
-      margin-top: 4rem;
-      text-align: center;
+    .svc-feature-list.stacked {
+      flex-direction: column;
+      gap: 0.55rem;
     }
 
-    .values-grid {
+    .svc-feature-list.stacked li { align-items: flex-start; }
+
+    .svc-sub-groups {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.2rem;
-      margin-top: 2.5rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.2rem;
+      margin-bottom: 1.6rem;
     }
 
-    .value-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 12px;
-      padding: 1.6rem 1.4rem;
-      text-align: center;
-      transition: border-color 0.2s;
-    }
+    .svc-sub-group { min-width: 0; }
 
-    .value-card:hover { border-color: rgba(58,171,92,0.3); }
-
-    .value-icon {
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 0.8rem;
-    }
-
-    .value-title {
-      font-size: 1rem;
-      font-weight: 600;
+    .svc-sub-heading {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       color: var(--white);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.7rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    .value-desc {
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.6;
+    .svc-cloud-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--green);
+      background: rgba(58,171,92,0.1);
+      border: 1px solid rgba(58,171,92,0.25);
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      margin-bottom: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      .svc-sub-groups { grid-template-columns: 1fr; gap: 1.6rem; }
     }
 
     .cta-band {
@@ -204,12 +209,8 @@
       }
       .svc-feature-list { justify-content: center; }
       .svc-desc { margin-left: auto; margin-right: auto; }
-      .values-grid { grid-template-columns: 1fr 1fr; }
+      .svc-sub-group { align-items: center; }
       .cta-band-actions { flex-direction: column; align-items: center; }
-    }
-
-    @media (max-width: 480px) {
-      .values-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -282,7 +283,7 @@
       </section>
 
       <!-- SERVICE 2: Payroll Consulting and Outsourcing -->
-      <section class="svc-block rise rise-d2" id="consulting-outsourcing">
+      <section class="svc-block svc-block--long rise rise-d2" id="consulting-outsourcing">
         <div class="svc-visual">
           <div class="svc-visual-badge">📈</div>
         </div>
@@ -291,15 +292,32 @@
           <h2>Payroll Consulting and Outsourcing</h2>
           <p class="svc-desc">
             Expert advice, decades of experience, and friendly staff to change the panic into peace of mind.
-            Whether you need a once-off compliance review or full end-to-end payroll outsourcing, our consultants
+            Whether you need strategic guidance or want to hand your entire payroll over to us, our consultants
             become a trusted extension of your team while your business grows.
           </p>
-          <ul class="svc-feature-list">
-            <li>Payroll outsourcing</li>
-            <li>Compliance reviews</li>
-            <li>SARS &amp; UIF submissions</li>
-            <li>Payroll audits</li>
-          </ul>
+          <div class="svc-sub-groups">
+            <div class="svc-sub-group">
+              <div class="svc-sub-heading">Consulting</div>
+              <ul class="svc-feature-list stacked">
+                <li>Streamlining your payroll process</li>
+                <li>Expert advice from experienced consultants</li>
+                <li>Support and training for your team</li>
+                <li>Custom configuration and reporting</li>
+              </ul>
+            </div>
+            <div class="svc-sub-group">
+              <div class="svc-sub-heading">Outsourcing</div>
+              <ul class="svc-feature-list stacked">
+                <li>Monthly, weekly, and biweekly processing</li>
+                <li>Payslip generation</li>
+                <li>WhatsApp delivery for employees — payslips, leave, IRP5s and claims</li>
+                <li>Bank file generation and salary payments</li>
+                <li>Third-party payments — garnishees, unions, pension and provident funds</li>
+                <li>Payroll journals for your accounting system</li>
+                <li>Advanced, customisable reports at the click of a button</li>
+              </ul>
+            </div>
+          </div>
           <a href="quote.html" class="btn-primary">Get a Quote</a>
         </div>
       </section>
@@ -312,51 +330,24 @@
         <div class="svc-content">
           <span class="svc-eyebrow">03 — Time &amp; Attendance</span>
           <h2>Time &amp; Attendance</h2>
+          <span class="svc-cloud-tag">☁️ Cloud-based technology</span>
           <p class="svc-desc">
-            Clock your employees accurately with easy-to-use, integratable software. From biometric clocking
-            to live attendance dashboards, our time &amp; attendance systems feed straight into payroll — so hours
-            worked become pay, automatically and accurately.
+            State-of-the-art software for accurate clocking and time management of your staff — easy to use,
+            powerful, and hosted in the cloud so you can manage attendance from anywhere. Our solutions scale
+            from farm workers and security guards to corporate, access-controlled environments, and feed
+            straight into payroll so hours worked become pay, automatically and accurately.
           </p>
           <ul class="svc-feature-list">
-            <li>Biometric clocking</li>
-            <li>Live attendance tracking</li>
-            <li>Mobile clock-in</li>
-            <li>Seamless payroll integration</li>
+            <li>Accurate clocking &amp; time management</li>
+            <li>Powerful cloud technology</li>
+            <li>Farm, security &amp; corporate access control</li>
+            <li>Fingerprint &amp; facial scanning</li>
+            <li>Zone clocking and more</li>
+            <li>Affordable and cost-effective</li>
           </ul>
           <a href="quote.html" class="btn-primary">Get a Quote</a>
         </div>
       </section>
-
-      <!-- VALUES -->
-      <div class="values-section rise rise-d4">
-        <span class="section-label">What drives us</span>
-        <h2 style="font-size:2rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.5rem;">Our Values</h2>
-        <p style="color:var(--muted);max-width:480px;margin:0 auto;font-size:0.95rem;line-height:1.7;">
-          Every business we serve is built on trust. These are the principles that guide everything we do.
-        </p>
-        <div class="values-grid">
-          <div class="value-card">
-            <span class="value-icon">🎯</span>
-            <div class="value-title">Accuracy First</div>
-            <p class="value-desc">Payroll errors cost businesses time and money. We get it right, every time.</p>
-          </div>
-          <div class="value-card">
-            <span class="value-icon">🤝</span>
-            <div class="value-title">Partnership</div>
-            <p class="value-desc">We don't just process payroll — we become a trusted extension of your team.</p>
-          </div>
-          <div class="value-card">
-            <span class="value-icon">⚖️</span>
-            <div class="value-title">Compliance</div>
-            <p class="value-desc">Always up to date with South African labour law and tax legislation.</p>
-          </div>
-          <div class="value-card">
-            <span class="value-icon">💡</span>
-            <div class="value-title">Innovation</div>
-            <p class="value-desc">Embracing the best payroll technology so your business stays ahead.</p>
-          </div>
-        </div>
-      </div>
 
       <!-- CTA BAND -->
       <div class="cta-band rise rise-d5">

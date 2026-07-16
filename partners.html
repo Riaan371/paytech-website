@@ -7,123 +7,6 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" type="image/png" href="Current LOGO/After Canva/paytech-icon-transparent.png" />
   <style>
-    .partners-hero {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 1.4rem;
-      margin-top: 3rem;
-    }
-
-    .partner-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 2rem 1.8rem;
-      transition: border-color 0.25s, transform 0.2s;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .partner-card:hover {
-      border-color: rgba(58,171,92,0.4);
-      transform: translateY(-4px);
-    }
-
-    .partner-card.featured {
-      border-color: rgba(58,171,92,0.3);
-      background: rgba(58,171,92,0.06);
-    }
-
-    .partner-logo-area {
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1.5rem;
-      background: rgba(255,255,255,0.04);
-      border-radius: 10px;
-    }
-
-    .partner-logo-text {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-    }
-
-    .sage-color   { color: #00c38a; }
-    .payspace-color { color: #0052cc; }
-    .deel-color   { color: #00a0e9; }
-
-    .partner-badge {
-      display: inline-block;
-      font-size: 0.65rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      padding: 0.25rem 0.8rem;
-      border-radius: 999px;
-      margin-bottom: 0.8rem;
-      width: fit-content;
-    }
-
-    .badge-certified {
-      background: rgba(58,171,92,0.15);
-      border: 1px solid rgba(58,171,92,0.3);
-      color: var(--green-dim);
-    }
-
-    .partner-name {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
-    }
-
-    .partner-desc {
-      font-size: 0.875rem;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 1.4rem;
-      flex: 1;
-    }
-
-    .partner-features {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .partner-features li {
-      font-size: 0.82rem;
-      color: var(--muted);
-      display: flex;
-      align-items: flex-start;
-      gap: 0.6rem;
-      line-height: 1.5;
-    }
-
-    .partner-features li::before {
-      content: '✓';
-      color: var(--green);
-      font-weight: 700;
-      flex-shrink: 0;
-      margin-top: 0.05rem;
-    }
-
-    .partner-link {
-      font-size: 0.8rem;
-      color: var(--green-dim);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      transition: color 0.2s;
-    }
-
-    .partner-link:hover { color: var(--green); }
-
     /* WHY SECTION */
     .why-section {
       margin-top: 5rem;
@@ -347,7 +230,6 @@
     .cta-band-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
     @media (max-width: 768px) {
-      .partners-hero { grid-template-columns: 1fr; }
       .why-grid { grid-template-columns: 1fr; }
       .why-stats { grid-template-columns: 1fr 1fr; }
       .testimonial-grid { grid-template-columns: 1fr; }
@@ -399,59 +281,6 @@
 
     <main>
 
-      <!-- PARTNER CARDS -->
-      <div class="partners-hero">
-
-        <!-- PaySpace -->
-        <div class="partner-card rise rise-d2">
-          <div class="partner-logo-area">
-            <span class="partner-logo-text payspace-color">PaySpace</span>
-          </div>
-          <span class="partner-badge badge-certified">Certified Partner</span>
-          <div class="partner-name">PaySpace</div>
-          <p class="partner-desc">
-            A fully cloud-based payroll and HR solution built for the African market.
-            PaySpace (now part of the Deel family) delivers enterprise-grade payroll
-            with modern self-service capabilities.
-          </p>
-          <ul class="partner-features">
-            <li>100% cloud-based — access anywhere</li>
-            <li>Multi-company &amp; multi-currency support</li>
-            <li>Employee self-service portal</li>
-            <li>Automated tax &amp; UIF calculations</li>
-            <li>Real-time reporting &amp; analytics</li>
-          </ul>
-          <a href="https://payspace.com" target="_blank" class="partner-link">
-            Visit PaySpace →
-          </a>
-        </div>
-
-        <!-- Deel Local -->
-        <div class="partner-card rise rise-d3">
-          <div class="partner-logo-area">
-            <span class="partner-logo-text deel-color">Deel Local</span>
-          </div>
-          <span class="partner-badge badge-certified">Certified Partner</span>
-          <div class="partner-name">Deel Local Payroll</div>
-          <p class="partner-desc">
-            Deel Local (powered by PaySpace) brings global-standard payroll
-            infrastructure to South African businesses — ideal for companies
-            with remote teams, contractors, or international operations.
-          </p>
-          <ul class="partner-features">
-            <li>Local &amp; international payroll in one platform</li>
-            <li>Contractor &amp; full-time employee management</li>
-            <li>Compliance across 150+ countries</li>
-            <li>Seamless onboarding &amp; offboarding</li>
-            <li>Built-in equity &amp; benefits management</li>
-          </ul>
-          <a href="https://www.deel.com" target="_blank" class="partner-link">
-            Visit Deel →
-          </a>
-        </div>
-
-      </div>
-
       <!-- WHY PAYTECH -->
       <div class="why-section rise rise-d4">
         <div class="why-grid">
@@ -464,7 +293,7 @@
             </p>
             <p>
               Whether you're migrating from one platform to another, starting fresh, or need ongoing support —
-              Paytech has you covered across all three platforms.
+              Paytech has you covered across both platforms.
             </p>
             <a href="quote.html" class="btn-primary" style="margin-top:0.5rem;">Talk to a specialist</a>
           </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Partners | Paytech Consulting Solutions</title>
+  <title>About Us | Paytech Consulting Solutions</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" type="image/png" href="Current LOGO/After Canva/paytech-icon-transparent.png" />
   <style>
@@ -181,6 +181,98 @@
       letter-spacing: 0.06em;
     }
 
+    /* TESTIMONIALS / CLIENT SUCCESS */
+    .testimonial-section {
+      margin-top: 5rem;
+      text-align: center;
+    }
+
+    .testimonial-intro {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .testimonial-intro h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .testimonial-intro p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+      margin-top: 2.6rem;
+      text-align: left;
+    }
+
+    .testimonial-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.8rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(58,171,92,0.4);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(58,171,92,0.12);
+    }
+
+    .testimonial-stars {
+      color: #f5b301;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+    }
+
+    .testimonial-quote {
+      font-size: 0.92rem;
+      color: var(--white);
+      line-height: 1.7;
+      margin-bottom: 1.4rem;
+      flex: 1;
+    }
+
+    .testimonial-quote::before { content: '\201C'; color: var(--green); font-weight: 700; }
+    .testimonial-quote::after  { content: '\201D'; color: var(--green); font-weight: 700; }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .testimonial-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(58,171,92,0.15);
+      border: 1px solid rgba(58,171,92,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--green);
+      flex-shrink: 0;
+    }
+
+    .testimonial-name { font-size: 0.85rem; font-weight: 600; color: var(--white); }
+    .testimonial-role  { font-size: 0.72rem; color: var(--muted2); }
+
     /* HOW WE WORK */
     .how-section {
       margin-top: 5rem;
@@ -258,6 +350,7 @@
       .partners-hero { grid-template-columns: 1fr; }
       .why-grid { grid-template-columns: 1fr; }
       .why-stats { grid-template-columns: 1fr 1fr; }
+      .testimonial-grid { grid-template-columns: 1fr; }
       .steps-grid { grid-template-columns: 1fr 1fr; }
       .steps-grid::before { display: none; }
       .cta-band-actions { flex-direction: column; align-items: center; }
@@ -288,7 +381,7 @@
         <li class="nav-mobile-logo"><img src="Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" /></li>
         <li><a href="index.html">Home</a></li>
         <li><a href="team.html">Products &amp; Services</a></li>
-        <li><a href="partners.html" class="active">Partners</a></li>
+        <li><a href="partners.html" class="active">About Us</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="login/" class="nav-login">🔐 Client Login</a></li>
         <li><a href="quote.html" class="nav-cta">Get a Quote</a></li>
@@ -298,9 +391,9 @@
     <!-- PAGE HEADER -->
     <div class="page-header rise rise-d0">
       <img class="page-watermark" src="Current LOGO/After Canva/paytech-full-logo.png" alt="" />
-      <span class="label">Certified on the platforms that matter</span>
-      <h1>Our Partners</h1>
-      <p>Paytech is certified across South Africa's leading payroll platforms — giving your business access to the best tools, backed by expert guidance.</p>
+      <span class="label">Who we are</span>
+      <h1>About Paytech</h1>
+      <p>15+ years of hands-on payroll expertise, certified across South Africa's leading platforms, and trusted by hundreds of businesses to get it right — every single month.</p>
       <div class="page-divider"></div>
     </div>
 
@@ -396,6 +489,51 @@
         </div>
       </div>
 
+      <!-- TESTIMONIALS / CLIENT SUCCESS -->
+      <!-- NOTE: sample quotes below — swap in real client names & feedback before this goes live -->
+      <div class="testimonial-section rise rise-d4b">
+        <div class="testimonial-intro">
+          <span class="section-label">Client success</span>
+          <h2>Don't just take our word for it</h2>
+          <p>15+ years in the industry, 200+ businesses trust us, and thousands of payslips processed — this is what happens when payroll just works.</p>
+        </div>
+        <div class="testimonial-grid">
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-quote">Paytech took payroll off my plate completely. What used to eat up two stressful days a month now takes me ten minutes.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">SB</div>
+              <div>
+                <div class="testimonial-name">Business Owner</div>
+                <div class="testimonial-role">Retail Sector</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-quote">Their team caught a compliance issue our previous provider had missed for years. That alone paid for itself.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">FM</div>
+              <div>
+                <div class="testimonial-name">Financial Manager</div>
+                <div class="testimonial-role">Manufacturing</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-quote">Fast, friendly, and they actually pick up the phone when we call. That's rare in this industry.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">HR</div>
+              <div>
+                <div class="testimonial-name">HR Manager</div>
+                <div class="testimonial-role">Logistics</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- HOW WE WORK -->
       <div class="how-section rise rise-d5">
         <span class="section-label">Our process</span>
@@ -445,7 +583,7 @@
       <ul class="footer-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="team.html">Products &amp; Services</a></li>
-        <li><a href="partners.html">Partners</a></li>
+        <li><a href="partners.html">About Us</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="quote.html">Get a Quote</a></li>
       </ul>

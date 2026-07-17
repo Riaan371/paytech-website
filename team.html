@@ -202,14 +202,43 @@
       width: 320px;
       max-width: 100%;
       margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .dm-wrap .dm-chart canvas {
+      transition: transform 0.35s ease;
+    }
+
+    .dm-wrap:hover .dm-chart canvas {
+      transform: scale(1.06);
+    }
+
+    .dm-chart-prompt {
+      position: absolute;
+      left: 50%;
+      bottom: -1rem;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #3AAB5C;
+      background: rgba(20,26,44,0.92);
+      border: 1px solid rgba(58,171,92,0.35);
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, bottom 0.25s ease;
+    }
+
+    .dm-wrap:hover .dm-chart-prompt {
+      opacity: 1;
+      bottom: -2rem;
     }
 
     .dm-laptop {
-      background: linear-gradient(160deg, #141a38 0%, #0a0e1e 100%);
-      border: 1px solid rgba(58,171,92,0.25);
-      border-radius: 14px;
+      background: transparent;
       padding: 0.9rem;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
     }
 
     .dm-chart {
@@ -426,12 +455,13 @@
       <!-- SERVICE 1: Payroll & HR Systems — visual only, wording lives in the hover zoom -->
       <section class="svc-block svc-block--chart-only rise rise-d1" id="payroll-hr">
         <div class="svc-visual svc-visual--dash">
-          <div class="dm-wrap">
+          <div class="dm-wrap" id="dmWrap">
             <div class="dm-laptop">
               <div class="dm-chart">
                 <canvas id="dmPayrollChart"></canvas>
               </div>
             </div>
+            <div class="dm-chart-prompt">Click here to find out more →</div>
           </div>
         </div>
       </section>
@@ -691,7 +721,7 @@
                     data: [45, 30, 25],
                     backgroundColor: ['rgba(58,171,92,0.85)', 'rgba(46,158,232,0.85)', 'rgba(139,92,246,0.85)'],
                     hoverBackgroundColor: ['#4bc470', '#52aef2', '#a07df8'],
-                    borderColor: '#141a38',
+                    borderColor: '#1d2540',
                     borderWidth: 2
                   }]
                 },
@@ -714,13 +744,11 @@
                   scales: {
                     r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.08)' }, angleLines: { color: 'rgba(255,255,255,0.1)' } }
                   },
-                  onHover: !zoomOverlay ? undefined : function (evt, elements) {
-                    if (elements.length > 0) zoomOverlay.classList.add('show');
-                  }
                 }
               });
-              if (chartCanvas && zoomOverlay) {
-                chartCanvas.addEventListener('click', function () { zoomOverlay.classList.add('show'); });
+              var dmWrapClickable = document.getElementById('dmWrap');
+              if (dmWrapClickable && zoomOverlay) {
+                dmWrapClickable.addEventListener('click', function () { zoomOverlay.classList.add('show'); });
               }
             }
           });

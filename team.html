@@ -76,6 +76,117 @@
       flex-shrink: 0;
     }
 
+    /* PAYROLL / HR / ESS DASHBOARD MOCKUP */
+    .svc-visual--dash { flex: 0 0 340px; }
+
+    .dm-wrap {
+      position: relative;
+      width: 320px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .dm-laptop {
+      background: linear-gradient(160deg, #141a38 0%, #0a0e1e 100%);
+      border: 1px solid rgba(58,171,92,0.25);
+      border-radius: 14px;
+      padding: 0.9rem 0.9rem 1rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .dm-top {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .dm-chip { display: flex; align-items: center; gap: 0.4rem; flex: 1; min-width: 0; }
+
+    .dm-chip-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.66rem;
+      flex-shrink: 0;
+    }
+
+    .dm-chip.payroll .dm-chip-icon { background: rgba(58,171,92,0.18); color: #3AAB5C; }
+    .dm-chip.hr .dm-chip-icon      { background: rgba(46,158,232,0.18); color: #2E9EE8; }
+    .dm-chip.ess .dm-chip-icon     { background: rgba(139,92,246,0.18); color: #8B5CF6; }
+
+    .dm-chip-label { font-size: 0.56rem; font-weight: 700; letter-spacing: 0.05em; color: #ffffff; line-height: 1.2; }
+    .dm-chip-sub   { font-size: 0.46rem; color: rgba(255,255,255,0.35); line-height: 1.2; }
+
+    .dm-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .dm-stat {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 0.5rem 0.6rem;
+    }
+
+    .dm-stat-num { font-size: 0.82rem; font-weight: 700; color: #3AAB5C; font-family: monospace; display: block; line-height: 1.15; }
+    .dm-stat-lbl { font-size: 0.46rem; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; text-transform: uppercase; }
+
+    .dm-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.35rem;
+      height: 46px;
+      padding: 0 0.1rem;
+    }
+
+    .dm-bar { flex: 1; border-radius: 3px 3px 0 0; }
+    .dm-bar.g { background: linear-gradient(180deg, #3AAB5C, rgba(58,171,92,0.35)); }
+    .dm-bar.b { background: linear-gradient(180deg, #2E9EE8, rgba(46,158,232,0.35)); }
+
+    .dm-phone {
+      position: absolute;
+      right: -18px;
+      bottom: -22px;
+      width: 108px;
+      background: linear-gradient(160deg, #1b2348 0%, #0a0e1e 100%);
+      border: 1px solid rgba(58,171,92,0.3);
+      border-radius: 16px;
+      padding: 0.55rem 0.5rem;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.45);
+    }
+
+    .dm-phone-head { font-size: 0.5rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem; }
+    .dm-phone-head span { color: #3AAB5C; }
+
+    .dm-phone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+
+    .dm-tile {
+      border-radius: 7px;
+      padding: 0.4rem 0.2rem;
+      text-align: center;
+      font-size: 0.66rem;
+    }
+
+    .dm-tile-lbl { display: block; font-size: 0.4rem; color: rgba(255,255,255,0.55); margin-top: 0.15rem; }
+
+    .dm-tile.payroll { background: rgba(58,171,92,0.14); }
+    .dm-tile.hr      { background: rgba(46,158,232,0.14); }
+    .dm-tile.ess     { background: rgba(139,92,246,0.14); }
+    .dm-tile.reports { background: rgba(255,255,255,0.06); }
+
+    @media (max-width: 768px) {
+      .svc-visual--dash { flex-basis: auto; }
+      .dm-wrap { margin-bottom: 1rem; }
+    }
+
     .svc-content { flex: 1; min-width: 0; }
 
     .svc-eyebrow {
@@ -254,19 +365,68 @@
 
       <!-- JUMP LINKS -->
       <div class="svc-jump rise rise-d1">
-        <a href="#payroll-hr">Payroll &amp; HR Systems</a>
+        <a href="#payroll-hr">Payroll, HR and ESS Systems</a>
         <a href="#consulting-outsourcing">Payroll Consulting and Outsourcing</a>
         <a href="#time-attendance">Time &amp; Attendance</a>
       </div>
 
       <!-- SERVICE 1: Payroll & HR Systems -->
       <section class="svc-block rise rise-d1" id="payroll-hr">
-        <div class="svc-visual">
-          <div class="svc-visual-badge">💼</div>
+        <div class="svc-visual svc-visual--dash">
+          <div class="dm-wrap">
+            <div class="dm-laptop">
+              <div class="dm-top">
+                <div class="dm-chip payroll">
+                  <div class="dm-chip-icon">💰</div>
+                  <div>
+                    <div class="dm-chip-label">PAYROLL</div>
+                    <div class="dm-chip-sub">Paid on time</div>
+                  </div>
+                </div>
+                <div class="dm-chip hr">
+                  <div class="dm-chip-icon">👥</div>
+                  <div>
+                    <div class="dm-chip-label">HR</div>
+                    <div class="dm-chip-sub">Empowering teams</div>
+                  </div>
+                </div>
+                <div class="dm-chip ess">
+                  <div class="dm-chip-icon">🙋</div>
+                  <div>
+                    <div class="dm-chip-label">ESS</div>
+                    <div class="dm-chip-sub">Self-service</div>
+                  </div>
+                </div>
+              </div>
+              <div class="dm-stats">
+                <div class="dm-stat"><span class="dm-stat-num">128</span><span class="dm-stat-lbl">Employees</span></div>
+                <div class="dm-stat"><span class="dm-stat-num">R842K</span><span class="dm-stat-lbl">Net Pay</span></div>
+                <div class="dm-stat"><span class="dm-stat-num">2</span><span class="dm-stat-lbl">Pending Tasks</span></div>
+                <div class="dm-stat"><span class="dm-stat-num">4</span><span class="dm-stat-lbl">Leave Requests</span></div>
+              </div>
+              <div class="dm-chart">
+                <div class="dm-bar g" style="height:45%"></div>
+                <div class="dm-bar b" style="height:65%"></div>
+                <div class="dm-bar g" style="height:55%"></div>
+                <div class="dm-bar b" style="height:80%"></div>
+                <div class="dm-bar g" style="height:70%"></div>
+                <div class="dm-bar b" style="height:95%"></div>
+              </div>
+            </div>
+            <div class="dm-phone">
+              <div class="dm-phone-head">Hi, <span>Alex</span></div>
+              <div class="dm-phone-grid">
+                <div class="dm-tile payroll">💰<span class="dm-tile-lbl">My Pay</span></div>
+                <div class="dm-tile hr">🏖️<span class="dm-tile-lbl">Leave</span></div>
+                <div class="dm-tile ess">📄<span class="dm-tile-lbl">Docs</span></div>
+                <div class="dm-tile reports">❓<span class="dm-tile-lbl">Help</span></div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="svc-content">
           <span class="svc-eyebrow">01 — Systems</span>
-          <h2>Payroll &amp; HR Systems</h2>
+          <h2>Payroll, HR and ESS Systems</h2>
           <p class="svc-desc">
             Fully compliant and powerful payroll solutions for all business types and sizes — from small businesses
             to large enterprises. We implement, configure, and support industry-leading platforms so your payroll

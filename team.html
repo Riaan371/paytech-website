@@ -174,16 +174,16 @@
     }
 
     /* PAYROLL / HR / ESS DASHBOARD MOCKUP */
-    .svc-visual--dash { flex: 0 0 340px; position: relative; }
+    .svc-visual--dash { flex: 0 0 680px; position: relative; }
 
     .svc-visual--dash::before {
       content: '';
       position: absolute;
-      width: 220px;
-      height: 220px;
+      width: 440px;
+      height: 440px;
       border-radius: 50%;
       background: rgba(58,171,92,0.16);
-      filter: blur(50px);
+      filter: blur(70px);
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       animation: dmGlowBreathe 4s ease-in-out infinite;
@@ -199,7 +199,7 @@
     .dm-wrap {
       position: relative;
       z-index: 1;
-      width: 320px;
+      width: 640px;
       max-width: 100%;
       margin: 0 auto;
       cursor: pointer;
@@ -242,15 +242,15 @@
     }
 
     .dm-chart {
-      height: 260px;
+      height: 520px;
       padding: 0.6rem 0.5rem 0.4rem;
       background: transparent;
       border-radius: 10px;
     }
 
     @media (max-width: 768px) {
-      .svc-visual--dash { flex-basis: auto; }
-      .dm-wrap { margin-bottom: 1rem; }
+      .svc-visual--dash { flex-basis: auto; width: 100%; }
+      .dm-wrap { margin-bottom: 1rem; width: 100%; }
     }
 
     /* ANIMATED CLOCK — Time & Attendance badge */
@@ -737,7 +737,7 @@
                     legend: {
                       display: true,
                       position: 'bottom',
-                      labels: { color: 'rgba(255,255,255,0.65)', font: { size: 10 }, boxWidth: 9, boxHeight: 9, padding: 10, usePointStyle: true, pointStyle: 'circle' }
+                      labels: { color: 'rgba(255,255,255,0.65)', font: { size: 16 }, boxWidth: 14, boxHeight: 14, padding: 18, usePointStyle: true, pointStyle: 'circle' }
                     },
                     tooltip: { enabled: false }
                   },

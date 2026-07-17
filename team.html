@@ -161,7 +161,7 @@
     @keyframes dmClockPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
     .dm-clock-sec {
       transform-origin: 50px 50px;
-      animation: dmClockSec 60s linear infinite;
+      animation: dmClockSec 6s linear infinite;
     }
     @keyframes dmClockSec { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
@@ -638,32 +638,12 @@
               });
             }
           };
-          var barLabelPlugin = {
-            id: 'barLabels',
-            afterDatasetsDraw: function (chart) {
-              var ctx = chart.ctx;
-              chart.data.datasets.forEach(function (ds, dsIndex) {
-                var meta = chart.getDatasetMeta(dsIndex);
-                if (meta.hidden) return;
-                meta.data.forEach(function (bar, i) {
-                  var p = bar.getProps(['x', 'y'], true);
-                  ctx.save();
-                  ctx.font = "600 10px 'Segoe UI', Arial, sans-serif";
-                  ctx.fillStyle = '#33415c';
-                  ctx.textAlign = 'center';
-                  ctx.fillText(Math.round(ds.data[i]), p.x + depth3D / 2, p.y - depth3D - 4);
-                  ctx.restore();
-                });
-              });
-            }
-          };
-
           var grossBase = [620, 640, 655, 670, 690, 710];
           var netBase = [480, 495, 505, 515, 530, 545];
 
-          new Chart(chartCanvas, {
+          var payrollChart = new Chart(chartCanvas, {
             type: 'bar',
-            plugins: [bar3DPlugin, barLabelPlugin],
+            plugins: [bar3DPlugin],
             data: {
               labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
               datasets: [
@@ -692,8 +672,24 @@
               maintainAspectRatio: false,
               layout: { padding: { top: 18, right: depth3D + 2 } },
               animation: { duration: reduceMotion ? 0 : 1400, easing: 'easeOutQuart' },
+              transitions: { active: { animation: { duration: 300, easing: 'easeOutQuart' } } },
               interaction: { mode: 'index', intersect: false },
               hover: { mode: 'index', intersect: false },
+              onHover: reduceMotion ? undefined : function (evt, elements) {
+                var prev = payrollChart._jumpIdx;
+                var idx = elements.length ? elements[0].index : null;
+                if (prev === idx) return;
+                if (prev != null) {
+                  payrollChart.data.datasets[0].data[prev] = grossBase[prev];
+                  payrollChart.data.datasets[1].data[prev] = netBase[prev];
+                }
+                if (idx != null) {
+                  payrollChart.data.datasets[0].data[idx] = grossBase[idx] * 1.22;
+                  payrollChart.data.datasets[1].data[idx] = netBase[idx] * 1.22;
+                }
+                payrollChart._jumpIdx = idx;
+                payrollChart.update();
+              },
               plugins: {
                 title: {
                   display: true,

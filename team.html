@@ -677,23 +677,11 @@
         });
       }
 
-      // ---- 3D tilt on the Payroll/HR/ESS dashboard mockup ----
+      // ---- Ambient float on the Payroll/HR/ESS dashboard mockup ----
       var dmWrap = document.querySelector('.svc-visual--dash .dm-wrap');
       if (dmWrap && window.gsap && !reduceMotion) {
-        // Ambient idle float, always running — separate transform props (y) from the
-        // hover tilt (rotateX/rotateY) below so GSAP composes both without conflict.
         gsap.to(dmWrap, {
           y: 10, duration: 2.8, ease: 'sine.inOut', yoyo: true, repeat: -1
-        });
-
-        dmWrap.addEventListener('mousemove', function (e) {
-          var rect = dmWrap.getBoundingClientRect();
-          var px = (e.clientX - rect.left) / rect.width - 0.5;
-          var py = (e.clientY - rect.top) / rect.height - 0.5;
-          gsap.to(dmWrap, { rotateY: px * 14, rotateX: -py * 14, duration: 0.5, ease: 'power2.out' });
-        });
-        dmWrap.addEventListener('mouseleave', function () {
-          gsap.to(dmWrap, { rotateY: 0, rotateX: 0, duration: 0.7, ease: 'power2.out' });
         });
       }
 
@@ -818,7 +806,7 @@
           var grossBase = [620, 640, 655, 670, 690, 710];
           var netBase = [480, 495, 505, 515, 530, 545];
 
-          var payrollChart = new Chart(chartCanvas, {
+          new Chart(chartCanvas, {
             type: 'bar',
             plugins: [bar3DPlugin, barLabelPlugin],
             data: {
@@ -847,22 +835,6 @@
               maintainAspectRatio: false,
               layout: { padding: { top: 18, right: depth3D + 2 } },
               animation: { duration: reduceMotion ? 0 : 1400, easing: 'easeOutQuart' },
-              onHover: reduceMotion ? undefined : function (evt, elements) {
-                if (!elements.length) return;
-                var idx = elements[0].index;
-                if (payrollChart._jumpIdx === idx) return;
-                payrollChart._jumpIdx = idx;
-                payrollChart.data.datasets[0].data[idx] = grossBase[idx] * 1.28;
-                payrollChart.data.datasets[1].data[idx] = netBase[idx] * 1.28;
-                payrollChart.update();
-                clearTimeout(payrollChart._resetTimer);
-                payrollChart._resetTimer = setTimeout(function () {
-                  payrollChart.data.datasets[0].data[idx] = grossBase[idx];
-                  payrollChart.data.datasets[1].data[idx] = netBase[idx];
-                  payrollChart.update();
-                  payrollChart._jumpIdx = null;
-                }, 500);
-              },
               plugins: {
                 title: {
                   display: true,
@@ -876,9 +848,7 @@
                   position: 'top',
                   labels: { color: '#44506b', font: { size: 7 }, boxWidth: 7, boxHeight: 7, padding: 8, usePointStyle: true, pointStyle: 'rect' }
                 },
-                tooltip: {
-                  backgroundColor: '#1B2048', titleFont: { size: 9 }, bodyFont: { size: 9 }, padding: 6, cornerRadius: 4
-                }
+                tooltip: { enabled: false }
               },
               scales: {
                 x: {

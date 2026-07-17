@@ -55,6 +55,7 @@
     .svc-block:nth-of-type(even) { flex-direction: row-reverse; }
     .svc-block--long { align-items: flex-start; }
     .svc-block--long .svc-visual { padding-top: 0.4rem; }
+    .svc-block--chart-only { justify-content: center; }
 
     .svc-visual {
       flex: 0 0 220px;
@@ -109,28 +110,63 @@
       background: radial-gradient(ellipse at center, #232b5c 0%, #12162e 100%);
       z-index: 500;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
       transition: opacity 0.4s ease;
-      padding: 2rem;
+      padding: 3rem 2rem 2rem;
+      overflow-y: auto;
     }
 
-    .pie-zoom-overlay.show { opacity: 1; visibility: visible; }
+    .pie-zoom-overlay.show { opacity: 1; visibility: visible; pointer-events: auto; }
 
     .pie-zoom-inner {
       max-width: 640px;
+      width: 100%;
       text-align: center;
       transform: scale(0.9);
       transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+      margin: auto;
     }
 
     .pie-zoom-overlay.show .pie-zoom-inner { transform: scale(1); }
 
     .pie-zoom-inner .svc-desc { margin-left: auto; margin-right: auto; }
     .pie-zoom-inner .svc-feature-list { justify-content: center; }
+
+    .pie-zoom-close {
+      position: fixed;
+      top: 1.4rem;
+      right: 1.6rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .pie-zoom-close:hover { background: rgba(58,171,92,0.25); border-color: rgba(58,171,92,0.5); }
+
+    .pie-zoom-divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 2rem 0 1.5rem; }
+
+    .pie-detail-wrap { width: 260px; height: 260px; margin: 0 auto; }
+
+    .pie-detail-info { min-height: 150px; margin-top: 1rem; }
+    .pie-detail-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    .pie-detail-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.7rem; }
+    .pie-detail-list { list-style: none; padding: 0; margin: 0 auto; display: inline-block; text-align: left; }
+    .pie-detail-list li { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 0.45rem; display: flex; align-items: flex-start; gap: 0.5rem; }
+    .pie-detail-list li::before { content: '✓'; font-weight: 700; flex-shrink: 0; }
+    .pie-detail-prompt { color: rgba(255,255,255,0.4); font-size: 0.85rem; padding-top: 2.5rem; }
 
     @media (prefers-reduced-motion: reduce) {
       .pie-zoom-overlay { transition: none; }
@@ -179,9 +215,8 @@
     .dm-chart {
       height: 260px;
       padding: 0.6rem 0.5rem 0.4rem;
-      background: #f4f6fb;
+      background: transparent;
       border-radius: 10px;
-      box-shadow: inset 0 0 0 1px rgba(20,30,60,0.05);
     }
 
     @media (max-width: 768px) {
@@ -388,8 +423,8 @@
         <a href="#time-attendance">Time &amp; Attendance</a>
       </div>
 
-      <!-- SERVICE 1: Payroll & HR Systems -->
-      <section class="svc-block rise rise-d1" id="payroll-hr">
+      <!-- SERVICE 1: Payroll & HR Systems — visual only, wording lives in the hover zoom -->
+      <section class="svc-block svc-block--chart-only rise rise-d1" id="payroll-hr">
         <div class="svc-visual svc-visual--dash">
           <div class="dm-wrap">
             <div class="dm-laptop">
@@ -398,22 +433,6 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="svc-content">
-          <span class="svc-eyebrow">01 — Systems</span>
-          <h2>Payroll, HR and ESS Systems</h2>
-          <p class="svc-desc">
-            Fully compliant and powerful payroll solutions for all business types and sizes — from small businesses
-            to large enterprises. We implement, configure, and support industry-leading platforms so your payroll
-            runs accurately every month, without the manual admin.
-          </p>
-          <ul class="svc-feature-list">
-            <li>Easy-to-use software your team will actually enjoy</li>
-            <li>Configurable workflows that adapt to how you work</li>
-            <li>Integrations &amp; API for connecting your other systems</li>
-            <li>Scales with you — suitable for any size business</li>
-          </ul>
-          <a href="quote.html" class="btn-primary">Get a Quote</a>
         </div>
       </section>
 
@@ -546,6 +565,7 @@
 
   <!-- FULLSCREEN ZOOM — shown while hovering the Payroll/HR/ESS pie chart -->
   <div class="pie-zoom-overlay" id="pieZoomOverlay">
+    <button class="pie-zoom-close" id="pieZoomClose" aria-label="Close">✕</button>
     <div class="pie-zoom-inner">
       <span class="svc-eyebrow">01 — Systems</span>
       <h2>Payroll, HR and ESS Systems</h2>
@@ -561,6 +581,14 @@
         <li>Scales with you — suitable for any size business</li>
       </ul>
       <a href="quote.html" class="btn-primary">Get a Quote</a>
+
+      <hr class="pie-zoom-divider" />
+
+      <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-bottom:0.8rem;">Hover a slice below for specifics</p>
+      <div class="pie-detail-wrap"><canvas id="pieDetailChart"></canvas></div>
+      <div class="pie-detail-info" id="pieDetailInfo">
+        <p class="pie-detail-prompt" id="pieDetailPrompt">Hover Payroll, HR, or ESS above</p>
+      </div>
     </div>
   </div>
 
@@ -661,10 +689,10 @@
                   labels: ['Payroll', 'HR', 'ESS'],
                   datasets: [{
                     data: [45, 30, 25],
-                    backgroundColor: ['rgba(58,171,92,0.78)', 'rgba(46,158,232,0.78)', 'rgba(139,92,246,0.78)'],
+                    backgroundColor: ['rgba(58,171,92,0.85)', 'rgba(46,158,232,0.85)', 'rgba(139,92,246,0.85)'],
                     hoverBackgroundColor: ['#4bc470', '#52aef2', '#a07df8'],
-                    borderColor: '#f4f6fb',
-                    borderWidth: 3
+                    borderColor: '#141a38',
+                    borderWidth: 2
                   }]
                 },
                 options: {
@@ -679,20 +707,94 @@
                     legend: {
                       display: true,
                       position: 'bottom',
-                      labels: { color: '#44506b', font: { size: 10 }, boxWidth: 9, boxHeight: 9, padding: 10, usePointStyle: true, pointStyle: 'circle' }
+                      labels: { color: 'rgba(255,255,255,0.65)', font: { size: 10 }, boxWidth: 9, boxHeight: 9, padding: 10, usePointStyle: true, pointStyle: 'circle' }
                     },
                     tooltip: { enabled: false }
                   },
                   scales: {
-                    r: { ticks: { display: false }, grid: { color: 'rgba(20,30,60,0.08)' }, angleLines: { color: 'rgba(20,30,60,0.1)' } }
+                    r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.08)' }, angleLines: { color: 'rgba(255,255,255,0.1)' } }
                   },
-                  onHover: reduceMotion || !zoomOverlay ? undefined : function (evt, elements) {
-                    zoomOverlay.classList.toggle('show', elements.length > 0);
+                  onHover: !zoomOverlay ? undefined : function (evt, elements) {
+                    if (elements.length > 0) zoomOverlay.classList.add('show');
                   }
                 }
               });
+              if (chartCanvas && zoomOverlay) {
+                chartCanvas.addEventListener('click', function () { zoomOverlay.classList.add('show'); });
+              }
             }
           });
+
+          // Closing the zoom — explicit close button or clicking the dimmed backdrop
+          var pieZoomClose = document.getElementById('pieZoomClose');
+          if (pieZoomClose && zoomOverlay) {
+            pieZoomClose.addEventListener('click', function () { zoomOverlay.classList.remove('show'); });
+          }
+          if (zoomOverlay) {
+            zoomOverlay.addEventListener('click', function (e) {
+              if (e.target === zoomOverlay) zoomOverlay.classList.remove('show');
+            });
+          }
+
+          // Second "exploded" pie chart inside the zoom — per-category detail on hover
+          var detailCanvas = document.getElementById('pieDetailChart');
+          if (detailCanvas && window.Chart) {
+            var detailLabels = ['Payroll', 'HR', 'ESS'];
+            var detailData = [45, 30, 25];
+            var detailIcons = ['💰', '👥', '🙋'];
+            var detailColors = ['#3AAB5C', '#2E9EE8', '#8B5CF6'];
+            var detailFeatures = [
+              ['Easy-to-use software your team will actually enjoy', 'Configurable workflows that adapt to how you work', 'Integrations & API for connecting your other systems', 'Scales with you — suitable for any size business'],
+              ['Centralised employee records in one place', 'Leave and attendance tracking built in', 'Org chart and team management tools', 'Performance review workflows'],
+              ['Employees view and download payslips anytime', 'Submit and track leave requests', 'Update personal details securely', 'Access IRP5s and tax documents on demand']
+            ];
+            var detailInfo = document.getElementById('pieDetailInfo');
+
+            var detailChart = new Chart(detailCanvas, {
+              type: 'doughnut',
+              data: {
+                labels: detailLabels,
+                datasets: [{
+                  data: detailData,
+                  backgroundColor: detailColors,
+                  hoverBackgroundColor: ['#4bc470', '#52aef2', '#a07df8'],
+                  borderColor: '#1c2440',
+                  borderWidth: 3,
+                  offset: [0, 0, 0]
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '38%',
+                animation: { duration: reduceMotion ? 0 : 1000, easing: 'easeOutQuart' },
+                transitions: { active: { animation: { duration: 350, easing: 'easeOutBack' } } },
+                interaction: { mode: 'nearest', intersect: false },
+                hover: { mode: 'nearest', intersect: false },
+                plugins: {
+                  legend: {
+                    display: true, position: 'bottom',
+                    labels: { color: 'rgba(255,255,255,0.7)', font: { size: 9 }, boxWidth: 8, boxHeight: 8, padding: 8, usePointStyle: true, pointStyle: 'circle' }
+                  },
+                  tooltip: { enabled: false }
+                },
+                onHover: function (evt, elements) {
+                  var exploded = elements.length > 0;
+                  detailChart.data.datasets[0].offset = exploded ? [24, 24, 24] : [0, 0, 0];
+                  detailChart.update();
+                  if (!exploded) {
+                    detailInfo.innerHTML = '<p class="pie-detail-prompt">Hover Payroll, HR, or ESS above</p>';
+                    return;
+                  }
+                  var i = elements[0].index;
+                  detailInfo.innerHTML =
+                    '<div class="pie-detail-icon">' + detailIcons[i] + '</div>' +
+                    '<div class="pie-detail-name" style="color:' + detailColors[i] + '">' + detailLabels[i] + '</div>' +
+                    '<ul class="pie-detail-list">' + detailFeatures[i].map(function (f) { return '<li>' + f + '</li>'; }).join('') + '</ul>';
+                }
+              }
+            });
+          }
         }
       }
 

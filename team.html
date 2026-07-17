@@ -103,12 +103,31 @@
     }
 
     /* PAYROLL / HR / ESS DASHBOARD MOCKUP */
-    .svc-visual--dash { flex: 0 0 340px; }
+    .svc-visual--dash { flex: 0 0 340px; position: relative; perspective: 800px; }
 
-    .svc-visual--dash { perspective: 800px; }
+    .svc-visual--dash::before {
+      content: '';
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(58,171,92,0.16);
+      filter: blur(50px);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: dmGlowBreathe 4s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes dmGlowBreathe {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
+    }
 
     .dm-wrap {
       position: relative;
+      z-index: 1;
       width: 320px;
       max-width: 100%;
       margin: 0 auto;
@@ -177,9 +196,24 @@
       padding: 0 0.1rem;
     }
 
-    .dm-bar { flex: 1; border-radius: 3px 3px 0 0; }
+    .dm-bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      transform-origin: bottom;
+      animation: dmBarPulse 2.6s ease-in-out infinite;
+    }
     .dm-bar.g { background: linear-gradient(180deg, #3AAB5C, rgba(58,171,92,0.35)); }
     .dm-bar.b { background: linear-gradient(180deg, #2E9EE8, rgba(46,158,232,0.35)); }
+    .dm-bar:nth-child(1) { animation-delay: 0s; }
+    .dm-bar:nth-child(2) { animation-delay: 0.2s; }
+    .dm-bar:nth-child(3) { animation-delay: 0.4s; }
+    .dm-bar:nth-child(4) { animation-delay: 0.6s; }
+    .dm-bar:nth-child(5) { animation-delay: 0.8s; }
+    .dm-bar:nth-child(6) { animation-delay: 1s; }
+    @keyframes dmBarPulse {
+      0%, 100% { transform: scaleY(1); }
+      50%      { transform: scaleY(1.12); }
+    }
 
     .dm-phone {
       position: absolute;
@@ -222,6 +256,17 @@
     .dm-clock-hour, .dm-clock-min { transform-origin: 50px 50px; }
     .dm-clock-pulse { animation: dmClockPulse 2s ease-in-out infinite; }
     @keyframes dmClockPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .dm-clock-sec {
+      transform-origin: 50px 50px;
+      animation: dmClockSec 60s linear infinite;
+    }
+    @keyframes dmClockSec { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dm-clock-sec { animation-play-state: paused; }
+      .dm-bar { animation: none; }
+      .svc-visual--dash::before { animation: none; }
+    }
 
     .svc-content { flex: 1; min-width: 0; }
 
@@ -537,6 +582,7 @@
                 </g>
                 <line class="dm-clock-hour" x1="50" y1="50" x2="50" y2="30" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
                 <line class="dm-clock-min" x1="50" y1="50" x2="50" y2="20" stroke="#3AAB5C" stroke-width="3" stroke-linecap="round"/>
+                <line class="dm-clock-sec" x1="50" y1="50" x2="50" y2="14" stroke="#f5b301" stroke-width="1.5" stroke-linecap="round"/>
                 <circle class="dm-clock-pulse" cx="50" cy="50" r="3.5" fill="#3AAB5C"/>
               </svg>
             </div>
@@ -658,6 +704,12 @@
       // ---- 3D tilt on the Payroll/HR/ESS dashboard mockup ----
       var dmWrap = document.querySelector('.svc-visual--dash .dm-wrap');
       if (dmWrap && window.gsap && !reduceMotion) {
+        // Ambient idle float, always running — separate transform props (y) from the
+        // hover tilt (rotateX/rotateY) below so GSAP composes both without conflict.
+        gsap.to(dmWrap, {
+          y: 10, duration: 2.8, ease: 'sine.inOut', yoyo: true, repeat: -1
+        });
+
         dmWrap.addEventListener('mousemove', function (e) {
           var rect = dmWrap.getBoundingClientRect();
           var px = (e.clientX - rect.left) / rect.width - 0.5;

@@ -189,30 +189,8 @@
     .dm-stat-lbl { font-size: 0.46rem; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; text-transform: uppercase; }
 
     .dm-chart {
-      display: flex;
-      align-items: flex-end;
-      gap: 0.35rem;
-      height: 46px;
-      padding: 0 0.1rem;
-    }
-
-    .dm-bar {
-      flex: 1;
-      border-radius: 3px 3px 0 0;
-      transform-origin: bottom;
-      animation: dmBarPulse 2.6s ease-in-out infinite;
-    }
-    .dm-bar.g { background: linear-gradient(180deg, #3AAB5C, rgba(58,171,92,0.35)); }
-    .dm-bar.b { background: linear-gradient(180deg, #2E9EE8, rgba(46,158,232,0.35)); }
-    .dm-bar:nth-child(1) { animation-delay: 0s; }
-    .dm-bar:nth-child(2) { animation-delay: 0.2s; }
-    .dm-bar:nth-child(3) { animation-delay: 0.4s; }
-    .dm-bar:nth-child(4) { animation-delay: 0.6s; }
-    .dm-bar:nth-child(5) { animation-delay: 0.8s; }
-    .dm-bar:nth-child(6) { animation-delay: 1s; }
-    @keyframes dmBarPulse {
-      0%, 100% { transform: scaleY(1); }
-      50%      { transform: scaleY(1.12); }
+      height: 92px;
+      padding: 0.1rem 0.1rem 0;
     }
 
     .dm-phone {
@@ -264,7 +242,6 @@
 
     @media (prefers-reduced-motion: reduce) {
       .dm-clock-sec { animation-play-state: paused; }
-      .dm-bar { animation: none; }
       .svc-visual--dash::before { animation: none; }
     }
 
@@ -486,12 +463,7 @@
                 <div class="dm-stat"><span class="dm-stat-num" data-count-to="4">0</span><span class="dm-stat-lbl">Leave Requests</span></div>
               </div>
               <div class="dm-chart">
-                <div class="dm-bar g" style="height:45%"></div>
-                <div class="dm-bar b" style="height:65%"></div>
-                <div class="dm-bar g" style="height:55%"></div>
-                <div class="dm-bar b" style="height:80%"></div>
-                <div class="dm-bar g" style="height:70%"></div>
-                <div class="dm-bar b" style="height:95%"></div>
+                <canvas id="dmPayrollChart"></canvas>
               </div>
             </div>
             <div class="dm-phone">
@@ -670,6 +642,7 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script>
     (function () {
       var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -766,6 +739,63 @@
                   val: to, duration: 1.3, ease: 'power2.out',
                   onUpdate: function () { el.textContent = prefix + Math.round(counter.val) + suffix; }
                 });
+              });
+            }
+          });
+        }
+
+        // Real payroll chart — draws in once the dashboard scrolls into view
+        var chartCanvas = document.getElementById('dmPayrollChart');
+        if (chartCanvas && window.Chart) {
+          ScrollTrigger.create({
+            trigger: chartCanvas,
+            start: 'top 90%',
+            once: true,
+            onEnter: function () {
+              new Chart(chartCanvas, {
+                type: 'bar',
+                data: {
+                  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                  datasets: [
+                    {
+                      label: 'Gross pay',
+                      data: [620, 640, 655, 670, 690, 710],
+                      backgroundColor: '#3AAB5C',
+                      borderRadius: 3,
+                      barPercentage: 0.7
+                    },
+                    {
+                      label: 'Net pay',
+                      data: [480, 495, 505, 515, 530, 545],
+                      backgroundColor: '#2E9EE8',
+                      borderRadius: 3,
+                      barPercentage: 0.7
+                    }
+                  ]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  animation: { duration: reduceMotion ? 0 : 1300, easing: 'easeOutQuart' },
+                  plugins: {
+                    legend: {
+                      display: true,
+                      position: 'top',
+                      labels: { color: 'rgba(255,255,255,0.55)', font: { size: 7 }, boxWidth: 7, boxHeight: 7, padding: 8 }
+                    },
+                    tooltip: {
+                      titleFont: { size: 9 }, bodyFont: { size: 9 }, padding: 6, cornerRadius: 4
+                    }
+                  },
+                  scales: {
+                    x: {
+                      ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 7 } },
+                      grid: { display: false },
+                      border: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    y: { display: false, beginAtZero: true }
+                  }
+                }
               });
             }
           });

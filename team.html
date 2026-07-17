@@ -189,8 +189,11 @@
     .dm-stat-lbl { font-size: 0.46rem; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; text-transform: uppercase; }
 
     .dm-chart {
-      height: 92px;
-      padding: 0.1rem 0.1rem 0;
+      height: 168px;
+      padding: 0.5rem 0.4rem 0.3rem;
+      background: #f4f6fb;
+      border-radius: 10px;
+      box-shadow: inset 0 0 0 1px rgba(20,30,60,0.05);
     }
 
     .dm-phone {
@@ -752,51 +755,147 @@
             start: 'top 90%',
             once: true,
             onEnter: function () {
-              new Chart(chartCanvas, {
-                type: 'bar',
-                data: {
-                  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                  datasets: [
-                    {
-                      label: 'Gross pay',
-                      data: [620, 640, 655, 670, 690, 710],
-                      backgroundColor: '#3AAB5C',
-                      borderRadius: 3,
-                      barPercentage: 0.7
-                    },
-                    {
-                      label: 'Net pay',
-                      data: [480, 495, 505, 515, 530, 545],
-                      backgroundColor: '#2E9EE8',
-                      borderRadius: 3,
-                      barPercentage: 0.7
-                    }
-                  ]
-                },
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  animation: { duration: reduceMotion ? 0 : 1300, easing: 'easeOutQuart' },
-                  plugins: {
-                    legend: {
-                      display: true,
-                      position: 'top',
-                      labels: { color: 'rgba(255,255,255,0.55)', font: { size: 7 }, boxWidth: 7, boxHeight: 7, padding: 8 }
-                    },
-                    tooltip: {
-                      titleFont: { size: 9 }, bodyFont: { size: 9 }, padding: 6, cornerRadius: 4
-                    }
-                  },
-                  scales: {
-                    x: {
-                      ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 7 } },
-                      grid: { display: false },
-                      border: { color: 'rgba(255,255,255,0.1)' }
-                    },
-                    y: { display: false, beginAtZero: true }
-                  }
-                }
+          var depth3D = 6;
+          function shade(hex, pct) {
+            var f = parseInt(hex.slice(1), 16), t = pct < 0 ? 0 : 255, p = Math.abs(pct);
+            var R = f >> 16, G = (f >> 8) & 0xff, B = f & 0xff;
+            return '#' + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
+          }
+          var bar3DPlugin = {
+            id: 'bar3D',
+            afterDatasetsDraw: function (chart) {
+              var ctx = chart.ctx;
+              chart.data.datasets.forEach(function (ds, dsIndex) {
+                var meta = chart.getDatasetMeta(dsIndex);
+                if (meta.hidden) return;
+                var top = shade(ds.backgroundColor, 0.32);
+                var side = shade(ds.backgroundColor, -0.24);
+                meta.data.forEach(function (bar) {
+                  var p = bar.getProps(['x', 'y', 'base', 'width'], true);
+                  var x0 = p.x - p.width / 2, x1 = p.x + p.width / 2;
+                  ctx.save();
+                  ctx.beginPath();
+                  ctx.moveTo(x0, p.y);
+                  ctx.lineTo(x0 + depth3D, p.y - depth3D);
+                  ctx.lineTo(x1 + depth3D, p.y - depth3D);
+                  ctx.lineTo(x1, p.y);
+                  ctx.closePath();
+                  ctx.fillStyle = top;
+                  ctx.fill();
+                  ctx.beginPath();
+                  ctx.moveTo(x1, p.y);
+                  ctx.lineTo(x1 + depth3D, p.y - depth3D);
+                  ctx.lineTo(x1 + depth3D, p.base - depth3D);
+                  ctx.lineTo(x1, p.base);
+                  ctx.closePath();
+                  ctx.fillStyle = side;
+                  ctx.fill();
+                  ctx.restore();
+                });
               });
+            }
+          };
+          var barLabelPlugin = {
+            id: 'barLabels',
+            afterDatasetsDraw: function (chart) {
+              var ctx = chart.ctx;
+              chart.data.datasets.forEach(function (ds, dsIndex) {
+                var meta = chart.getDatasetMeta(dsIndex);
+                if (meta.hidden) return;
+                meta.data.forEach(function (bar, i) {
+                  var p = bar.getProps(['x', 'y'], true);
+                  ctx.save();
+                  ctx.font = "600 8px 'Segoe UI', Arial, sans-serif";
+                  ctx.fillStyle = '#33415c';
+                  ctx.textAlign = 'center';
+                  ctx.fillText(Math.round(ds.data[i]), p.x + depth3D / 2, p.y - depth3D - 4);
+                  ctx.restore();
+                });
+              });
+            }
+          };
+
+          var grossBase = [620, 640, 655, 670, 690, 710];
+          var netBase = [480, 495, 505, 515, 530, 545];
+
+          var payrollChart = new Chart(chartCanvas, {
+            type: 'bar',
+            plugins: [bar3DPlugin, barLabelPlugin],
+            data: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+              datasets: [
+                {
+                  label: 'Gross pay (R’000)',
+                  data: grossBase.slice(),
+                  backgroundColor: '#3AAB5C',
+                  borderRadius: 2,
+                  barPercentage: 0.62,
+                  categoryPercentage: 0.75
+                },
+                {
+                  label: 'Net pay (R’000)',
+                  data: netBase.slice(),
+                  backgroundColor: '#2E9EE8',
+                  borderRadius: 2,
+                  barPercentage: 0.62,
+                  categoryPercentage: 0.75
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              layout: { padding: { top: 18, right: depth3D + 2 } },
+              animation: { duration: reduceMotion ? 0 : 1400, easing: 'easeOutQuart' },
+              onHover: reduceMotion ? undefined : function (evt, elements) {
+                if (!elements.length) return;
+                var idx = elements[0].index;
+                if (payrollChart._jumpIdx === idx) return;
+                payrollChart._jumpIdx = idx;
+                payrollChart.data.datasets[0].data[idx] = grossBase[idx] * 1.28;
+                payrollChart.data.datasets[1].data[idx] = netBase[idx] * 1.28;
+                payrollChart.update();
+                clearTimeout(payrollChart._resetTimer);
+                payrollChart._resetTimer = setTimeout(function () {
+                  payrollChart.data.datasets[0].data[idx] = grossBase[idx];
+                  payrollChart.data.datasets[1].data[idx] = netBase[idx];
+                  payrollChart.update();
+                  payrollChart._jumpIdx = null;
+                }, 500);
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Payroll overview',
+                  color: '#1B2048',
+                  font: { size: 10, weight: '700' },
+                  padding: { bottom: 8 }
+                },
+                legend: {
+                  display: true,
+                  position: 'top',
+                  labels: { color: '#44506b', font: { size: 7 }, boxWidth: 7, boxHeight: 7, padding: 8, usePointStyle: true, pointStyle: 'rect' }
+                },
+                tooltip: {
+                  backgroundColor: '#1B2048', titleFont: { size: 9 }, bodyFont: { size: 9 }, padding: 6, cornerRadius: 4
+                }
+              },
+              scales: {
+                x: {
+                  ticks: { color: '#5a6785', font: { size: 7 } },
+                  grid: { display: false },
+                  border: { color: 'rgba(20,30,60,0.12)' }
+                },
+                y: {
+                  display: true,
+                  beginAtZero: true,
+                  ticks: { display: false },
+                  grid: { color: 'rgba(20,30,60,0.06)' },
+                  border: { display: false }
+                }
+              }
+            }
+          });
             }
           });
         }

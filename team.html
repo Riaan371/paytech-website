@@ -187,6 +187,19 @@
       .dm-wrap { margin-bottom: 1rem; }
     }
 
+    /* ANIMATED GROWTH CHART — Consulting & Outsourcing badge */
+    .dm-growth-svg { width: 128px; height: 50px; overflow: visible; display: block; }
+    .dm-growth-note { margin-top: 0.5rem; font-size: 0.56rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #3AAB5C; text-align: center; }
+
+    /* ANIMATED CLOCK — Time & Attendance badge */
+    .dm-clock-svg { width: 116px; height: 116px; overflow: visible; display: block; }
+    .dm-clock-hour { transform-origin: 50px 50px; animation: dmClockHour 9s linear infinite; }
+    .dm-clock-min  { transform-origin: 50px 50px; animation: dmClockMin 3s linear infinite; }
+    @keyframes dmClockHour { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes dmClockMin  { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .dm-clock-pulse { animation: dmClockPulse 2s ease-in-out infinite; }
+    @keyframes dmClockPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
     .svc-content { flex: 1; min-width: 0; }
 
     .svc-eyebrow {
@@ -445,7 +458,29 @@
       <!-- SERVICE 2: Payroll Consulting and Outsourcing -->
       <section class="svc-block svc-block--long rise rise-d2" id="consulting-outsourcing">
         <div class="svc-visual">
-          <div class="svc-visual-badge">📈</div>
+          <div class="svc-visual-badge">
+            <div>
+              <svg class="dm-growth-svg" viewBox="0 0 200 70" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="dmGgrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3AAB5C" stop-opacity="0.22"/>
+                    <stop offset="100%" stop-color="#3AAB5C" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <polygon points="5,62 35,54 70,44 105,30 145,16 195,4 195,68 5,68" fill="url(#dmGgrad)"/>
+                <polyline points="5,62 35,54 70,44 105,30 145,16 195,4"
+                  fill="none" stroke="#3AAB5C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-dasharray="300" stroke-dashoffset="300">
+                  <animate attributeName="stroke-dashoffset" from="300" to="0" dur="1.8s" repeatCount="indefinite"/>
+                </polyline>
+                <circle cx="195" cy="4" r="6" fill="#3AAB5C">
+                  <animate attributeName="r" values="6;9;6" dur="1.4s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="1;0.35;1" dur="1.4s" repeatCount="indefinite"/>
+                </circle>
+              </svg>
+              <div class="dm-growth-note">↑ Growing every month</div>
+            </div>
+          </div>
         </div>
         <div class="svc-content">
           <span class="svc-eyebrow">02 — Consulting</span>
@@ -485,7 +520,20 @@
       <!-- SERVICE 3: Time & Attendance -->
       <section class="svc-block rise rise-d3" id="time-attendance">
         <div class="svc-visual">
-          <div class="svc-visual-badge">🕒</div>
+          <div class="svc-visual-badge">
+            <svg class="dm-clock-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="rgba(58,171,92,0.06)" stroke="rgba(58,171,92,0.35)" stroke-width="2"/>
+              <g stroke="rgba(58,171,92,0.45)" stroke-width="2.5" stroke-linecap="round">
+                <line x1="50" y1="9" x2="50" y2="16"/>
+                <line x1="50" y1="84" x2="50" y2="91"/>
+                <line x1="9" y1="50" x2="16" y2="50"/>
+                <line x1="84" y1="50" x2="91" y2="50"/>
+              </g>
+              <line class="dm-clock-hour" x1="50" y1="50" x2="50" y2="30" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+              <line class="dm-clock-min" x1="50" y1="50" x2="50" y2="20" stroke="#3AAB5C" stroke-width="3" stroke-linecap="round"/>
+              <circle class="dm-clock-pulse" cx="50" cy="50" r="3.5" fill="#3AAB5C"/>
+            </svg>
+          </div>
         </div>
         <div class="svc-content">
           <span class="svc-eyebrow">03 — Time &amp; Attendance</span>

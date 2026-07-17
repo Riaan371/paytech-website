@@ -102,6 +102,41 @@
       .dm-clock-ping { display: none; }
     }
 
+    /* FULLSCREEN ZOOM — Payroll/HR/ESS pie chart hover */
+    .pie-zoom-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, #232b5c 0%, #12162e 100%);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      padding: 2rem;
+    }
+
+    .pie-zoom-overlay.show { opacity: 1; visibility: visible; }
+
+    .pie-zoom-inner {
+      max-width: 640px;
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+    }
+
+    .pie-zoom-overlay.show .pie-zoom-inner { transform: scale(1); }
+
+    .pie-zoom-inner .svc-desc { margin-left: auto; margin-right: auto; }
+    .pie-zoom-inner .svc-feature-list { justify-content: center; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pie-zoom-overlay { transition: none; }
+      .pie-zoom-inner { transition: none; }
+    }
+
     /* PAYROLL / HR / ESS DASHBOARD MOCKUP */
     .svc-visual--dash { flex: 0 0 340px; position: relative; }
 
@@ -508,6 +543,27 @@
     </footer>
 
   </div>
+
+  <!-- FULLSCREEN ZOOM — shown while hovering the Payroll/HR/ESS pie chart -->
+  <div class="pie-zoom-overlay" id="pieZoomOverlay">
+    <div class="pie-zoom-inner">
+      <span class="svc-eyebrow">01 — Systems</span>
+      <h2>Payroll, HR and ESS Systems</h2>
+      <p class="svc-desc">
+        Fully compliant and powerful payroll solutions for all business types and sizes — from small businesses
+        to large enterprises. We implement, configure, and support industry-leading platforms so your payroll
+        runs accurately every month, without the manual admin.
+      </p>
+      <ul class="svc-feature-list">
+        <li>Easy-to-use software your team will actually enjoy</li>
+        <li>Configurable workflows that adapt to how you work</li>
+        <li>Integrations &amp; API for connecting your other systems</li>
+        <li>Scales with you — suitable for any size business</li>
+      </ul>
+      <a href="quote.html" class="btn-primary">Get a Quote</a>
+    </div>
+  </div>
+
   <script>
     const toggle = document.getElementById('navToggle');
     const navLinks = document.getElementById('navLinks');
@@ -589,150 +645,52 @@
           }
         });
 
-        // Real payroll chart — draws in once the dashboard scrolls into view
+        // Payroll/HR/ESS pie chart — draws in once it scrolls into view, then
+        // zooms the whole screen into the section's real copy on hover
         var chartCanvas = document.getElementById('dmPayrollChart');
+        var zoomOverlay = document.getElementById('pieZoomOverlay');
         if (chartCanvas && window.Chart) {
           ScrollTrigger.create({
             trigger: chartCanvas,
             start: 'top 90%',
             once: true,
             onEnter: function () {
-          var depth3D = 6;
-          function shade(hex, pct) {
-            var f = parseInt(hex.slice(1), 16), t = pct < 0 ? 0 : 255, p = Math.abs(pct);
-            var R = f >> 16, G = (f >> 8) & 0xff, B = f & 0xff;
-            return '#' + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
-          }
-          var bar3DPlugin = {
-            id: 'bar3D',
-            afterDatasetsDraw: function (chart) {
-              var ctx = chart.ctx;
-              chart.data.datasets.forEach(function (ds, dsIndex) {
-                var meta = chart.getDatasetMeta(dsIndex);
-                if (meta.hidden) return;
-                meta.data.forEach(function (bar) {
-                  var baseColor = (bar.active && ds.hoverBackgroundColor) ? ds.hoverBackgroundColor : ds.backgroundColor;
-                  var top = shade(baseColor, 0.32);
-                  var side = shade(baseColor, -0.24);
-                  var p = bar.getProps(['x', 'y', 'base', 'width'], true);
-                  var x0 = p.x - p.width / 2, x1 = p.x + p.width / 2;
-                  ctx.save();
-                  ctx.beginPath();
-                  ctx.moveTo(x0, p.y);
-                  ctx.lineTo(x0 + depth3D, p.y - depth3D);
-                  ctx.lineTo(x1 + depth3D, p.y - depth3D);
-                  ctx.lineTo(x1, p.y);
-                  ctx.closePath();
-                  ctx.fillStyle = top;
-                  ctx.fill();
-                  ctx.beginPath();
-                  ctx.moveTo(x1, p.y);
-                  ctx.lineTo(x1 + depth3D, p.y - depth3D);
-                  ctx.lineTo(x1 + depth3D, p.base - depth3D);
-                  ctx.lineTo(x1, p.base);
-                  ctx.closePath();
-                  ctx.fillStyle = side;
-                  ctx.fill();
-                  ctx.restore();
-                });
-              });
-            }
-          };
-          var grossBase = [620, 640, 655, 670, 690, 710];
-          var netBase = [480, 495, 505, 515, 530, 545];
-
-          var payrollChart = new Chart(chartCanvas, {
-            type: 'bar',
-            plugins: [bar3DPlugin],
-            data: {
-              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-              datasets: [
-                {
-                  label: 'Gross pay (R’000)',
-                  data: grossBase.slice(),
-                  backgroundColor: '#3AAB5C',
-                  hoverBackgroundColor: '#4bc470',
-                  borderRadius: 2,
-                  barPercentage: 0.62,
-                  categoryPercentage: 0.75
+              new Chart(chartCanvas, {
+                type: 'polarArea',
+                data: {
+                  labels: ['Payroll', 'HR', 'ESS'],
+                  datasets: [{
+                    data: [45, 30, 25],
+                    backgroundColor: ['rgba(58,171,92,0.78)', 'rgba(46,158,232,0.78)', 'rgba(139,92,246,0.78)'],
+                    hoverBackgroundColor: ['#4bc470', '#52aef2', '#a07df8'],
+                    borderColor: '#f4f6fb',
+                    borderWidth: 3
+                  }]
                 },
-                {
-                  label: 'Net pay (R’000)',
-                  data: netBase.slice(),
-                  backgroundColor: '#2E9EE8',
-                  hoverBackgroundColor: '#52aef2',
-                  borderRadius: 2,
-                  barPercentage: 0.62,
-                  categoryPercentage: 0.75
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              layout: { padding: { top: 18, right: depth3D + 2 } },
-              animation: { duration: reduceMotion ? 0 : 1400, easing: 'easeOutQuart' },
-              transitions: { active: { animation: { duration: 300, easing: 'easeOutQuart' } } },
-              interaction: { mode: 'index', intersect: false },
-              hover: { mode: 'index', intersect: false },
-              onHover: reduceMotion ? undefined : function (evt, elements) {
-                var prev = payrollChart._jumpIdx;
-                var idx = elements.length ? elements[0].index : null;
-                if (prev === idx) return;
-                if (prev != null) {
-                  payrollChart.data.datasets[0].data[prev] = grossBase[prev];
-                  payrollChart.data.datasets[1].data[prev] = netBase[prev];
-                }
-                if (idx != null) {
-                  payrollChart.data.datasets[0].data[idx] = grossBase[idx] * 1.22;
-                  payrollChart.data.datasets[1].data[idx] = netBase[idx] * 1.22;
-                }
-                payrollChart._jumpIdx = idx;
-                payrollChart.update();
-              },
-              plugins: {
-                title: {
-                  display: true,
-                  text: 'Payroll overview',
-                  color: '#1B2048',
-                  font: { size: 11, weight: '700' },
-                  padding: { bottom: 10 }
-                },
-                legend: {
-                  display: true,
-                  position: 'top',
-                  labels: { color: '#44506b', font: { size: 8 }, boxWidth: 8, boxHeight: 8, padding: 10, usePointStyle: true, pointStyle: 'rect' }
-                },
-                tooltip: {
-                  enabled: true,
-                  backgroundColor: '#1B2048',
-                  titleFont: { size: 10, weight: '700' },
-                  bodyFont: { size: 10 },
-                  padding: 8,
-                  cornerRadius: 6,
-                  displayColors: true,
-                  boxPadding: 3,
-                  callbacks: {
-                    label: function (ctx) { return ctx.dataset.label + ': R' + ctx.formattedValue + 'K'; }
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  animation: reduceMotion ? { duration: 0 } : {
+                    duration: 1600,
+                    easing: 'easeOutElastic',
+                    delay: function (ctx) { return ctx.dataIndex * 200; }
+                  },
+                  plugins: {
+                    legend: {
+                      display: true,
+                      position: 'bottom',
+                      labels: { color: '#44506b', font: { size: 10 }, boxWidth: 9, boxHeight: 9, padding: 10, usePointStyle: true, pointStyle: 'circle' }
+                    },
+                    tooltip: { enabled: false }
+                  },
+                  scales: {
+                    r: { ticks: { display: false }, grid: { color: 'rgba(20,30,60,0.08)' }, angleLines: { color: 'rgba(20,30,60,0.1)' } }
+                  },
+                  onHover: reduceMotion || !zoomOverlay ? undefined : function (evt, elements) {
+                    zoomOverlay.classList.toggle('show', elements.length > 0);
                   }
                 }
-              },
-              scales: {
-                x: {
-                  ticks: { color: '#5a6785', font: { size: 9 } },
-                  grid: { display: false },
-                  border: { color: 'rgba(20,30,60,0.12)' }
-                },
-                y: {
-                  display: true,
-                  beginAtZero: true,
-                  ticks: { display: false },
-                  grid: { color: 'rgba(20,30,60,0.06)' },
-                  border: { display: false }
-                }
-              }
-            }
-          });
+              });
             }
           });
         }

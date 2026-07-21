@@ -30,6 +30,64 @@
       margin-bottom: 1rem;
     }
 
+    /* OUR VALUES (moved from the home page) */
+    .values-section {
+      margin-top: 5rem;
+      text-align: center;
+    }
+
+    .values-section h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .values-intro {
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin-top: 2.5rem;
+    }
+
+    .value-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 1.6rem 1.4rem;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .value-card:hover { border-color: rgba(58,171,92,0.3); }
+
+    .value-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.8rem;
+    }
+
+    .value-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+
+    .value-desc {
+      font-size: 0.82rem;
+      color: rgba(210,225,245,0.65);
+      line-height: 1.6;
+    }
+
     /* INDUSTRIES SERVED */
     .industries-section {
       margin-top: 5rem;
@@ -310,6 +368,7 @@
     .cta-band-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
     @media (max-width: 768px) {
+      .values-grid { grid-template-columns: 1fr 1fr; }
       .why-grid { grid-template-columns: 1fr; }
       .why-stats { grid-template-columns: 1fr 1fr; }
       .testimonial-grid { grid-template-columns: 1fr; }
@@ -320,6 +379,7 @@
     }
 
     @media (max-width: 480px) {
+      .values-grid { grid-template-columns: 1fr; }
       .steps-grid { grid-template-columns: 1fr; }
       .why-stats { grid-template-columns: 1fr 1fr; }
       .industries-grid { grid-template-columns: 1fr 1fr; }
@@ -366,17 +426,50 @@
       <!-- OUR STORY -->
       <div class="story-section rise rise-d1">
         <span class="section-label">Our story</span>
-        <h2>Why Paytech exists</h2>
+        <h2>Client focused. Result driven.</h2>
         <p>
-          Paytech was built on a simple frustration: payroll shouldn't be this hard. Too many business owners lose sleep
-          over PAYE deadlines, missed UIF submissions, and payslips gone wrong — not because they're bad at business,
-          but because payroll was never meant to be a side project.
+          We are a group of highly skilled consultants with similar mindsets: client focused and result driven.
+          We understand that each customer has their own unique requirements, and our focus is to give our customers
+          the best experience when dealing with top-tier consultants. Our goal is to build a lasting legacy and truly
+          make people's lives better — we love working and growing with the people we interact with daily.
         </p>
         <p>
-          So we set out to be the partner that takes the weight off, not just another system to manage. Whether you're
-          a five-person team or a multi-site operation, our job stays the same: your people get paid accurately, your
-          business stays compliant, and payroll stops being something you have to think about.
+          To ensure we deliver the best service, we only employ senior consultants with decades of Payroll and HR
+          experience. We also work with a wide variety of industries, stretching from mining and construction all the
+          way through to corporate, medical and retail companies. So rest assured — your payroll will always be in
+          good hands.
         </p>
+      </div>
+
+      <!-- OUR VALUES (moved from the home page) -->
+      <div class="values-section rise rise-d2">
+        <span class="section-label">What drives us</span>
+        <h2>Our Values</h2>
+        <p class="values-intro">
+          Every business we serve is built on trust. These are the principles that guide everything we do.
+        </p>
+        <div class="values-grid">
+          <div class="value-card">
+            <span class="value-icon">🎯</span>
+            <div class="value-title">Accuracy First</div>
+            <p class="value-desc">Payroll errors cost businesses time and money. We get it right, every time.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon">🤝</span>
+            <div class="value-title">Partnership</div>
+            <p class="value-desc">We don't just process payroll — we become a trusted extension of your team.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon">⚖️</span>
+            <div class="value-title">Compliance</div>
+            <p class="value-desc">Always up to date with South African labour law and tax legislation.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon">💡</span>
+            <div class="value-title">Innovation</div>
+            <p class="value-desc">Embracing the best payroll technology so your business stays ahead.</p>
+          </div>
+        </div>
       </div>
 
       <!-- WHY PAYTECH -->

@@ -661,16 +661,15 @@
       line-height: 1.7;
     }
 
-    .testimonial-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      align-items: start;
-      gap: 1.4rem;
+    .testimonial-carousel {
+      position: relative;
+      height: 320px;
       margin-top: 2.6rem;
       text-align: left;
       max-width: 1100px;
       margin-left: auto;
       margin-right: auto;
+      overflow: hidden;
     }
 
     .testimonial-quote .lang-original { display: block; }
@@ -682,19 +681,18 @@
       margin-top: 0.6rem;
     }
     .testimonial-card {
+      position: absolute;
+      top: 0;
+      height: 300px;
+      box-sizing: border-box;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px;
       padding: 1.8rem 1.6rem;
       display: flex;
       flex-direction: column;
-      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-    }
-
-    .testimonial-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(58,171,92,0.4);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(58,171,92,0.12);
+      cursor: pointer;
+      transition: left 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1), opacity 0.5s ease, filter 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease;
     }
 
     .testimonial-stars {
@@ -710,6 +708,10 @@
       line-height: 1.7;
       margin-bottom: 1.4rem;
       flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 6;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .testimonial-author {
@@ -738,8 +740,9 @@
     .testimonial-name { font-size: 0.85rem; font-weight: 600; color: #ffffff; }
     .testimonial-role  { font-size: 0.72rem; color: rgba(180,200,230,0.4); }
 
-    @media (max-width: 768px) {
-      .testimonial-grid { grid-template-columns: 1fr; }
+    @media (max-width: 480px) {
+      .testimonial-carousel { height: 380px; }
+      .testimonial-card { height: 360px; }
     }
 
     /* INDUSTRIES SERVED */
@@ -1181,7 +1184,7 @@
           <h2>Don't just take our word for it</h2>
           <p>15+ years in the industry, 200+ businesses trust us, and thousands of payslips processed — this is what happens when payroll just works.</p>
         </div>
-        <div class="testimonial-grid">
+        <div class="testimonial-carousel">
           <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
             <p class="testimonial-quote">I wanted to take a moment to share how grateful I am for Caroline and the exceptional support she has given me as a client. In a world where outstanding customer service can be hard to find, Caroline has been an absolute breath of fresh air. From the very beginning, she has treated every interaction with kindness, patience, professionalism, and genuine care.</p>
@@ -1447,6 +1450,69 @@
       img.src = s.style.backgroundImage.replace(/url\(['"]?([^'"]+)['"]?\)/,'$1');
     });
     setTimeout(startSlideshow, 2000);
+  </script>
+  <script>
+    // Testimonial carousel — auto-rotates, hover brings a card to front
+    (function () {
+      const wrap = document.querySelector('.testimonial-carousel');
+      if (!wrap) return;
+      const cards = [...wrap.querySelectorAll('.testimonial-card')];
+      const n = cards.length;
+      let active = 0;
+      let hovering = false;
+      let timer = null;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function circularDelta(i) {
+        let d = i - active;
+        d = ((d % n) + n) % n;
+        if (d > n / 2) d -= n;
+        return d;
+      }
+
+      function layout() {
+        const containerWidth = wrap.clientWidth;
+        const cardWidth = Math.min(460, containerWidth * 0.62);
+        const spacing = cardWidth * 0.58;
+        cards.forEach((card, i) => {
+          const delta = circularDelta(i);
+          const mag = Math.abs(delta);
+          const left = containerWidth / 2 - cardWidth / 2 + delta * spacing;
+          let scale, opacity, blur, z, y;
+          if (mag === 0) { scale = 1.05; opacity = 1; blur = 0; z = 10; y = -6; }
+          else if (mag === 1) { scale = 0.88; opacity = 0.55; blur = 1; z = 5; y = 0; }
+          else { scale = 0.8; opacity = 0.28; blur = 2; z = 1; y = 0; }
+          card.style.width = cardWidth + 'px';
+          card.style.left = left + 'px';
+          card.style.transform = `scale(${scale}) translateY(${y}px)`;
+          card.style.opacity = opacity;
+          card.style.filter = `blur(${blur}px)`;
+          card.style.zIndex = z;
+          card.style.boxShadow = mag === 0
+            ? '0 20px 45px rgba(0,0,0,0.4), 0 0 0 1px rgba(58,171,92,0.15)'
+            : '0 10px 25px rgba(0,0,0,0.25)';
+          card.style.borderColor = mag === 0 ? 'rgba(58,171,92,0.4)' : 'rgba(255,255,255,0.08)';
+        });
+      }
+
+      function goTo(i) { active = i; layout(); }
+
+      cards.forEach((card, i) => {
+        card.addEventListener('mouseenter', () => { hovering = true; goTo(i); });
+        card.addEventListener('mouseleave', () => { hovering = false; });
+      });
+
+      window.addEventListener('resize', layout);
+      layout();
+
+      if (!reduceMotion) {
+        timer = setInterval(() => {
+          if (hovering) return;
+          active = (active + 1) % n;
+          layout();
+        }, 4000);
+      }
+    })();
   </script>
 </body>
 </html>

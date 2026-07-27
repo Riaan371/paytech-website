@@ -70,9 +70,31 @@
     .value-card:hover { border-color: rgba(58,171,92,0.3); }
 
     .value-icon {
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 0.8rem;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 1rem;
+      background: radial-gradient(circle at 35% 30%, rgba(var(--vc-rgb),0.25) 0%, rgba(var(--vc-rgb),0.04) 70%);
+      border: 1px solid rgba(var(--vc-rgb),0.35);
+      animation: valueGlow 3.5s ease-in-out infinite;
+    }
+
+    @keyframes valueGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(var(--vc-rgb), 0); }
+      50%      { box-shadow: 0 0 24px 4px rgba(var(--vc-rgb), 0.28); }
+    }
+
+    .value-card:nth-child(1) .value-icon { --vc-rgb: 58,171,92; }
+    .value-card:nth-child(2) .value-icon { --vc-rgb: 46,158,232; }
+    .value-card:nth-child(3) .value-icon { --vc-rgb: 139,92,246; }
+    .value-card:nth-child(4) .value-icon { --vc-rgb: 16,190,214; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .value-icon { animation: none; }
     }
 
     .value-title {
@@ -324,7 +346,7 @@
       <img class="page-watermark" src="Current LOGO/After Canva/paytech-full-logo.png" alt="" />
       <span class="label">Who we are</span>
       <h1>About Paytech</h1>
-      <p>15+ years of hands-on payroll expertise, certified across South Africa's leading platforms, and trusted by hundreds of businesses to get it right — every single month.</p>
+      <p>75+ years of hands-on payroll expertise, certified across South Africa's leading platforms, and trusted by hundreds of businesses to get it right — every single month.</p>
       <div class="page-divider"></div>
     </div>
 
@@ -358,23 +380,23 @@
         <div class="values-grid">
           <div class="value-card">
             <span class="value-icon">🎯</span>
-            <div class="value-title">Accuracy First</div>
-            <p class="value-desc">Payroll errors cost businesses time and money. We get it right, every time.</p>
+            <div class="value-title">Client First</div>
+            <p class="value-desc">We focus on the needs of the customer and the outcome they want to see.</p>
           </div>
           <div class="value-card">
-            <span class="value-icon">🤝</span>
-            <div class="value-title">Partnership</div>
-            <p class="value-desc">We don't just process payroll — we become a trusted extension of your team.</p>
+            <span class="value-icon">⚡</span>
+            <div class="value-title">Streamline and Enhance</div>
+            <p class="value-desc">Let's work smarter, not harder — we advise on the best and easiest solutions that produce the best outcomes.</p>
           </div>
           <div class="value-card">
             <span class="value-icon">⚖️</span>
-            <div class="value-title">Compliance</div>
-            <p class="value-desc">Always up to date with South African labour law and tax legislation.</p>
+            <div class="value-title">Integrity</div>
+            <p class="value-desc">It's commonly thrown around, but we bring this to life.</p>
           </div>
           <div class="value-card">
-            <span class="value-icon">💡</span>
-            <div class="value-title">Innovation</div>
-            <p class="value-desc">Embracing the best payroll technology so your business stays ahead.</p>
+            <span class="value-icon">❤️</span>
+            <div class="value-title">Be the Change</div>
+            <p class="value-desc">In a world where everyone is a number, we see the person.</p>
           </div>
         </div>
       </div>
@@ -401,7 +423,7 @@
               <span class="stat-label">Certified platforms</span>
             </div>
             <div class="stat-card">
-              <span class="stat-number">15+</span>
+              <span class="stat-number">75+</span>
               <span class="stat-label">Years experience</span>
             </div>
             <div class="stat-card">

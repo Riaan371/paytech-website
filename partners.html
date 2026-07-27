@@ -132,6 +132,7 @@
     @keyframes indPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.85; } }
     .ind-handle { transform-origin: 30px 26px; animation: indHandle 2.8s ease-in-out infinite; }
     @keyframes indHandle { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-4deg); } }
+    .ind-more { transform-origin: 30px 30px; animation: indPulse 2.2s ease-in-out infinite; }
 
     @media (prefers-reduced-motion: reduce) {
       .vi-gear { animation: none; }
@@ -179,7 +180,7 @@
 
     .industries-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 1rem;
       margin-top: 2.6rem;
     }
@@ -345,7 +346,6 @@
       .values-grid { grid-template-columns: 1fr 1fr; }
       .why-grid { grid-template-columns: 1fr; }
       .why-stats { grid-template-columns: 1fr 1fr; }
-      .industries-grid { grid-template-columns: repeat(3, 1fr); }
       .steps-grid { grid-template-columns: 1fr 1fr; }
       .steps-grid::before { display: none; }
       .cta-band-actions { flex-direction: column; align-items: center; }
@@ -355,7 +355,6 @@
       .values-grid { grid-template-columns: 1fr; }
       .steps-grid { grid-template-columns: 1fr; }
       .why-stats { grid-template-columns: 1fr 1fr; }
-      .industries-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -583,6 +582,18 @@
               </svg>
             </span>
             <div class="industry-label">Corporate &amp; Professional Services</div>
+          </div>
+          <div class="industry-tag">
+            <span class="industry-icon">
+              <svg class="ind-svg" viewBox="0 0 60 60">
+                <circle cx="30" cy="30" r="18" fill="none" stroke="#3AAB5C" stroke-width="2.5" stroke-dasharray="4 5"/>
+                <g class="ind-more">
+                  <line x1="30" y1="21" x2="30" y2="39" stroke="#3AAB5C" stroke-width="3" stroke-linecap="round"/>
+                  <line x1="21" y1="30" x2="39" y2="30" stroke="#3AAB5C" stroke-width="3" stroke-linecap="round"/>
+                </g>
+              </svg>
+            </span>
+            <div class="industry-label">+ Many More</div>
           </div>
         </div>
       </div>

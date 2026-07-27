@@ -768,9 +768,13 @@
 
     .industries-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       margin-top: 2.6rem;
+    }
+
+    @media (max-width: 768px) {
+      .industries-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     .industry-tag {

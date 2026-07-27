@@ -672,14 +672,6 @@
       overflow: hidden;
     }
 
-    .testimonial-quote .lang-original { display: block; }
-    .testimonial-quote .lang-translation {
-      display: block;
-      font-size: 0.78rem;
-      font-style: italic;
-      color: rgba(180,200,230,0.4);
-      margin-top: 0.6rem;
-    }
     .testimonial-card {
       position: absolute;
       top: 0;
@@ -691,7 +683,6 @@
       padding: 1.8rem 1.6rem;
       display: flex;
       flex-direction: column;
-      cursor: pointer;
       transition: left 0.9s cubic-bezier(0.22,1,0.36,1), transform 0.9s cubic-bezier(0.22,1,0.36,1), opacity 0.9s ease, filter 0.9s ease, box-shadow 0.9s ease, border-color 0.9s ease, background 0.9s ease;
     }
 
@@ -1197,10 +1188,7 @@
           </div>
           <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-quote">
-              <span class="lang-original">Ek het nog nooit voorheen sulke goeie, hulpsame en vriendelike diens ontvang nie.</span>
-              <span class="lang-translation">I have never before received such good, helpful, and friendly service.</span>
-            </p>
+            <p class="testimonial-quote">Ek het nog nooit voorheen sulke goeie, hulpsame en vriendelike diens ontvang nie.</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar">L</div>
               <div>
@@ -1230,10 +1218,7 @@
           </div>
           <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-quote">
-              <span class="lang-original">Julle span is awesome! Julle het my so vinnig gehelp, baie dankie!</span>
-              <span class="lang-translation">Your team is awesome! You helped me so quickly, thank you so much!</span>
-            </p>
+            <p class="testimonial-quote">Julle span is awesome! Julle het my so vinnig gehelp, baie dankie!</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar">L</div>
               <div>
@@ -1452,15 +1437,13 @@
     setTimeout(startSlideshow, 2000);
   </script>
   <script>
-    // Testimonial carousel — auto-rotates, hover brings a card to front
+    // Testimonial carousel — auto-rotates to the next card every few seconds
     (function () {
       const wrap = document.querySelector('.testimonial-carousel');
       if (!wrap) return;
       const cards = [...wrap.querySelectorAll('.testimonial-card')];
       const n = cards.length;
       let active = 0;
-      let hovering = false;
-      let timer = null;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function circularDelta(i) {
@@ -1496,19 +1479,11 @@
         });
       }
 
-      function goTo(i) { active = i; layout(); }
-
-      cards.forEach((card, i) => {
-        card.addEventListener('mouseenter', () => { hovering = true; goTo(i); });
-        card.addEventListener('mouseleave', () => { hovering = false; });
-      });
-
       window.addEventListener('resize', layout);
       layout();
 
       if (!reduceMotion) {
-        timer = setInterval(() => {
-          if (hovering) return;
+        setInterval(() => {
           active = (active + 1) % n;
           layout();
         }, 6500);

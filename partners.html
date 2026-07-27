@@ -70,22 +70,17 @@
     .value-card:hover { border-color: rgba(58,171,92,0.3); }
 
     .value-icon {
+      position: relative;
       width: 64px;
       height: 64px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
       margin: 0 auto 1rem;
-      background: radial-gradient(circle at 35% 30%, rgba(var(--vc-rgb),0.25) 0%, rgba(var(--vc-rgb),0.04) 70%);
+      background: radial-gradient(circle at 35% 30%, rgba(var(--vc-rgb),0.22) 0%, rgba(var(--vc-rgb),0.04) 70%);
       border: 1px solid rgba(var(--vc-rgb),0.35);
-      animation: valueGlow 3.5s ease-in-out infinite;
-    }
-
-    @keyframes valueGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(var(--vc-rgb), 0); }
-      50%      { box-shadow: 0 0 24px 4px rgba(var(--vc-rgb), 0.28); }
+      overflow: visible;
     }
 
     .value-card:nth-child(1) .value-icon { --vc-rgb: 58,171,92; }
@@ -93,8 +88,42 @@
     .value-card:nth-child(3) .value-icon { --vc-rgb: 139,92,246; }
     .value-card:nth-child(4) .value-icon { --vc-rgb: 16,190,214; }
 
+    .vi-svg { width: 34px; height: 34px; overflow: visible; }
+
+    /* Streamline and Enhance — rotating gear */
+    .vi-gear {
+      transform-origin: 30px 30px;
+      animation: viSpin 6s linear infinite;
+    }
+    @keyframes viSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* Integrity — balance scale tipping */
+    .vi-beam {
+      transform-origin: 30px 16px;
+      animation: viTilt 3.2s ease-in-out infinite;
+    }
+    @keyframes viTilt {
+      0%, 100% { transform: rotate(-8deg); }
+      50%      { transform: rotate(8deg); }
+    }
+
+    /* Be the Change — heartbeat */
+    .vi-heart {
+      transform-origin: 30px 30px;
+      animation: viBeat 1.8s ease-in-out infinite;
+    }
+    @keyframes viBeat {
+      0%, 100% { transform: scale(1); }
+      15%      { transform: scale(1.18); }
+      30%      { transform: scale(1); }
+      45%      { transform: scale(1.12); }
+      60%      { transform: scale(1); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      .value-icon { animation: none; }
+      .vi-gear { animation: none; }
+      .vi-beam { animation: none; }
+      .vi-heart { animation: none; }
     }
 
     .value-title {
@@ -379,22 +408,68 @@
         </p>
         <div class="values-grid">
           <div class="value-card">
-            <span class="value-icon">🎯</span>
+            <span class="value-icon">
+              <svg class="vi-svg" viewBox="0 0 60 60">
+                <circle cx="30" cy="30" r="16" fill="none" stroke="#3AAB5C" stroke-width="2" opacity="0.3"/>
+                <circle cx="30" cy="30" r="10" fill="none" stroke="#3AAB5C" stroke-width="2" opacity="0.55"/>
+                <circle cx="30" cy="30" r="4" fill="#3AAB5C"/>
+                <circle cx="30" cy="30" r="8" fill="none" stroke="#3AAB5C" stroke-width="2">
+                  <animate attributeName="r" values="8;24" dur="2.4s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.8;0" dur="2.4s" repeatCount="indefinite"/>
+                </circle>
+                <circle cx="30" cy="30" r="8" fill="none" stroke="#3AAB5C" stroke-width="2">
+                  <animate attributeName="r" values="8;24" dur="2.4s" begin="1.2s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.8;0" dur="2.4s" begin="1.2s" repeatCount="indefinite"/>
+                </circle>
+              </svg>
+            </span>
             <div class="value-title">Client First</div>
             <p class="value-desc">We focus on the needs of the customer and the outcome they want to see.</p>
           </div>
           <div class="value-card">
-            <span class="value-icon">⚡</span>
+            <span class="value-icon">
+              <svg class="vi-svg" viewBox="0 0 60 60">
+                <g class="vi-gear" fill="#2E9EE8">
+                  <circle cx="30" cy="30" r="14" fill="none" stroke="#2E9EE8" stroke-width="3"/>
+                  <rect x="27" y="4" width="6" height="9" rx="1.5"/>
+                  <rect x="27" y="47" width="6" height="9" rx="1.5"/>
+                  <rect x="4" y="27" width="9" height="6" rx="1.5"/>
+                  <rect x="47" y="27" width="9" height="6" rx="1.5"/>
+                  <rect x="10" y="10" width="7" height="7" rx="1.5" transform="rotate(45 13.5 13.5)"/>
+                  <rect x="43" y="10" width="7" height="7" rx="1.5" transform="rotate(45 46.5 13.5)"/>
+                  <rect x="10" y="43" width="7" height="7" rx="1.5" transform="rotate(45 13.5 46.5)"/>
+                  <rect x="43" y="43" width="7" height="7" rx="1.5" transform="rotate(45 46.5 46.5)"/>
+                  <circle cx="30" cy="30" r="5" fill="#141a38"/>
+                </g>
+              </svg>
+            </span>
             <div class="value-title">Streamline and Enhance</div>
             <p class="value-desc">Let's work smarter, not harder — we advise on the best and easiest solutions that produce the best outcomes.</p>
           </div>
           <div class="value-card">
-            <span class="value-icon">⚖️</span>
+            <span class="value-icon">
+              <svg class="vi-svg" viewBox="0 0 60 60">
+                <line x1="30" y1="8" x2="30" y2="46" stroke="#8B5CF6" stroke-width="2.5"/>
+                <path d="M20,50 L40,50 L36,55 L24,55 Z" fill="#8B5CF6"/>
+                <circle cx="30" cy="8" r="2.4" fill="#8B5CF6"/>
+                <g class="vi-beam" stroke="#8B5CF6" stroke-width="2" fill="none">
+                  <line x1="10" y1="16" x2="50" y2="16"/>
+                  <path d="M6,16 Q6,24 14,24 Q22,24 22,16"/>
+                  <path d="M38,16 Q38,24 46,24 Q54,24 54,16"/>
+                  <circle cx="10" cy="16" r="1.6" fill="#8B5CF6"/>
+                  <circle cx="50" cy="16" r="1.6" fill="#8B5CF6"/>
+                </g>
+              </svg>
+            </span>
             <div class="value-title">Integrity</div>
             <p class="value-desc">It's commonly thrown around, but we bring this to life.</p>
           </div>
           <div class="value-card">
-            <span class="value-icon">❤️</span>
+            <span class="value-icon">
+              <svg class="vi-svg" viewBox="0 0 60 60">
+                <path class="vi-heart" d="M30,48 C10,34 6,20 18,14 C25,10 30,16 30,20 C30,16 35,10 42,14 C54,20 50,34 30,48 Z" fill="#10BED6"/>
+              </svg>
+            </span>
             <div class="value-title">Be the Change</div>
             <p class="value-desc">In a world where everyone is a number, we see the person.</p>
           </div>

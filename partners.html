@@ -228,11 +228,26 @@
 
     .testimonial-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+      align-items: start;
       gap: 1.4rem;
       margin-top: 2.6rem;
       text-align: left;
+      max-width: 860px;
+      margin-left: auto;
+      margin-right: auto;
     }
+
+    .testimonial-quote .lang-original { display: block; }
+    .testimonial-quote .lang-translation {
+      display: block;
+      font-size: 0.78rem;
+      font-style: italic;
+      color: var(--muted2);
+      margin-top: 0.6rem;
+    }
+    .testimonial-quote .lang-translation::before,
+    .testimonial-quote .lang-translation::after { content: none; }
 
     .testimonial-card {
       background: rgba(255,255,255,0.04);
@@ -544,8 +559,7 @@
         </div>
       </div>
 
-      <!-- TESTIMONIALS / CLIENT SUCCESS -->
-      <!-- NOTE: sample quotes below — swap in real client names & feedback before this goes live -->
+      <!-- TESTIMONIALS / CLIENT SUCCESS — real client reviews -->
       <div class="testimonial-section rise rise-d4b">
         <div class="testimonial-intro">
           <span class="section-label">Client success</span>
@@ -555,34 +569,25 @@
         <div class="testimonial-grid">
           <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-quote">Paytech took payroll off my plate completely. What used to eat up two stressful days a month now takes me ten minutes.</p>
+            <p class="testimonial-quote">In a world where outstanding customer service can be hard to find, Caroline has been an absolute breath of fresh air. From the very beginning, she has treated every interaction with kindness, patience, professionalism, and genuine care. No request has ever seemed to be too much trouble, and she consistently goes above and beyond to make sure everything is taken care of.</p>
             <div class="testimonial-author">
-              <div class="testimonial-avatar">SB</div>
+              <div class="testimonial-avatar">🤝</div>
               <div>
-                <div class="testimonial-name">Business Owner</div>
-                <div class="testimonial-role">Retail Sector</div>
+                <div class="testimonial-name">A Grateful Client</div>
+                <div class="testimonial-role">On working with Caroline</div>
               </div>
             </div>
           </div>
           <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-quote">Their team caught a compliance issue our previous provider had missed for years. That alone paid for itself.</p>
+            <p class="testimonial-quote">
+              <span class="lang-original">Ek het nog nooit voorheen sulke goeie, hulpsame en vriendelike diens ontvang nie.</span>
+              <span class="lang-translation">"I have never before received such good, helpful, and friendly service."</span>
+            </p>
             <div class="testimonial-author">
-              <div class="testimonial-avatar">FM</div>
+              <div class="testimonial-avatar">L</div>
               <div>
-                <div class="testimonial-name">Financial Manager</div>
-                <div class="testimonial-role">Manufacturing</div>
-              </div>
-            </div>
-          </div>
-          <div class="testimonial-card">
-            <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-quote">Fast, friendly, and they actually pick up the phone when we call. That's rare in this industry.</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">HR</div>
-              <div>
-                <div class="testimonial-name">HR Manager</div>
-                <div class="testimonial-role">Logistics</div>
+                <div class="testimonial-name">Louanne</div>
               </div>
             </div>
           </div>

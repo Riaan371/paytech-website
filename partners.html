@@ -120,25 +120,10 @@
       60%      { transform: scale(1); }
     }
 
-    /* Industries — icon micro-animations */
-    .ind-svg { width: 32px; height: 32px; overflow: visible; }
-    .ind-puff { transform-origin: center; }
-    .ind-tag { transform-origin: 30px 22px; animation: indSwing 2.6s ease-in-out infinite; }
-    @keyframes indSwing { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
-    .ind-wheel { transform-origin: center; animation: viSpin 1.4s linear infinite; }
-    .ind-leaf { transform-origin: 30px 30px; animation: indSway 3.4s ease-in-out infinite; }
-    @keyframes indSway { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
-    .ind-shield { transform-origin: 30px 30px; animation: indPulse 2.2s ease-in-out infinite; }
-    @keyframes indPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.85; } }
-    .ind-handle { transform-origin: 30px 26px; animation: indHandle 2.8s ease-in-out infinite; }
-    @keyframes indHandle { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-4deg); } }
-    .ind-more { transform-origin: 30px 30px; animation: indPulse 2.2s ease-in-out infinite; }
-
     @media (prefers-reduced-motion: reduce) {
       .vi-gear { animation: none; }
       .vi-beam { animation: none; }
       .vi-heart { animation: none; }
-      .ind-tag, .ind-wheel, .ind-leaf, .ind-shield, .ind-handle { animation: none; }
     }
 
     .value-title {
@@ -152,64 +137,6 @@
       font-size: 0.82rem;
       color: rgba(210,225,245,0.65);
       line-height: 1.6;
-    }
-
-    /* INDUSTRIES SERVED */
-    .industries-section {
-      margin-top: 5rem;
-      text-align: center;
-    }
-
-    .industries-intro {
-      max-width: 560px;
-      margin: 0 auto;
-    }
-
-    .industries-intro h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.5rem;
-    }
-
-    .industries-intro p {
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-
-    .industries-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-      margin-top: 2.6rem;
-    }
-
-    .industry-tag {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 12px;
-      padding: 1.4rem 1rem;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-
-    .industry-tag:hover {
-      border-color: rgba(58,171,92,0.3);
-      transform: translateY(-3px);
-    }
-
-    .industry-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 0.6rem;
-    }
-
-    .industry-label {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--white);
-      line-height: 1.4;
     }
 
     /* WHY SECTION */
@@ -486,114 +413,6 @@
             </span>
             <div class="value-title">Be the Change</div>
             <p class="value-desc">In a world where everyone is a number, we see the person.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- INDUSTRIES SERVED -->
-      <div class="industries-section rise rise-d4a">
-        <div class="industries-intro">
-          <span class="section-label">Who we work with</span>
-          <h2>Industries we serve</h2>
-          <p>From five-person teams to multi-site operations — our payroll and time &amp; attendance solutions scale to fit.</p>
-        </div>
-        <div class="industries-grid">
-          <div class="industry-tag">
-            <span class="industry-icon">
-              <svg class="ind-svg" viewBox="0 0 60 60">
-                <rect x="10" y="30" width="40" height="20" rx="2" fill="none" stroke="#F59E0B" stroke-width="2.5"/>
-                <path d="M14,30 L14,20 L22,26 L22,18 L30,24 L30,30" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linejoin="round"/>
-                <rect x="38" y="14" width="6" height="16" fill="#F59E0B"/>
-                <circle class="ind-puff" cx="41" cy="12" r="3" fill="#F59E0B" opacity="0.7">
-                  <animate attributeName="cy" values="12;2" dur="2.6s" repeatCount="indefinite"/>
-                  <animate attributeName="r" values="3;7" dur="2.6s" repeatCount="indefinite"/>
-                  <animate attributeName="opacity" values="0.7;0" dur="2.6s" repeatCount="indefinite"/>
-                </circle>
-                <circle class="ind-puff" cx="41" cy="12" r="3" fill="#F59E0B" opacity="0.7">
-                  <animate attributeName="cy" values="12;2" dur="2.6s" begin="1.3s" repeatCount="indefinite"/>
-                  <animate attributeName="r" values="3;7" dur="2.6s" begin="1.3s" repeatCount="indefinite"/>
-                  <animate attributeName="opacity" values="0.7;0" dur="2.6s" begin="1.3s" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </span>
-            <div class="industry-label">Manufacturing</div>
-          </div>
-          <div class="industry-tag">
-            <span class="industry-icon">
-              <svg class="ind-svg" viewBox="0 0 60 60">
-                <path d="M16,22 L44,22 L41,50 L19,50 Z" fill="none" stroke="#EC4899" stroke-width="2.5" stroke-linejoin="round"/>
-                <path d="M22,22 C22,14 26,10 30,10 C34,10 38,14 38,22" fill="none" stroke="#EC4899" stroke-width="2.5"/>
-                <g class="ind-tag">
-                  <line x1="30" y1="22" x2="30" y2="32" stroke="#EC4899" stroke-width="1.6"/>
-                  <circle cx="30" cy="35" r="4" fill="#EC4899"/>
-                </g>
-              </svg>
-            </span>
-            <div class="industry-label">Retail</div>
-          </div>
-          <div class="industry-tag">
-            <span class="industry-icon">
-              <svg class="ind-svg" viewBox="0 0 60 60">
-                <rect x="6" y="24" width="26" height="14" rx="1.5" fill="none" stroke="#2E9EE8" stroke-width="2.5"/>
-                <path d="M32,28 L44,28 L50,34 L50,38 L32,38 Z" fill="none" stroke="#2E9EE8" stroke-width="2.5" stroke-linejoin="round"/>
-                <rect x="36" y="31" width="6" height="5" fill="#2E9EE8"/>
-                <g class="ind-wheel">
-                  <circle cx="16" cy="42" r="5" fill="none" stroke="#2E9EE8" stroke-width="2"/>
-                  <line x1="16" y1="38" x2="16" y2="46" stroke="#2E9EE8" stroke-width="1.4"/>
-                  <line x1="12" y1="42" x2="20" y2="42" stroke="#2E9EE8" stroke-width="1.4"/>
-                </g>
-                <g class="ind-wheel">
-                  <circle cx="42" cy="42" r="5" fill="none" stroke="#2E9EE8" stroke-width="2"/>
-                  <line x1="42" y1="38" x2="42" y2="46" stroke="#2E9EE8" stroke-width="1.4"/>
-                  <line x1="38" y1="42" x2="46" y2="42" stroke="#2E9EE8" stroke-width="1.4"/>
-                </g>
-              </svg>
-            </span>
-            <div class="industry-label">Logistics &amp; Transport</div>
-          </div>
-          <div class="industry-tag">
-            <span class="industry-icon">
-              <svg class="ind-svg" viewBox="0 0 60 60">
-                <line x1="30" y1="50" x2="30" y2="30" stroke="#3AAB5C" stroke-width="2.5"/>
-                <g class="ind-leaf">
-                  <path d="M30,30 C30,18 20,14 14,16 C14,26 22,30 30,30 Z" fill="#3AAB5C"/>
-                  <path d="M30,30 C30,20 40,16 46,18 C46,28 38,32 30,30 Z" fill="#3AAB5C" opacity="0.85"/>
-                </g>
-                <path d="M22,50 L38,50" stroke="#3AAB5C" stroke-width="2.5" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <div class="industry-label">Agriculture</div>
-          </div>
-          <div class="industry-tag">
-            <span class="industry-icon">
-              <svg class="ind-svg" viewBox="0 0 60 60">
-                <path class="ind-shield" d="M30,8 L48,15 L48,28 C48,40 40,48 30,52 C20,48 12,40 12,28 L12,15 Z" fill="none" stroke="#10BED6" stroke-width="2.5" stroke-linejoin="round"/>
-                <path d="M21,29 L27,35 L40,21" fill="none" stroke="#10BED6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <div class="industry-label">Security Services</div>
-          </div>
-          <div class="industry-tag">
-            <span class="industry-icon">
-              <svg class="ind-svg" viewBox="0 0 60 60">
-                <rect x="12" y="26" width="36" height="22" rx="2" fill="none" stroke="#8B5CF6" stroke-width="2.5"/>
-                <path class="ind-handle" d="M24,26 L24,20 C24,17 26,15 30,15 C34,15 36,17 36,20 L36,26" fill="none" stroke="#8B5CF6" stroke-width="2.5"/>
-                <line x1="12" y1="35" x2="48" y2="35" stroke="#8B5CF6" stroke-width="2"/>
-              </svg>
-            </span>
-            <div class="industry-label">Corporate &amp; Professional Services</div>
-          </div>
-          <div class="industry-tag">
-            <span class="industry-icon">
-              <svg class="ind-svg" viewBox="0 0 60 60">
-                <circle cx="30" cy="30" r="18" fill="none" stroke="#3AAB5C" stroke-width="2.5" stroke-dasharray="4 5"/>
-                <g class="ind-more">
-                  <line x1="30" y1="21" x2="30" y2="39" stroke="#3AAB5C" stroke-width="3" stroke-linecap="round"/>
-                  <line x1="21" y1="30" x2="39" y2="30" stroke="#3AAB5C" stroke-width="3" stroke-linecap="round"/>
-                </g>
-              </svg>
-            </span>
-            <div class="industry-label">+ Many More</div>
           </div>
         </div>
       </div>

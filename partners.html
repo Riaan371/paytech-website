@@ -202,113 +202,6 @@
       letter-spacing: 0.06em;
     }
 
-    /* TESTIMONIALS / CLIENT SUCCESS */
-    .testimonial-section {
-      margin-top: 5rem;
-      text-align: center;
-    }
-
-    .testimonial-intro {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .testimonial-intro h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.5rem;
-    }
-
-    .testimonial-intro p {
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-
-    .testimonial-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      align-items: start;
-      gap: 1.4rem;
-      margin-top: 2.6rem;
-      text-align: left;
-      max-width: 860px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .testimonial-quote .lang-original { display: block; }
-    .testimonial-quote .lang-translation {
-      display: block;
-      font-size: 0.78rem;
-      font-style: italic;
-      color: var(--muted2);
-      margin-top: 0.6rem;
-    }
-    .testimonial-quote .lang-translation::before,
-    .testimonial-quote .lang-translation::after { content: none; }
-
-    .testimonial-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 1.8rem 1.6rem;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-    }
-
-    .testimonial-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(58,171,92,0.4);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(58,171,92,0.12);
-    }
-
-    .testimonial-stars {
-      color: #f5b301;
-      font-size: 0.9rem;
-      letter-spacing: 0.15em;
-      margin-bottom: 1rem;
-    }
-
-    .testimonial-quote {
-      font-size: 0.92rem;
-      color: var(--white);
-      line-height: 1.7;
-      margin-bottom: 1.4rem;
-      flex: 1;
-    }
-
-    .testimonial-quote::before { content: '\201C'; color: var(--green); font-weight: 700; }
-    .testimonial-quote::after  { content: '\201D'; color: var(--green); font-weight: 700; }
-
-    .testimonial-author {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .testimonial-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: rgba(58,171,92,0.15);
-      border: 1px solid rgba(58,171,92,0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--green);
-      flex-shrink: 0;
-    }
-
-    .testimonial-name { font-size: 0.85rem; font-weight: 600; color: var(--white); }
-    .testimonial-role  { font-size: 0.72rem; color: var(--muted2); }
-
     /* HOW WE WORK */
     .how-section {
       margin-top: 5rem;
@@ -386,7 +279,6 @@
       .values-grid { grid-template-columns: 1fr 1fr; }
       .why-grid { grid-template-columns: 1fr; }
       .why-stats { grid-template-columns: 1fr 1fr; }
-      .testimonial-grid { grid-template-columns: 1fr; }
       .industries-grid { grid-template-columns: repeat(3, 1fr); }
       .steps-grid { grid-template-columns: 1fr 1fr; }
       .steps-grid::before { display: none; }
@@ -555,41 +447,6 @@
           <div class="industry-tag">
             <span class="industry-icon">🏢</span>
             <div class="industry-label">Corporate &amp; Professional Services</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TESTIMONIALS / CLIENT SUCCESS — real client reviews -->
-      <div class="testimonial-section rise rise-d4b">
-        <div class="testimonial-intro">
-          <span class="section-label">Client success</span>
-          <h2>Don't just take our word for it</h2>
-          <p>15+ years in the industry, 200+ businesses trust us, and thousands of payslips processed — this is what happens when payroll just works.</p>
-        </div>
-        <div class="testimonial-grid">
-          <div class="testimonial-card">
-            <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-quote">I wanted to take a moment to share how grateful I am for Caroline and the exceptional support she has given me as a client. In a world where outstanding customer service can be hard to find, Caroline has been an absolute breath of fresh air. From the very beginning, she has treated every interaction with kindness, patience, professionalism, and genuine care.</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">N</div>
-              <div>
-                <div class="testimonial-name">Nallinie</div>
-                <div class="testimonial-role">On working with Caroline</div>
-              </div>
-            </div>
-          </div>
-          <div class="testimonial-card">
-            <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-quote">
-              <span class="lang-original">Ek het nog nooit voorheen sulke goeie, hulpsame en vriendelike diens ontvang nie.</span>
-              <span class="lang-translation">"I have never before received such good, helpful, and friendly service."</span>
-            </p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">L</div>
-              <div>
-                <div class="testimonial-name">Louanne</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

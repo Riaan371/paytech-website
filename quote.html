@@ -422,6 +422,8 @@
           <p>Complete the form below and we'll put together a solution that fits your business perfectly. All fields marked <span style="color:var(--green);">*</span> are required.</p>
 
           <form id="quoteForm" onsubmit="handleQuoteSubmit(event)">
+            <input type="hidden" name="_subject" value="New Quote Request - Paytech Website" />
+            <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
 
             <!-- SECTION 1: CONTACT DETAILS -->
             <div class="form-section">
@@ -431,19 +433,19 @@
               <div class="form-grid">
                 <div class="form-group">
                   <label>First Name <span>*</span></label>
-                  <input type="text" id="firstName" placeholder="e.g. Riaan" required />
+                  <input type="text" id="firstName" name="firstName" placeholder="e.g. Riaan" required />
                 </div>
                 <div class="form-group">
                   <label>Last Name <span>*</span></label>
-                  <input type="text" placeholder="e.g. Smith" required />
+                  <input type="text" name="lastName" placeholder="e.g. Smith" required />
                 </div>
                 <div class="form-group">
                   <label>Email Address <span>*</span></label>
-                  <input type="email" placeholder="you@company.co.za" required />
+                  <input type="email" name="email" placeholder="you@company.co.za" required />
                 </div>
                 <div class="form-group">
                   <label>Phone Number <span>*</span></label>
-                  <input type="tel" placeholder="082 000 0000" required />
+                  <input type="tel" name="phone" placeholder="082 000 0000" required />
                 </div>
               </div>
             </div>
@@ -456,11 +458,11 @@
               <div class="form-grid">
                 <div class="form-group full">
                   <label>Company Name <span>*</span></label>
-                  <input type="text" placeholder="Your company name" required />
+                  <input type="text" name="company" placeholder="Your company name" required />
                 </div>
                 <div class="form-group">
                   <label>Industry / Sector</label>
-                  <select>
+                  <select name="industry">
                     <option value="" disabled selected>Select your industry</option>
                     <option>Retail &amp; Wholesale</option>
                     <option>Manufacturing</option>
@@ -476,7 +478,7 @@
                 </div>
                 <div class="form-group">
                   <label>Number of Employees <span>*</span></label>
-                  <select required>
+                  <select name="employees" required>
                     <option value="" disabled selected>Select headcount</option>
                     <option>1 – 10 employees</option>
                     <option>11 – 25 employees</option>
@@ -489,7 +491,7 @@
                 </div>
                 <div class="form-group">
                   <label>Current Payroll System</label>
-                  <select>
+                  <select name="currentSystem">
                     <option value="" disabled selected>What do you use now?</option>
                     <option>PaySpace</option>
                     <option>PaySpace</option>
@@ -502,7 +504,7 @@
                 </div>
                 <div class="form-group">
                   <label>Payroll Frequency</label>
-                  <select>
+                  <select name="payrollFrequency">
                     <option value="" disabled selected>How often do you pay?</option>
                     <option>Monthly</option>
                     <option>Bi-monthly (twice a month)</option>
@@ -521,35 +523,35 @@
               </div>
               <div class="services-grid">
                 <label class="service-check">
-                  <input type="checkbox" />
+                  <input type="checkbox" name="services" value="Payroll Consulting" />
                   <div class="service-check-label">
                     <strong>Payroll Consulting</strong>
                     <span>Expert advice on your payroll setup, processes, and best practices.</span>
                   </div>
                 </label>
                 <label class="service-check">
-                  <input type="checkbox" />
+                  <input type="checkbox" name="services" value="Full Outsourcing" />
                   <div class="service-check-label">
                     <strong>Full Outsourcing</strong>
                     <span>We handle your entire monthly payroll end-to-end.</span>
                   </div>
                 </label>
                 <label class="service-check">
-                  <input type="checkbox" />
+                  <input type="checkbox" name="services" value="PaySpace / Deel" />
                   <div class="service-check-label">
                     <strong>PaySpace / Deel</strong>
                     <span>Cloud payroll setup, migration, and support.</span>
                   </div>
                 </label>
                 <label class="service-check">
-                  <input type="checkbox" />
+                  <input type="checkbox" name="services" value="Compliance Review" />
                   <div class="service-check-label">
                     <strong>Compliance Review</strong>
                     <span>Audit your payroll for SARS, UIF, and labour law compliance.</span>
                   </div>
                 </label>
                 <label class="service-check">
-                  <input type="checkbox" />
+                  <input type="checkbox" name="services" value="Payroll Training" />
                   <div class="service-check-label">
                     <strong>Payroll Training</strong>
                     <span>Train your team to manage payroll confidently and correctly.</span>
@@ -587,11 +589,11 @@
               <div class="form-grid">
                 <div class="form-group full">
                   <label>Tell us about your payroll needs or challenges</label>
-                  <textarea placeholder="E.g. We're a growing team of 30 and our current manual process is taking too long. We'd like to automate and ensure compliance..."></textarea>
+                  <textarea name="message" placeholder="E.g. We're a growing team of 30 and our current manual process is taking too long. We'd like to automate and ensure compliance..."></textarea>
                 </div>
                 <div class="form-group full">
                   <label>How did you hear about Paytech?</label>
-                  <select>
+                  <select name="referralSource">
                     <option value="" disabled selected>Select an option</option>
                     <option>Google search</option>
                     <option>LinkedIn</option>
@@ -672,12 +674,31 @@
     }
   </script>
   <script>
-    function handleQuoteSubmit(e) {
+    async function handleQuoteSubmit(e) {
       e.preventDefault();
-      const name = document.getElementById('firstName').value || 'there';
-      document.getElementById('quoteForm').style.display = 'none';
-      document.getElementById('quoteSuccess').style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const form = document.getElementById('quoteForm');
+      const submitBtn = form.querySelector('.submit-btn');
+      const originalBtnText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      try {
+        const response = await fetch('https://formspree.io/f/mojgrlyn', {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) throw new Error('Formspree submission failed');
+
+        form.style.display = 'none';
+        document.getElementById('quoteSuccess').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+        alert('Sorry, something went wrong submitting your request. Please try again, or email us directly at info@paytech.org.za.');
+      }
     }
   </script>
 </body>

@@ -18,15 +18,49 @@
       align-items: start;
     }
 
+    /* LEFT COLUMN: intro text block */
+    .contact-intro {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.8rem;
+    }
+
+    .contact-intro h3 {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.2rem;
+    }
+
+    .contact-intro p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 1.4rem;
+    }
+
+    .contact-intro-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 1.2rem;
+      width: 100%;
+    }
+
+    .contact-intro-email:hover { color: var(--green); }
+
     /* RIGHT COLUMN */
     .contact-right {
       display: flex;
       flex-direction: column;
       gap: 1.2rem;
-      grid-column: 1 / -1;
-      max-width: 480px;
-      margin: 0 auto;
-      width: 100%;
     }
 
     /* Hours card */
@@ -221,6 +255,19 @@
 
       <div class="contact-hero">
 
+        <!-- LEFT: Intro text block -->
+        <div class="contact-intro rise rise-d1">
+          <h3>💬 Get in Touch</h3>
+          <p>
+            When you reach out to Paytech, we promise a quick turnaround time. Be that for consulting support,
+            buying a new system or general advice. Resolving issues and problem solving is what we do every day,
+            so expect a quick response from a professional.
+          </p>
+          <a href="mailto:info@paytech.org.za" class="contact-intro-email">
+            ✉️ info@paytech.org.za
+          </a>
+        </div>
+
         <!-- RIGHT: Hours, location -->
         <div class="contact-right">
 
@@ -245,10 +292,6 @@
             <div class="hours-row">
               <span class="hours-day"><span class="open-dot"></span> Friday</span>
               <span class="hours-time">08:00 – 16:00</span>
-            </div>
-            <div class="hours-row">
-              <span class="hours-day">Sunday &amp; Public Holidays</span>
-              <span class="hours-closed">Closed</span>
             </div>
           </div>
 

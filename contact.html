@@ -18,7 +18,13 @@
       align-items: start;
     }
 
-    /* LEFT COLUMN: intro text block */
+    /* LEFT COLUMN */
+    .contact-left {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
     .contact-intro {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
@@ -55,6 +61,34 @@
     }
 
     .contact-intro-email:hover { color: var(--green); }
+
+    .social-mini-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.6rem 1.8rem;
+    }
+
+    .social-mini-card h3 {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1rem;
+    }
+
+    .social-mini-link {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.5rem 0;
+    }
+
+    .social-mini-link:hover { color: var(--green); }
 
     /* RIGHT COLUMN */
     .contact-right {
@@ -139,40 +173,6 @@
       line-height: 1.7;
     }
 
-    /* SOCIAL ROW */
-    .social-section {
-      margin-top: 4rem;
-      text-align: center;
-    }
-
-    .social-row {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1.2rem;
-      flex-wrap: wrap;
-    }
-
-    .social-btn {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 0.8rem 1.8rem;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      transition: border-color 0.2s, color 0.2s, transform 0.15s;
-    }
-
-    .social-btn:hover {
-      border-color: rgba(58,171,92,0.4);
-      color: var(--green-dim);
-      transform: translateY(-2px);
-    }
-
     /* BOTTOM CTA */
     .quote-cta-band {
       margin-top: 4rem;
@@ -209,8 +209,6 @@
 
     @media (max-width: 768px) {
       .contact-hero { grid-template-columns: 1fr; }
-      .social-row { flex-direction: column; align-items: center; }
-      .social-btn { justify-content: center; width: 100%; max-width: 300px; }
       .quote-cta-band { flex-direction: column; }
       .quote-cta-band-actions { width: 100%; flex-direction: column; }
     }
@@ -255,17 +253,25 @@
 
       <div class="contact-hero">
 
-        <!-- LEFT: Intro text block -->
-        <div class="contact-intro rise rise-d1">
-          <h3>💬 Get in Touch</h3>
-          <p>
-            When you reach out to Paytech, we promise a quick turnaround time. Be that for consulting support,
-            buying a new system or general advice. Resolving issues and problem solving is what we do every day,
-            so expect a quick response from a professional.
-          </p>
-          <a href="mailto:info@paytech.org.za" class="contact-intro-email">
-            ✉️ info@paytech.org.za
-          </a>
+        <!-- LEFT: Intro text block + social -->
+        <div class="contact-left">
+          <div class="contact-intro rise rise-d1">
+            <h3>💬 Get in Touch</h3>
+            <p>
+              When you reach out to Paytech, we promise a quick turnaround time. Be that for consulting support,
+              buying a new system or general advice. Resolving issues and problem solving is what we do every day,
+              so expect a quick response from a professional.
+            </p>
+            <a href="mailto:info@paytech.org.za" class="contact-intro-email">
+              ✉️ info@paytech.org.za
+            </a>
+          </div>
+
+          <div class="social-mini-card rise rise-d1b">
+            <h3>🔗 Find Us On</h3>
+            <a href="#" class="social-mini-link">💼 LinkedIn</a>
+            <a href="#" class="social-mini-link">📘 Facebook</a>
+          </div>
         </div>
 
         <!-- RIGHT: Hours, location -->
@@ -307,16 +313,6 @@
 
         </div>
 
-      </div>
-
-      <!-- SOCIAL -->
-      <div class="social-section rise rise-d4">
-        <span class="section-label">Find us on social media</span>
-        <div class="social-row">
-          <a href="#" class="social-btn">💼 LinkedIn</a>
-          <a href="#" class="social-btn">📘 Facebook</a>
-          <a href="https://www.paytech.org.za" target="_blank" class="social-btn">🌐 Website</a>
-        </div>
       </div>
 
       <!-- BOTTOM CTA: push to quote -->

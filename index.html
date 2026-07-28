@@ -9,14 +9,13 @@
   <style>
     /* ── HERO LAYOUT ── */
     .hero {
-      --hero-pad-x: 2rem;
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       text-align: center;
-      padding: 1.6rem var(--hero-pad-x) 3rem;
+      padding: 1.6rem 2rem 3rem;
       position: relative;
     }
 
@@ -44,16 +43,16 @@
     /* ── HERO HEADLINE ── */
     .hero-h1 {
       display: block;
-      align-self: stretch;
-      margin: 0 calc(-1 * var(--hero-pad-x)) 0.6rem;
+      max-width: 1100px;
+      margin: 0 auto 0.6rem;
       text-align: center;
       font-size: clamp(1.6rem, 3vw, 2.8rem);
       font-weight: 800;
       line-height: 1.15;
       letter-spacing: -0.02em;
       color: #ffffff;
-      background: rgba(58,171,92,0.08);
-      padding: 0.45em var(--hero-pad-x);
+      background: rgba(58,171,92,0.05);
+      padding: 0.45em 2rem;
     }
 
     .hero-h1 strong { color: #3AAB5C; font-weight: 800; }
@@ -378,7 +377,7 @@
 
     /* ── MOBILE ── */
     @media (max-width: 680px) {
-      .hero { --hero-pad-x: 1.2rem; padding: 3rem var(--hero-pad-x) 3rem; }
+      .hero { padding: 3rem 1.2rem 3rem; }
       .hero-service-cards { grid-template-columns: 1fr; gap: 0.75rem; }
       .hero-svc-card { text-align: center; }
       .svc-anim { min-height: 90px; }
@@ -414,7 +413,7 @@
       .hero-cta a { width: 100%; max-width: 300px; text-align: center; }
       .partners-row { gap: 0.5rem; }
 
-      .hero { --hero-pad-x: 1.2rem; padding: 5rem var(--hero-pad-x) 4rem; }
+      .hero { padding: 5rem 1.2rem 4rem; }
 
       .hero-icon {
         width: 240px;

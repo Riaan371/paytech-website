@@ -18,139 +18,15 @@
       align-items: start;
     }
 
-    /* LEFT: Person card + direct contact */
-    .person-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 20px;
-      overflow: hidden;
-    }
-
-    .person-banner {
-      height: 120px;
-      background: linear-gradient(135deg, #1B2048 0%, #252c5a 50%, #1a3d27 100%);
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      padding: 0 2rem 0;
-    }
-
-    .person-avatar {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background: rgba(58,171,92,0.15);
-      border: 3px solid var(--green);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--green);
-      margin-bottom: -45px;
-      position: relative;
-      z-index: 2;
-      flex-shrink: 0;
-    }
-
-    .person-body {
-      padding: 3.5rem 2rem 2rem;
-    }
-
-    .person-role {
-      font-size: 0.68rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 0.2rem;
-    }
-
-    .person-name {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: -0.02em;
-      margin-bottom: 0.7rem;
-    }
-
-    .person-bio {
-      font-size: 0.875rem;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 1.8rem;
-    }
-
-    /* Big direct contact buttons */
-    .contact-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-
-    .contact-action-btn {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 1rem 1.2rem;
-      text-decoration: none;
-      color: var(--white);
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
-      cursor: pointer;
-    }
-
-    .contact-action-btn:hover {
-      border-color: rgba(58,171,92,0.5);
-      background: rgba(58,171,92,0.08);
-      transform: translateX(4px);
-    }
-
-    .contact-action-btn.primary-action {
-      background: rgba(58,171,92,0.12);
-      border-color: rgba(58,171,92,0.3);
-    }
-
-    .contact-action-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      background: rgba(58,171,92,0.15);
-      border: 1px solid rgba(58,171,92,0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-
-    .contact-action-text strong {
-      display: block;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--white);
-      line-height: 1.2;
-    }
-
-    .contact-action-text span {
-      font-size: 0.75rem;
-      color: var(--muted2);
-      letter-spacing: 0.02em;
-    }
-
-    .contact-action-arrow {
-      margin-left: auto;
-      color: var(--green);
-      font-size: 1.1rem;
-      opacity: 0.7;
-    }
-
     /* RIGHT COLUMN */
     .contact-right {
       display: flex;
       flex-direction: column;
       gap: 1.2rem;
+      grid-column: 1 / -1;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     /* Hours card */
@@ -205,35 +81,6 @@
       background: var(--green);
       display: inline-block;
       animation: dotPulse 2s ease-in-out infinite;
-    }
-
-    /* Response guarantee card */
-    .guarantee-card {
-      background: rgba(58,171,92,0.08);
-      border: 1px solid rgba(58,171,92,0.25);
-      border-radius: 14px;
-      padding: 1.4rem 1.6rem;
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-
-    .guarantee-icon {
-      font-size: 1.8rem;
-      flex-shrink: 0;
-    }
-
-    .guarantee-text h4 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: 0.3rem;
-    }
-
-    .guarantee-text p {
-      font-size: 0.8rem;
-      color: var(--muted);
-      line-height: 1.6;
     }
 
     /* Location card */
@@ -374,49 +221,7 @@
 
       <div class="contact-hero">
 
-        <!-- LEFT: Contact card -->
-        <div class="person-card rise rise-d1">
-          <div class="person-banner">
-            <div class="person-avatar">PT</div>
-          </div>
-          <div class="person-body">
-            <div class="person-role">Managing Director · Operations</div>
-            <div class="person-name">Paytech</div>
-            <p class="person-bio">
-              When you reach out to Paytech, you're talking directly to an experienced professional — not a switchboard.
-              With over 15 years of payroll experience, we'll give you a straight answer and a practical solution.
-            </p>
-
-            <div class="contact-actions">
-              <a href="tel:0824401937" class="contact-action-btn primary-action">
-                <div class="contact-action-icon">📞</div>
-                <div class="contact-action-text">
-                  <strong>082 440 1937</strong>
-                  <span>Call us directly</span>
-                </div>
-                <span class="contact-action-arrow">→</span>
-              </a>
-              <a href="mailto:info@paytech.org.za" class="contact-action-btn">
-                <div class="contact-action-icon">✉️</div>
-                <div class="contact-action-text">
-                  <strong>info@paytech.org.za</strong>
-                  <span>Email — response within 1 business day</span>
-                </div>
-                <span class="contact-action-arrow">→</span>
-              </a>
-              <a href="#" class="contact-action-btn">
-                <div class="contact-action-icon">💼</div>
-                <div class="contact-action-text">
-                  <strong>LinkedIn</strong>
-                  <span>Connect professionally</span>
-                </div>
-                <span class="contact-action-arrow">→</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT: Hours, guarantee, location -->
+        <!-- RIGHT: Hours, location -->
         <div class="contact-right">
 
           <div class="hours-card rise rise-d2">
@@ -439,26 +244,11 @@
             </div>
             <div class="hours-row">
               <span class="hours-day"><span class="open-dot"></span> Friday</span>
-              <span class="hours-time">08:00 – 17:00</span>
-            </div>
-            <div class="hours-row">
-              <span class="hours-day">Saturday</span>
-              <span class="hours-time">09:00 – 13:00</span>
+              <span class="hours-time">08:00 – 16:00</span>
             </div>
             <div class="hours-row">
               <span class="hours-day">Sunday &amp; Public Holidays</span>
               <span class="hours-closed">Closed</span>
-            </div>
-          </div>
-
-          <div class="guarantee-card rise rise-d3">
-            <span class="guarantee-icon">⚡</span>
-            <div class="guarantee-text">
-              <h4>We respond fast</h4>
-              <p>
-                Emails answered within 1 business day. Quote requests called back within 2 hours.
-                Urgent payroll queries handled same day wherever possible.
-              </p>
             </div>
           </div>
 

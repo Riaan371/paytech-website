@@ -1,0 +1,9 @@
+{
+  "name": "paytech-client-login-scripts",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "csv-parse": "^5.5.6"
+  }
+}

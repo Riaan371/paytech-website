@@ -96,6 +96,8 @@ async function main() {
   }
   console.log(`Found ${existingByEmail.size} existing account(s).\n`);
 
+  const resetPasswordsThisRun = new Map(); // email -> password, so duplicate-email rows in one run share the same shown password
+
   for (const row of rows) {
     const clientId = row.id;
     const companyName = row.company_name || '(no name)';
@@ -107,13 +109,26 @@ async function main() {
       continue;
     }
 
-    const existingId = existingByEmail.get(email.toLowerCase());
+    const emailKey = email.toLowerCase();
+    const existingId = existingByEmail.get(emailKey);
     let userId, password;
 
     if (existingId) {
       userId = existingId;
-      password = '(unchanged - account already existed)';
-      console.log(`Account already exists for ${email}, syncing profile only...`);
+      if (resetPasswordsThisRun.has(emailKey)) {
+        password = resetPasswordsThisRun.get(emailKey);
+        console.log(`Account already exists for ${email}, reusing this run's reset password...`);
+      } else {
+        password = generatePassword();
+        const { error: resetError } = await supabase.auth.admin.updateUserById(existingId, { password });
+        if (resetError) {
+          console.error(`Password reset FAILED for ${email}: ${resetError.message}`);
+          results.push({ company: companyName, email, password: '', status: `ERROR resetting password: ${resetError.message}` });
+          continue;
+        }
+        resetPasswordsThisRun.set(emailKey, password);
+        console.log(`Account already existed for ${email}, password reset to a new one.`);
+      }
     } else {
       password = generatePassword();
       const { data: userData, error: createError } = await supabase.auth.admin.createUser({
@@ -130,7 +145,8 @@ async function main() {
       }
 
       userId = userData.user.id;
-      existingByEmail.set(email.toLowerCase(), userId);
+      existingByEmail.set(emailKey, userId);
+      resetPasswordsThisRun.set(emailKey, password);
     }
 
     const { error: profileError } = await supabase

@@ -187,6 +187,7 @@
 <div class="portal-hero">
   <h1 id="company-name">Your Invoices</h1>
   <p id="company-sub">Paytech Consulting Solutions — Client Portal</p>
+  <select id="company-switcher" style="display:none;margin-top:1rem;padding:0.5rem 1rem;border-radius:7px;border:1.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:white;font-size:0.85rem;font-family:inherit;max-width:320px;"></select>
 </div>
 
 <div class="stats-row">
@@ -263,6 +264,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let clientId = null, invoices = [], queries = [], currentInvId = null, currentInv = null;
+let groupClients = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { data:{ session } } = await sb.auth.getSession();
@@ -272,14 +274,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('user-name').textContent = user.email.split('@')[0];
   document.getElementById('user-avatar').textContent = user.email[0].toUpperCase();
 
-  // Get role + client_id
+  // Get role + client_id / group_id
   const role = user.user_metadata?.role;
   if (role === 'admin') { window.location.href = '../admin/'; return; }
   if (role === 'consultant') { window.location.href = '../consultant/'; return; }
   if (role !== 'client') { window.location.href = '../login/'; return; }
 
-  const { data: profileData, error: profileError } = await sb.from('profiles').select('client_id').eq('id', user.id).single();
+  const { data: profileData, error: profileError } = await sb.from('profiles').select('client_id, group_id').eq('id', user.id).single();
   console.log('[PORTAL] profile query:', profileData, profileError);
+
+  if (profileData?.group_id) {
+    const { data: groupClientsData, error: groupError } = await sb.from('clients').select('id, company_name, service_type').eq('group_id', profileData.group_id).order('company_name');
+    console.log('[PORTAL] group clients query:', groupClientsData, groupError);
+    groupClients = groupClientsData || [];
+
+    if (!groupClients.length) {
+      document.getElementById('company-sub').textContent = 'ERROR: Group has no linked companies — contact admin';
+      document.getElementById('inv-tbody').innerHTML = `<tr><td colspan="6"><div class="empty-state"><p style="color:red;">This login's company group has no companies linked. Please contact Paytech admin.</p></div></td></tr>`;
+      return;
+    }
+
+    const switcher = document.getElementById('company-switcher');
+    switcher.innerHTML = groupClients.map(c => `<option value="${c.id}">${c.company_name}</option>`).join('');
+    switcher.style.display = 'block';
+    switcher.addEventListener('change', () => selectCompany(switcher.value));
+
+    selectCompany(groupClients[0].id);
+    return;
+  }
+
   clientId = profileData?.client_id;
 
   if (!clientId) {
@@ -300,6 +323,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadInvoices();
   await loadQueries();
 });
+
+async function selectCompany(id) {
+  clientId = id;
+  const company = groupClients.find(c => c.id === id);
+  if (company) {
+    document.getElementById('company-name').textContent = company.company_name;
+    document.getElementById('company-sub').textContent = `${company.service_type || ''} · Paytech Client Portal`;
+  }
+  document.getElementById('company-switcher').value = id;
+  await loadInvoices();
+  await loadQueries();
+}
 
 async function loadInvoices() {
   const { data } = await sb.from('invoices').select('*').eq('client_id', clientId).order('invoice_date', { ascending: false });

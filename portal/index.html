@@ -211,6 +211,16 @@
     </table>
   </div>
 
+  <!-- WHATSAPP PAYSLIPS -->
+  <div class="card" id="whatsapp-card">
+    <div class="card-header">
+      <div class="card-title">📤 WhatsApp Payslips</div>
+    </div>
+    <div id="whatsapp-content" style="padding:1.4rem;">
+      <div class="empty-state"><p>Loading...</p></div>
+    </div>
+  </div>
+
   <!-- QUERIES -->
   <div class="card">
     <div class="card-header">
@@ -265,6 +275,37 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let clientId = null, invoices = [], queries = [], currentInvId = null, currentInv = null;
 let groupClients = [];
+
+// WhatsApp Payslips is a separate Cloudflare Worker app on a different origin, embedded via
+// iframe. It has no login of its own — instead, once its embedded page signals it's ready,
+// we hand it this session's access token (re-fetched fresh each time, so it's never stale)
+// plus the currently selected clientId, and it verifies both against Supabase itself.
+const PAYSLIP_APP_ORIGIN = 'https://paytech-payslip-whatsapp.mnrriaanvangraan.workers.dev';
+let whatsappIframeEl = null;
+
+window.addEventListener('message', async (event) => {
+  if (event.origin !== PAYSLIP_APP_ORIGIN) return;
+  if (event.data?.type !== 'paytech-payslip-embed-ready') return;
+  if (!whatsappIframeEl || event.source !== whatsappIframeEl.contentWindow) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  whatsappIframeEl.contentWindow.postMessage(
+    { type: 'paytech-payslip-auth', accessToken: session.access_token, clientId },
+    PAYSLIP_APP_ORIGIN,
+  );
+});
+
+async function loadWhatsappSection() {
+  const container = document.getElementById('whatsapp-content');
+  const { data: clientRow } = await sb.from('clients').select('whatsapp_payslip_enabled').eq('id', clientId).single();
+  if (!clientRow?.whatsapp_payslip_enabled) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📤</div><p>This service isn't enabled on your account yet. Please contact Paytech Consulting Solutions for further information on this service.</p></div>`;
+    whatsappIframeEl = null;
+    return;
+  }
+  container.innerHTML = `<iframe id="whatsapp-iframe" src="${PAYSLIP_APP_ORIGIN}/client" style="width:100%;min-height:640px;border:none;border-radius:8px;" title="WhatsApp Payslips"></iframe>`;
+  whatsappIframeEl = document.getElementById('whatsapp-iframe');
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { data:{ session } } = await sb.auth.getSession();
@@ -322,6 +363,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadInvoices();
   await loadQueries();
+  await loadWhatsappSection();
 });
 
 async function selectCompany(id) {
@@ -334,6 +376,7 @@ async function selectCompany(id) {
   document.getElementById('company-switcher').value = id;
   await loadInvoices();
   await loadQueries();
+  await loadWhatsappSection();
 }
 
 async function loadInvoices() {

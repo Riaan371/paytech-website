@@ -473,8 +473,11 @@
     <div class="nav-item" onclick="showPage('assign')">
       <span class="nav-icon">🔗</span> Assign Clients
     </div>
+    <div class="nav-item" onclick="showPage('payslips')">
+      <span class="nav-icon">📤</span> Payslip Sends
+    </div>
     <a class="nav-item" href="https://paytech-payslip-whatsapp.mnrriaanvangraan.workers.dev" target="_blank" rel="noreferrer">
-      <span class="nav-icon">📤</span> WhatsApp Payslips
+      <span class="nav-icon">🛠</span> Payslip Sender Tool
     </a>
   </nav>
   <div class="sidebar-footer">
@@ -690,6 +693,33 @@
     </div>
   </div>
 
+  <!-- ── PAYSLIP SENDS (invoicing) ── -->
+  <div class="page" id="page-payslips">
+    <div style="padding:2rem;">
+      <div class="section-header">
+        <div class="section-title">Payslip Sends — Monthly Totals</div>
+        <div class="flex gap-2 items-center">
+          <select id="payslips-month-filter" onchange="renderPayslipSends()" style="padding:0.5rem 0.8rem;border:1.5px solid var(--gray-200);border-radius:7px;font-size:0.85rem;">
+            <option value="">All months</option>
+          </select>
+        </div>
+      </div>
+      <p style="font-size:0.82rem;color:var(--gray-400);margin-bottom:1rem;">
+        Count of payslips sent per client per month via the WhatsApp Payslip Sender — use this to work out monthly invoicing.
+      </p>
+      <div class="card">
+        <div class="card-body">
+          <table class="responsive-table">
+            <thead><tr><th>Client</th><th>Month</th><th>Payslips Sent</th><th>Delivered</th><th>Failed</th></tr></thead>
+            <tbody id="payslips-table-body">
+              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <!-- ═══════════════════════════════════ MODALS ═══════════════════════════════════ -->
 
 <!-- CLIENT MODAL -->
@@ -721,6 +751,10 @@
       <div class="form-group"><label>Monthly Fee (ZAR)</label><input id="c-fee" type="number" placeholder="0.00" /></div>
       <div class="form-group"><label>Number of Employees</label><input id="c-employees" type="number" placeholder="0" /></div>
       <div class="form-group"><label>Invoice Day (1-28)</label><input id="c-invoice-day" type="number" placeholder="1" min="1" max="28" value="1" /></div>
+      <div class="form-group full" style="flex-direction:row;align-items:center;gap:0.6rem;">
+        <input type="checkbox" id="c-whatsapp-enabled" style="width:auto;" />
+        <label style="margin:0;">Enable WhatsApp Payslips for this client (shows in their portal)</label>
+      </div>
       <div class="form-group full"><label>Notes</label><textarea id="c-notes" rows="2" placeholder="Any special requirements or notes..."></textarea></div>
     </div>
     <div class="modal-footer">
@@ -1000,7 +1034,7 @@ function renderClientsTable(filter = '') {
   }
   tbody.innerHTML = rows.map(c => `
     <tr>
-      <td data-label="Company"><strong>${c.company_name}</strong></td>
+      <td data-label="Company"><strong>${c.company_name}</strong>${c.whatsapp_payslip_enabled ? ' <span title="WhatsApp Payslips enabled">📤</span>' : ''}</td>
       <td data-label="Contact">${c.contact_person||'-'}</td>
       <td data-label="Email"><a href="mailto:${c.email}" style="color:var(--green);text-decoration:none;">${c.email||'-'}</a></td>
       <td data-label="Phone">${c.phone||'-'}</td>
@@ -1028,7 +1062,7 @@ function renderArchivedTable() {
   }
   tbody.innerHTML = archivedClients.map(c => `
     <tr style="opacity:0.75;">
-      <td data-label="Company"><strong>${c.company_name}</strong></td>
+      <td data-label="Company"><strong>${c.company_name}</strong>${c.whatsapp_payslip_enabled ? ' <span title="WhatsApp Payslips enabled">📤</span>' : ''}</td>
       <td data-label="Contact">${c.contact_person||'-'}</td>
       <td data-label="Email"><a href="mailto:${c.email}" style="color:var(--green);text-decoration:none;">${c.email||'-'}</a></td>
       <td data-label="Service"><span class="badge badge-gray">${c.service_type||'-'}</span></td>
@@ -1064,6 +1098,7 @@ function openClientModal(id = null) {
   document.getElementById('c-fee').value = '';
   document.getElementById('c-employees').value = '';
   document.getElementById('c-invoice-day').value = '1';
+  document.getElementById('c-whatsapp-enabled').checked = false;
   document.getElementById('client-modal-title').textContent = 'Add New Client';
   openModal('client-modal');
 }
@@ -1083,6 +1118,7 @@ function editClient(id) {
   document.getElementById('c-fee').value      = c.monthly_fee || '';
   document.getElementById('c-employees').value= c.employees || '';
   document.getElementById('c-invoice-day').value = c.invoice_day || '1';
+  document.getElementById('c-whatsapp-enabled').checked = Boolean(c.whatsapp_payslip_enabled);
   document.getElementById('c-notes').value    = c.notes || '';
   document.getElementById('client-modal-title').textContent = 'Edit Client';
   openModal('client-modal');
@@ -1102,6 +1138,7 @@ async function saveClient() {
     monthly_fee:    parseFloat(document.getElementById('c-fee').value) || 0,
     employees:      parseInt(document.getElementById('c-employees').value) || 0,
     invoice_day:    parseInt(document.getElementById('c-invoice-day').value) || 1,
+    whatsapp_payslip_enabled: document.getElementById('c-whatsapp-enabled').checked,
     notes:          document.getElementById('c-notes').value,
   };
   if (!payload.company_name) return toast('Company name is required', 'error');
@@ -1632,11 +1669,80 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => { if (n.textContent.toLowerCase().includes(name.toLowerCase().slice(0,4))) n.classList.add('active'); });
-  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule', queries:'Client Queries', assign:'Assign Clients' };
+  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule', queries:'Client Queries', assign:'Assign Clients', payslips:'Payslip Sends' };
   if (name === 'queries') loadAdminQueries();
   if (name === 'assign') loadAssignPage();
+  if (name === 'payslips') loadPayslipSends();
   document.getElementById('page-title').textContent = titles[name] || name;
   if (name === 'schedule') loadSchedule();
+}
+
+// ── PAYSLIP SENDS (invoicing) ──
+let payslipSendRows = [];
+
+async function loadPayslipSends() {
+  const tbody = document.getElementById('payslips-table-body');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>';
+  const { data, error } = await sb
+    .from('payslip_sends')
+    .select('client_id, send_status, delivery_status, created_at, clients(company_name)')
+    .order('created_at', { ascending: false });
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><p style="color:red;">${error.message}</p></div></td></tr>`;
+    return;
+  }
+  payslipSendRows = data || [];
+
+  const months = [...new Set(payslipSendRows.map(r => (r.created_at || '').slice(0, 7)))].sort().reverse();
+  const monthSelect = document.getElementById('payslips-month-filter');
+  const currentSelection = monthSelect.value;
+  monthSelect.innerHTML = '<option value="">All months</option>' +
+    months.map(m => `<option value="${m}">${m}</option>`).join('');
+  if (months.includes(currentSelection)) monthSelect.value = currentSelection;
+
+  renderPayslipSends();
+}
+
+function renderPayslipSends() {
+  const tbody = document.getElementById('payslips-table-body');
+  const monthFilter = document.getElementById('payslips-month-filter').value;
+
+  // Group by client + month (YYYY-MM) for monthly invoicing.
+  const groups = new Map();
+  for (const r of payslipSendRows) {
+    const month = (r.created_at || '').slice(0, 7);
+    if (monthFilter && month !== monthFilter) continue;
+    const key = `${r.client_id}|${month}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        companyName: r.clients?.company_name || '(unknown client)',
+        month,
+        total: 0,
+        delivered: 0,
+        failed: 0,
+      });
+    }
+    const g = groups.get(key);
+    g.total += 1;
+    if (r.delivery_status === 'delivered' || r.delivery_status === 'read') g.delivered += 1;
+    if (r.delivery_status === 'failed' || r.delivery_status === 'undelivered' || r.send_status === 'rejected') g.failed += 1;
+  }
+
+  const rows = [...groups.values()].sort((a, b) => b.month.localeCompare(a.month) || a.companyName.localeCompare(b.companyName));
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📤</div><p>No payslip sends recorded yet.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(g => `
+    <tr>
+      <td data-label="Client"><strong>${g.companyName}</strong></td>
+      <td data-label="Month">${g.month}</td>
+      <td data-label="Payslips Sent"><strong>${g.total}</strong></td>
+      <td data-label="Delivered"><span class="badge badge-green">${g.delivered}</span></td>
+      <td data-label="Failed">${g.failed ? `<span class="badge badge-red">${g.failed}</span>` : '0'}</td>
+    </tr>`).join('');
 }
 
 // ── ASSIGN CLIENTS ──

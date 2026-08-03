@@ -79,6 +79,23 @@ async function main() {
   const rows = parse(fs.readFileSync(csvPath, 'utf8'), { columns: true, skip_empty_lines: true });
   const results = [];
 
+  // Build a map of already-existing auth users (email -> id), so re-running
+  // this script after a partial failure doesn't try to recreate accounts
+  // that were already created in a previous run.
+  console.log('Checking for existing accounts...');
+  const existingByEmail = new Map();
+  {
+    let page = 1;
+    while (true) {
+      const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
+      if (error) { console.error('Could not list existing users:', error.message); break; }
+      for (const u of data.users) existingByEmail.set(u.email.toLowerCase(), u.id);
+      if (data.users.length < 200) break;
+      page++;
+    }
+  }
+  console.log(`Found ${existingByEmail.size} existing account(s).\n`);
+
   for (const row of rows) {
     const clientId = row.id;
     const companyName = row.company_name || '(no name)';
@@ -90,22 +107,31 @@ async function main() {
       continue;
     }
 
-    const password = generatePassword();
+    const existingId = existingByEmail.get(email.toLowerCase());
+    let userId, password;
 
-    const { data: userData, error: createError } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { role: 'client', client_id: clientId }
-    });
+    if (existingId) {
+      userId = existingId;
+      password = '(unchanged - account already existed)';
+      console.log(`Account already exists for ${email}, syncing profile only...`);
+    } else {
+      password = generatePassword();
+      const { data: userData, error: createError } = await supabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { role: 'client', client_id: clientId }
+      });
 
-    if (createError) {
-      console.error(`FAILED for ${email}: ${createError.message}`);
-      results.push({ company: companyName, email, password: '', status: `ERROR: ${createError.message}` });
-      continue;
+      if (createError) {
+        console.error(`FAILED for ${email}: ${createError.message}`);
+        results.push({ company: companyName, email, password: '', status: `ERROR: ${createError.message}` });
+        continue;
+      }
+
+      userId = userData.user.id;
+      existingByEmail.set(email.toLowerCase(), userId);
     }
-
-    const userId = userData.user.id;
 
     const { error: profileError } = await supabase
       .from('profiles')
@@ -117,7 +143,7 @@ async function main() {
       continue;
     }
 
-    console.log(`Created login for ${companyName} <${email}>`);
+    console.log(`OK: ${companyName} <${email}>`);
     results.push({ company: companyName, email, password, status: 'OK' });
   }
 

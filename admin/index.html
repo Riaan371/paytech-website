@@ -476,7 +476,7 @@
     <div class="nav-item" onclick="showPage('payslips')">
       <span class="nav-icon">📤</span> Payslip Sends
     </div>
-    <a class="nav-item" href="https://paytech-payslip-whatsapp.mnrriaanvangraan.workers.dev" target="_blank" rel="noreferrer">
+    <a class="nav-item" href="https://www.paytech.org.za/whatsapp" target="_blank" rel="noreferrer">
       <span class="nav-icon">🛠</span> Payslip Sender Tool
     </a>
   </nav>
@@ -710,9 +710,9 @@
       <div class="card">
         <div class="card-body">
           <table class="responsive-table">
-            <thead><tr><th>Client</th><th>Month</th><th>Payslips Sent</th><th>Delivered</th><th>Failed</th></tr></thead>
+            <thead><tr><th>Client</th><th>Month</th><th>Reference(s)</th><th>Payslips Sent</th><th>Delivered</th><th>Failed</th></tr></thead>
             <tbody id="payslips-table-body">
-              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1682,13 +1682,13 @@ let payslipSendRows = [];
 
 async function loadPayslipSends() {
   const tbody = document.getElementById('payslips-table-body');
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>';
   const { data, error } = await sb
     .from('payslip_sends')
-    .select('client_id, send_status, delivery_status, created_at, clients(company_name)')
+    .select('client_id, batch_reference, send_status, delivery_status, created_at, clients(company_name)')
     .order('created_at', { ascending: false });
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><p style="color:red;">${error.message}</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p style="color:red;">${error.message}</p></div></td></tr>`;
     return;
   }
   payslipSendRows = data || [];
@@ -1720,18 +1720,20 @@ function renderPayslipSends() {
         total: 0,
         delivered: 0,
         failed: 0,
+        references: new Set(),
       });
     }
     const g = groups.get(key);
     g.total += 1;
+    if (r.batch_reference) g.references.add(r.batch_reference);
     if (r.delivery_status === 'delivered' || r.delivery_status === 'read') g.delivered += 1;
-    if (r.delivery_status === 'failed' || r.delivery_status === 'undelivered' || r.send_status === 'rejected') g.failed += 1;
+    if (r.delivery_status === 'failed' || r.delivery_status === 'undelivered' || r.send_status === 'rejected' || r.send_status === 'excluded') g.failed += 1;
   }
 
   const rows = [...groups.values()].sort((a, b) => b.month.localeCompare(a.month) || a.companyName.localeCompare(b.companyName));
 
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📤</div><p>No payslip sends recorded yet.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📤</div><p>No payslip sends recorded yet.</p></div></td></tr>`;
     return;
   }
 
@@ -1739,6 +1741,7 @@ function renderPayslipSends() {
     <tr>
       <td data-label="Client"><strong>${g.companyName}</strong></td>
       <td data-label="Month">${g.month}</td>
+      <td data-label="Reference(s)">${[...g.references].join(', ') || '—'}</td>
       <td data-label="Payslips Sent"><strong>${g.total}</strong></td>
       <td data-label="Delivered"><span class="badge badge-green">${g.delivered}</span></td>
       <td data-label="Failed">${g.failed ? `<span class="badge badge-red">${g.failed}</span>` : '0'}</td>

@@ -180,6 +180,7 @@
       <span id="user-name">Loading...</span>
     </div>
     <a href="../index.html" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:0.4rem 1rem;border-radius:6px;font-size:0.78rem;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">🌐 Website</a>
+    <button class="btn-logout" onclick="openModal('password-modal')">🔑 Password</button>
     <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
   </div>
 </nav>
@@ -262,6 +263,24 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('query-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="submitQuery()">📤 Submit Query</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal-overlay" id="password-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Change Password</div>
+      <button class="modal-close" onclick="closeModal('password-modal')">✕</button>
+    </div>
+    <div class="form-group"><label>Current Password *</label><input type="password" id="pw-current" autocomplete="current-password" /></div>
+    <div class="form-group"><label>New Password *</label><input type="password" id="pw-new" autocomplete="new-password" /></div>
+    <div class="form-group"><label>Confirm New Password *</label><input type="password" id="pw-confirm" autocomplete="new-password" /></div>
+    <div id="pw-error" style="display:none;color:#ef4444;font-size:0.82rem;margin-bottom:0.5rem;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('password-modal')">Cancel</button>
+      <button class="btn btn-primary" id="pw-submit-btn" onclick="submitPasswordChange()">Update Password</button>
     </div>
   </div>
 </div>
@@ -513,6 +532,63 @@ async function handleLogout() {
 
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+async function submitPasswordChange() {
+  const current = document.getElementById('pw-current').value;
+  const next    = document.getElementById('pw-new').value;
+  const confirm = document.getElementById('pw-confirm').value;
+  const errEl   = document.getElementById('pw-error');
+  const btn     = document.getElementById('pw-submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!current || !next || !confirm) {
+    errEl.textContent = 'Please fill in all fields.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (next.length < 8) {
+    errEl.textContent = 'New password must be at least 8 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (next !== confirm) {
+    errEl.textContent = 'New password and confirmation do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  const { data: { user } } = await sb.auth.getUser();
+  const email = user.email;
+
+  const { error: verifyError } = await sb.auth.signInWithPassword({ email, password: current });
+  if (verifyError) {
+    errEl.textContent = 'Current password is incorrect.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Update Password';
+    return;
+  }
+
+  const { error: updateError } = await sb.auth.updateUser({ password: next });
+  if (updateError) {
+    errEl.textContent = 'Could not update password: ' + updateError.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Update Password';
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Update Password';
+  closeModal('password-modal');
+  toast('Password updated! Please sign in again.', 'success');
+  await sb.auth.signOut();
+  setTimeout(() => { window.location.href = '../login/'; }, 1200);
+}
 function statusBadge(s) { return {Paid:'badge-green',Draft:'badge-gray',Sent:'badge-blue',Overdue:'badge-red'}[s]||'badge-gray'; }
 function toast(msg, type='') {
   const el = document.getElementById('toast');

@@ -97,6 +97,17 @@
     }
     .back-link:hover { color: var(--green); }
     .loading { display: none; text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 0.8rem; }
+    .forgot-link {
+      display: block; text-align: center; margin-top: 1rem;
+      color: var(--green); font-size: 0.8rem; text-decoration: none;
+      font-weight: 600;
+    }
+    .forgot-link:hover { color: var(--green-dim); }
+    .success-msg {
+      background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;
+      border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.82rem;
+      margin-top: 0.8rem; display: none;
+    }
 
     @media (max-width: 480px) {
       body { align-items: flex-start; padding: 2rem 1rem; }
@@ -107,26 +118,51 @@
 </head>
 <body>
   <div class="card">
-    <div class="logo-wrap">
-      <img src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" />
-    </div>
-    <h1>Welcome Back</h1>
-    <p class="sub">Sign in to your Paytech account</p>
 
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" id="email" placeholder="your@email.co.za" autocomplete="email" />
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+    <div id="login-view">
+      <div class="logo-wrap">
+        <img src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" />
+      </div>
+      <h1>Welcome Back</h1>
+      <p class="sub">Sign in to your Paytech account</p>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="your@email.co.za" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <button class="btn" id="login-btn" onclick="handleLogin()">Sign In</button>
+      <div class="error" id="error-msg"></div>
+      <div class="loading" id="loading">Signing you in...</div>
+
+      <a class="forgot-link" href="#" onclick="toggleView('forgot'); return false;">Forgot password?</a>
+      <a class="back-link" href="../index.html">← Back to website</a>
     </div>
 
-    <button class="btn" id="login-btn" onclick="handleLogin()">Sign In</button>
-    <div class="error" id="error-msg"></div>
-    <div class="loading" id="loading">Signing you in...</div>
+    <div id="forgot-view" style="display:none;">
+      <div class="logo-wrap">
+        <img src="../Current LOGO/After Canva/paytech-full-logo.png" alt="Paytech" />
+      </div>
+      <h1>Reset Password</h1>
+      <p class="sub">Enter your email and we'll send you a reset link</p>
 
-    <a class="back-link" href="../index.html">← Back to website</a>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="forgot-email" placeholder="your@email.co.za" autocomplete="email" />
+      </div>
+
+      <button class="btn" id="forgot-btn" onclick="handleForgotPassword()">Send Reset Link</button>
+      <div class="error" id="forgot-error"></div>
+      <div class="loading" id="forgot-loading">Sending...</div>
+      <div class="success-msg" id="forgot-success">Check your email for a password reset link.</div>
+
+      <a class="back-link" href="#" onclick="toggleView('login'); return false;">← Back to login</a>
+    </div>
+
   </div>
 
   <script>
@@ -168,6 +204,52 @@
       if (role === 'admin')           window.location.href = '../admin/';
       else if (role === 'consultant') window.location.href = '../consultant/';
       else                            window.location.href = '../portal/';
+    }
+
+    function toggleView(view) {
+      document.getElementById('login-view').style.display  = view === 'login'  ? 'block' : 'none';
+      document.getElementById('forgot-view').style.display = view === 'forgot' ? 'block' : 'none';
+      document.getElementById('forgot-error').style.display = 'none';
+      document.getElementById('forgot-success').style.display = 'none';
+    }
+
+    document.getElementById('forgot-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleForgotPassword();
+    });
+
+    async function handleForgotPassword() {
+      const email = document.getElementById('forgot-email').value.trim();
+      const err   = document.getElementById('forgot-error');
+      const btn   = document.getElementById('forgot-btn');
+      const load  = document.getElementById('forgot-loading');
+      const success = document.getElementById('forgot-success');
+
+      err.style.display = 'none';
+      success.style.display = 'none';
+
+      if (!email) {
+        err.textContent = 'Please enter your email address.';
+        err.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      load.style.display = 'block';
+
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/login/reset-password.html'
+      });
+
+      btn.disabled = false;
+      load.style.display = 'none';
+
+      if (error) {
+        err.textContent = 'Something went wrong. Please try again.';
+        err.style.display = 'block';
+        return;
+      }
+
+      success.style.display = 'block';
     }
   </script>
 </body>

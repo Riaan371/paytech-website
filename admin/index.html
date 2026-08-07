@@ -502,6 +502,7 @@
     </div>
     <div class="topbar-actions">
       <span class="text-muted" id="topbar-date"></span>
+      <button class="btn btn-outline btn-sm" onclick="openModal('password-modal')">🔑 Password</button>
       <a href="../index.html" class="btn btn-outline btn-sm" target="_blank">🌐 View Website</a>
     </div>
   </div>
@@ -913,6 +914,24 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('query-reply-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="submitAdminReply()">📤 Send Reply</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal-overlay" id="password-modal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">Change Password</div>
+      <button class="modal-close" onclick="closeModal('password-modal')">✕</button>
+    </div>
+    <div class="form-group"><label>Current Password *</label><input type="password" id="pw-current" autocomplete="current-password" /></div>
+    <div class="form-group"><label>New Password *</label><input type="password" id="pw-new" autocomplete="new-password" /></div>
+    <div class="form-group"><label>Confirm New Password *</label><input type="password" id="pw-confirm" autocomplete="new-password" /></div>
+    <div id="pw-error" style="display:none;color:#ef4444;font-size:0.82rem;margin-bottom:0.5rem;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('password-modal')">Cancel</button>
+      <button class="btn btn-primary" id="pw-submit-btn" onclick="submitPasswordChange()">Update Password</button>
     </div>
   </div>
 </div>
@@ -1811,6 +1830,63 @@ async function toggleAssign(consultantId, clientId, checkbox) {
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+async function submitPasswordChange() {
+  const current = document.getElementById('pw-current').value;
+  const next    = document.getElementById('pw-new').value;
+  const confirm = document.getElementById('pw-confirm').value;
+  const errEl   = document.getElementById('pw-error');
+  const btn     = document.getElementById('pw-submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!current || !next || !confirm) {
+    errEl.textContent = 'Please fill in all fields.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (next.length < 8) {
+    errEl.textContent = 'New password must be at least 8 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (next !== confirm) {
+    errEl.textContent = 'New password and confirmation do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  const { data: { user } } = await sb.auth.getUser();
+  const email = user.email;
+
+  const { error: verifyError } = await sb.auth.signInWithPassword({ email, password: current });
+  if (verifyError) {
+    errEl.textContent = 'Current password is incorrect.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Update Password';
+    return;
+  }
+
+  const { error: updateError } = await sb.auth.updateUser({ password: next });
+  if (updateError) {
+    errEl.textContent = 'Could not update password: ' + updateError.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Update Password';
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Update Password';
+  closeModal('password-modal');
+  toast('Password updated! Please sign in again.', 'success');
+  await sb.auth.signOut();
+  setTimeout(() => { window.location.href = '../login/'; }, 1200);
+}
 
 function statusBadge(s) {
   return { 'Paid':'badge-green','Draft':'badge-gray','Sent':'badge-blue','Overdue':'badge-red','Accepted':'badge-green','Declined':'badge-red' }[s] || 'badge-gray';

@@ -979,6 +979,40 @@
         <div class="section-title">Generate PDF Letters</div>
         <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">Generates one PDF per employee by merging their data into your template. Review before uploading.</p>
       </div>
+      <!-- File Naming Builder -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <div class="card-header">
+          <div class="card-title">File Naming</div>
+          <span style="font-size:0.75rem;color:var(--gray-400);">Choose which columns + custom text make up each PDF filename</span>
+        </div>
+        <div class="card-body" style="padding:1rem 1.4rem;">
+          <div style="margin-bottom:0.8rem;">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--gray-600);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.5rem;">Include Excel Columns</div>
+            <div id="ltr-filename-cols" style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+              <span style="font-size:0.82rem;color:var(--gray-400);">Upload Excel in Step 1 to see columns</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:0.8rem;">
+            <div class="form-group" style="flex:1;min-width:180px;margin-bottom:0;">
+              <label class="form-label">Custom Text (optional)</label>
+              <input type="text" class="form-input" id="ltr-filename-custom" placeholder="e.g. Bonus 2026" oninput="ltrUpdateFilenamePreview()">
+            </div>
+            <div class="form-group" style="flex:1;min-width:180px;margin-bottom:0;">
+              <label class="form-label">Separator</label>
+              <select class="form-input" id="ltr-filename-sep" onchange="ltrUpdateFilenamePreview()">
+                <option value="_">Underscore  ( _ )</option>
+                <option value="-">Dash  ( - )</option>
+                <option value=" ">Space</option>
+              </select>
+            </div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid var(--gray-200);border-radius:6px;padding:0.6rem 1rem;">
+            <span style="font-size:0.75rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.06em;">Preview: </span>
+            <span id="ltr-filename-preview" style="font-size:0.85rem;font-family:monospace;color:var(--navy);">—</span>
+          </div>
+        </div>
+      </div>
+
       <div id="ltr-gen-ready" class="card" style="padding:1.5rem;text-align:center;margin-bottom:1.2rem;">
         <div style="font-size:3rem;margin-bottom:0.8rem;">📄</div>
         <div id="ltr-gen-summary" style="font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:0.4rem;">—</div>
@@ -2714,6 +2748,46 @@ function ltrShowGenSummary() {
   const n = ltrExcelRows.length;
   document.getElementById('ltr-gen-summary').textContent =
     n ? `Ready to generate ${n} letter${n!==1?'s':''}` : 'No employee data loaded — go back to Step 1';
+  ltrRenderFilenameColPicker();
+  ltrUpdateFilenamePreview();
+}
+
+function ltrRenderFilenameColPicker() {
+  const container = document.getElementById('ltr-filename-cols');
+  if (!container) return;
+  if (!ltrExcelCols.length) {
+    container.innerHTML = '<span style="font-size:0.82rem;color:var(--gray-400);">Upload Excel in Step 1 to see columns</span>';
+    return;
+  }
+  container.innerHTML = ltrExcelCols.map(col => {
+    const id = 'ltr-fn-col-' + col.replace(/\W/g,'_');
+    return `<label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;background:#f1f5f9;border:1px solid var(--gray-200);border-radius:20px;padding:0.3rem 0.8rem;font-size:0.82rem;user-select:none;">
+      <input type="checkbox" id="${id}" data-col="${col}" onchange="ltrUpdateFilenamePreview()" style="cursor:pointer;">
+      ${col}
+    </label>`;
+  }).join('');
+}
+
+function ltrGetFilenameForRow(row) {
+  const sep = document.getElementById('ltr-filename-sep')?.value || '_';
+  const custom = (document.getElementById('ltr-filename-custom')?.value || '').trim();
+  const checked = [...document.querySelectorAll('#ltr-filename-cols input[type=checkbox]:checked')];
+  const parts = checked.map(cb => String(row[cb.dataset.col] || '').trim()).filter(Boolean);
+  if (custom) parts.push(custom);
+  if (!parts.length) {
+    // fallback: use employee number
+    const empCol = document.getElementById('ltr-empno-col')?.value || ltrExcelCols[0] || '';
+    return (String(row[empCol] || 'letter')).replace(/[^a-zA-Z0-9_\-]/g, '_');
+  }
+  return parts.join(sep).replace(/[^a-zA-Z0-9_\-\. ]/g, '').replace(/\s+/g, sep);
+}
+
+function ltrUpdateFilenamePreview() {
+  const preview = document.getElementById('ltr-filename-preview');
+  if (!preview) return;
+  const sample = ltrExcelRows.length ? ltrExcelRows[0] : null;
+  if (!sample) { preview.textContent = '—'; return; }
+  preview.textContent = ltrGetFilenameForRow(sample) + '.pdf';
 }
 
 async function ltrGenerateAll() {
@@ -2734,11 +2808,13 @@ async function ltrGenerateAll() {
   for (let i = 0; i < total; i++) {
     const row = ltrExcelRows[i];
     const empNo = String(row[empCol] || `EMP${i+1}`);
-    const name  = [row.FirstName||'', row.Surname||row.LastName||''].join(' ').trim() || empNo;
+    const builtName = ltrGetFilenameForRow(row);
+    const filename = builtName + '.pdf';
+    const displayName = builtName.replace(/[_-]/g, ' ');
 
     const pct = Math.round(((i+1)/total)*100);
     document.getElementById('ltr-gen-prog-fill').style.width = pct + '%';
-    document.getElementById('ltr-gen-prog-label').textContent = `Generating ${i+1} of ${total}: ${name}`;
+    document.getElementById('ltr-gen-prog-label').textContent = `Generating ${i+1} of ${total}: ${displayName}`;
 
     const merged = ltrMergeRow(tmpl, row);
 
@@ -2756,20 +2832,20 @@ async function ltrGenerateAll() {
     try {
       const blob = await html2pdf().set({
         margin: 0,
-        filename: `${empNo}.pdf`,
+        filename: filename,
         html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         image: { type: 'jpeg', quality: 0.95 }
       }).from(el).output('blob');
 
-      ltrGeneratedPdfs.push({ empNo, name, blob, filename:`${empNo}_letter.pdf` });
+      ltrGeneratedPdfs.push({ empNo, name: displayName, blob, filename });
 
       const size = (blob.size/1024).toFixed(1) + ' KB';
       const url  = URL.createObjectURL(blob);
       tbody.innerHTML += `<tr>
-        <td>${empNo}</td><td>${name}</td>
-        <td>${empNo}_letter.pdf</td><td>${size}</td>
-        <td><a href="${url}" download="${empNo}_letter.pdf" class="btn btn-outline btn-sm">⬇ Download</a></td>
+        <td>${empNo}</td><td>${displayName}</td>
+        <td>${filename}</td><td>${size}</td>
+        <td><a href="${url}" download="${filename}" class="btn btn-outline btn-sm">⬇ Download</a></td>
       </tr>`;
     } catch(err) {
       tbody.innerHTML += `<tr><td>${empNo}</td><td>${name}</td><td colspan="2" style="color:var(--danger);">Error: ${err.message}</td><td>—</td></tr>`;

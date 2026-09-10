@@ -864,6 +864,12 @@
           <button class="btn btn-outline btn-sm" onclick="ltrChangeDocx()">↺ Change</button>
         </div>
 
+        <!-- Detected placeholder chips -->
+        <div style="margin-bottom:1.2rem;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--gray-600);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.5rem;">Detected Placeholders in Document</div>
+          <div id="ltr-ph-list" style="display:flex;flex-wrap:wrap;gap:0.4rem;min-height:28px;"></div>
+        </div>
+
         <!-- Field mapping table — shown once DOCX is loaded -->
         <div class="card" style="margin-bottom:1.2rem;">
           <div class="card-header">
@@ -2523,7 +2529,7 @@ async function ltrProcessDocx(file) {
     const phMatches = [...new Set([...ltrDocxHtml.matchAll(/\{\{([^}]+)\}\}/g)].map(m => m[1].trim()))];
     ltrDetectedPlaceholders = phMatches;
     const phEl = document.getElementById('ltr-ph-list');
-    phEl.innerHTML = phMatches.length
+    if (phEl) phEl.innerHTML = phMatches.length
       ? phMatches.map(p => `<span class="ltr-ph-tag">{{${p}}}</span>`).join('')
       : '<span style="font-size:0.78rem;color:var(--gray-400);">No {{placeholders}} found — make sure your Word doc contains them</span>';
     ltrRenderMappingTable();
@@ -2595,6 +2601,7 @@ function ltrFuzzyMatch(placeholder, cols) {
 function ltrRenderMappingTable() {
   const container = document.getElementById('ltr-mapping-rows');
   const noExcelWarn = document.getElementById('ltr-no-excel-warn');
+  if (!container) return;
   if (!ltrDetectedPlaceholders.length) { container.innerHTML = ''; return; }
 
   if (!ltrExcelCols.length) {

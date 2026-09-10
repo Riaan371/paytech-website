@@ -800,8 +800,8 @@
     <div class="ltr-steps" id="ltr-step-tabs">
       <button class="ltr-step-btn active" onclick="ltrGoStep(1)" id="ltr-tab-1">1 · Upload Data</button>
       <button class="ltr-step-btn" onclick="ltrGoStep(2)" id="ltr-tab-2">2 · Letter Template</button>
-      <button class="ltr-step-btn" onclick="ltrGoStep(3)" id="ltr-tab-3">3 · PaySpace Config</button>
-      <button class="ltr-step-btn" onclick="ltrGoStep(4)" id="ltr-tab-4">4 · Generate PDFs</button>
+      <button class="ltr-step-btn" onclick="ltrGoStep(3)" id="ltr-tab-3">3 · Generate PDFs</button>
+      <button class="ltr-step-btn" onclick="ltrGoStep(4)" id="ltr-tab-4">4 · PaySpace Config</button>
       <button class="ltr-step-btn" onclick="ltrGoStep(5)" id="ltr-tab-5">5 · Upload &amp; Results</button>
     </div>
 
@@ -899,8 +899,8 @@
       </div>
     </div>
 
-    <!-- STEP 3: PaySpace Config -->
-    <div class="ltr-panel" id="ltr-panel-3">
+    <!-- STEP 4: PaySpace Config -->
+    <div class="ltr-panel" id="ltr-panel-4">
       <div class="section-header" style="margin-bottom:1.2rem;">
         <div class="section-title">PaySpace API Configuration</div>
         <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">Enter your PaySpace credentials. These are stored in your browser session only — never saved to the server.</p>
@@ -967,13 +967,13 @@
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;">
-        <button class="btn btn-outline" onclick="ltrGoStep(2)">← Back</button>
-        <button class="btn btn-primary" onclick="ltrGoStep(4)">Next: Generate →</button>
+        <button class="btn btn-outline" onclick="ltrGoStep(3)">← Back</button>
+        <button class="btn btn-primary" onclick="ltrGoStep(5)">Next: Upload →</button>
       </div>
     </div>
 
-    <!-- STEP 4: Generate PDFs -->
-    <div class="ltr-panel" id="ltr-panel-4">
+    <!-- STEP 3: Generate PDFs -->
+    <div class="ltr-panel" id="ltr-panel-3">
       <div class="section-header" style="margin-bottom:1.2rem;">
         <div class="section-title">Generate PDF Letters</div>
         <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">Generates one PDF per employee by merging their data into your template. Review before uploading.</p>
@@ -1001,8 +1001,8 @@
         </div>
       </div>
       <div style="margin-top:1rem;display:flex;justify-content:space-between;">
-        <button class="btn btn-outline" onclick="ltrGoStep(3)">← Back</button>
-        <button class="btn btn-primary" id="ltr-to-upload-btn" disabled onclick="ltrGoStep(5)">Next: Upload to PaySpace →</button>
+        <button class="btn btn-outline" onclick="ltrGoStep(2)">← Back</button>
+        <button class="btn btn-primary" id="ltr-to-upload-btn" disabled onclick="ltrGoStep(4)">Next: PaySpace Config →</button>
       </div>
     </div>
 
@@ -2429,8 +2429,8 @@ function ltrGoStep(n) {
   // mark previous steps as done
   for (let i = 1; i < n; i++) document.getElementById(`ltr-tab-${i}`).classList.add('done');
   ltrCurrentStep = n;
-  if (n === 3) ltrPopulateEmpNoSelect();
-  if (n === 4) ltrShowGenSummary();
+  if (n === 3) ltrShowGenSummary();
+  if (n === 4) ltrPopulateEmpNoSelect();
   if (n === 5) ltrShowUploadSummary();
 }
 

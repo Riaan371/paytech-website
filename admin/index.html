@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="Paytech Admin" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Quicksand:wght@600;700&display=swap');
 
@@ -420,6 +421,66 @@
     @media (max-width: 480px) {
       .stats-grid { grid-template-columns: 1fr; }
     }
+
+    /* ── LETTERS TOOL ── */
+    .ltr-steps { display: flex; gap: 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 1.6rem; overflow-x: auto; }
+    .ltr-step-btn {
+      padding: 0.75rem 1.2rem; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      border: none; background: none; color: var(--gray-400); white-space: nowrap;
+      border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+    }
+    .ltr-step-btn:hover { color: var(--navy); }
+    .ltr-step-btn.active { color: var(--green); border-bottom-color: var(--green); }
+    .ltr-step-btn.done { color: var(--navy); }
+    .ltr-step-btn.done::before { content: '✓ '; color: var(--green); }
+    .ltr-panel { display: none; }
+    .ltr-panel.active { display: block; }
+    .ltr-drop-zone {
+      border: 2px dashed var(--gray-200); border-radius: 12px; padding: 2.5rem;
+      text-align: center; cursor: pointer; transition: all 0.2s; background: var(--gray-50);
+    }
+    .ltr-drop-zone:hover, .ltr-drop-zone.dragover { border-color: var(--green); background: #f0fbf3; }
+    .ltr-drop-zone .dz-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+    .ltr-drop-zone p { font-size: 0.85rem; color: var(--gray-400); margin: 0; }
+    .ltr-drop-zone strong { color: var(--navy); }
+    .ltr-template-editor {
+      width: 100%; min-height: 320px; font-family: 'Courier New', monospace;
+      font-size: 0.82rem; padding: 1rem; border: 1.5px solid var(--gray-200);
+      border-radius: 8px; resize: vertical; line-height: 1.6;
+      color: var(--gray-800); background: #fafbfc;
+    }
+    .ltr-template-editor:focus { outline: none; border-color: var(--green); }
+    .ltr-preview-frame {
+      border: 1px solid var(--gray-200); border-radius: 8px; padding: 1.5rem 2rem;
+      background: white; min-height: 300px; font-family: Arial, sans-serif;
+      font-size: 0.9rem; line-height: 1.7; color: #222;
+    }
+    .ltr-ph-tag {
+      display: inline-block; background: rgba(58,171,92,0.12); color: #1a8040;
+      border: 1px solid rgba(58,171,92,0.3); border-radius: 4px;
+      padding: 1px 6px; font-size: 0.72rem; font-weight: 600; font-family: monospace;
+    }
+    .ltr-map-row { display: grid; grid-template-columns: 1fr 24px 1fr; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .ltr-map-row select { padding: 0.4rem 0.6rem; border: 1.5px solid var(--gray-200); border-radius: 6px; font-size: 0.82rem; }
+    .ltr-log {
+      background: #0f172a; border-radius: 8px; padding: 1rem 1.2rem;
+      font-family: 'Courier New', monospace; font-size: 0.78rem; color: #94a3b8;
+      max-height: 280px; overflow-y: auto; line-height: 1.8;
+    }
+    .ltr-log .ok  { color: #4ade80; }
+    .ltr-log .err { color: #f87171; }
+    .ltr-log .inf { color: #60a5fa; }
+    .ltr-prog-bar { height: 8px; border-radius: 999px; background: var(--gray-200); overflow: hidden; margin: 0.6rem 0; }
+    .ltr-prog-fill { height: 100%; border-radius: 999px; background: var(--green); transition: width 0.3s; }
+    .ltr-results-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1.2rem; }
+    .ltr-result-card { background: white; border-radius: 8px; padding: 1rem 1.2rem; box-shadow: var(--shadow); text-align: center; }
+    .ltr-result-card .rc-val { font-size: 1.8rem; font-weight: 800; }
+    .ltr-result-card .rc-lbl { font-size: 0.72rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.06em; }
+    .ltr-result-card.green .rc-val { color: var(--green); }
+    .ltr-result-card.red .rc-val { color: var(--danger); }
+    .ltr-result-card.blue .rc-val { color: var(--info); }
+    .ltr-cred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media(max-width:640px) { .ltr-cred-grid { grid-template-columns: 1fr; } .ltr-results-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -475,6 +536,9 @@
     </div>
     <div class="nav-item" onclick="showPage('payslips')">
       <span class="nav-icon">📤</span> Payslip Sends
+    </div>
+    <div class="nav-item" onclick="showPage('letters')">
+      <span class="nav-icon">📨</span> Letter Uploader
     </div>
     <a class="nav-item" href="https://www.paytech.org.za/whatsapp" target="_blank" rel="noreferrer">
       <span class="nav-icon">🛠</span> Payslip Sender Tool
@@ -720,6 +784,234 @@
       </div>
     </div>
   </div>
+
+<!-- ═══════════════════════════════ LETTERS PAGE ═══════════════════════════════ -->
+<div class="page" id="page-letters">
+  <div style="padding:2rem;">
+
+    <!-- Step tabs -->
+    <div class="ltr-steps" id="ltr-step-tabs">
+      <button class="ltr-step-btn active" onclick="ltrGoStep(1)" id="ltr-tab-1">1 · Upload Data</button>
+      <button class="ltr-step-btn" onclick="ltrGoStep(2)" id="ltr-tab-2">2 · Letter Template</button>
+      <button class="ltr-step-btn" onclick="ltrGoStep(3)" id="ltr-tab-3">3 · PaySpace Config</button>
+      <button class="ltr-step-btn" onclick="ltrGoStep(4)" id="ltr-tab-4">4 · Generate PDFs</button>
+      <button class="ltr-step-btn" onclick="ltrGoStep(5)" id="ltr-tab-5">5 · Upload &amp; Results</button>
+    </div>
+
+    <!-- STEP 1: Upload Excel -->
+    <div class="ltr-panel active" id="ltr-panel-1">
+      <div class="section-header" style="margin-bottom:1.2rem;">
+        <div class="section-title">Upload Employee Data</div>
+        <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">Upload an Excel file (.xlsx) with one employee per row. Must include an EmployeeNumber column.</p>
+      </div>
+      <div class="ltr-drop-zone" id="ltr-excel-drop" onclick="document.getElementById('ltr-excel-input').click()">
+        <div class="dz-icon">📊</div>
+        <strong>Click to browse or drag &amp; drop</strong>
+        <p>Accepts .xlsx / .xls files</p>
+      </div>
+      <input type="file" id="ltr-excel-input" accept=".xlsx,.xls" style="display:none" onchange="ltrReadExcel(this)">
+      <div id="ltr-excel-status" style="display:none;margin-top:1rem;"></div>
+      <div id="ltr-excel-preview" style="display:none;margin-top:1rem;" class="card">
+        <div class="card-header">
+          <div class="card-title" id="ltr-excel-title">Data Preview</div>
+          <button class="btn btn-primary btn-sm" onclick="ltrGoStep(2)">Next: Letter Template →</button>
+        </div>
+        <div class="card-body" style="overflow-x:auto;">
+          <table class="responsive-table" id="ltr-excel-table">
+            <thead id="ltr-excel-thead"></thead>
+            <tbody id="ltr-excel-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Letter Template -->
+    <div class="ltr-panel" id="ltr-panel-2">
+      <div class="section-header" style="margin-bottom:1.2rem;">
+        <div class="section-title">Design Letter Template</div>
+        <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">
+          Write your letter below using <code>{{ColumnName}}</code> placeholders. These will be replaced with each employee's data.
+        </p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+            <label style="font-size:0.82rem;font-weight:600;color:var(--navy);">HTML Template</label>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn btn-outline btn-sm" onclick="ltrInsertSampleTemplate()">Load Sample</button>
+              <button class="btn btn-primary btn-sm" onclick="ltrPreviewTemplate()">Preview ▶</button>
+            </div>
+          </div>
+          <textarea class="ltr-template-editor" id="ltr-template" oninput="ltrUpdatePlaceholders()" placeholder="Type your letter here. Use {{ColumnName}} for dynamic values.&#10;&#10;Example:&#10;Dear {{FirstName}} {{Surname}},&#10;&#10;We are pleased to advise that your salary has been adjusted..."></textarea>
+          <div style="margin-top:0.8rem;">
+            <div style="font-size:0.75rem;font-weight:600;color:var(--gray-600);margin-bottom:0.4rem;">Detected Placeholders:</div>
+            <div id="ltr-ph-list" style="display:flex;flex-wrap:wrap;gap:0.4rem;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.82rem;font-weight:600;color:var(--navy);margin-bottom:0.6rem;">Live Preview — First Employee</div>
+          <div class="ltr-preview-frame" id="ltr-preview-frame">
+            <span style="color:var(--gray-400);">Click Preview ▶ to see the merged letter</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;display:flex;justify-content:space-between;">
+        <button class="btn btn-outline" onclick="ltrGoStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="ltrGoStep(3)">Next: Config →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PaySpace Config -->
+    <div class="ltr-panel" id="ltr-panel-3">
+      <div class="section-header" style="margin-bottom:1.2rem;">
+        <div class="section-title">PaySpace API Configuration</div>
+        <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">Enter your PaySpace credentials. These are stored in your browser session only — never saved to the server.</p>
+      </div>
+      <div class="card" style="padding:1.5rem;margin-bottom:1.2rem;">
+        <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:1rem;">OAuth &amp; API Endpoints</div>
+        <div class="ltr-cred-grid">
+          <div class="form-group">
+            <label class="form-label">OAuth Token URL</label>
+            <input type="url" class="form-input" id="ltr-token-url" placeholder="https://identity.payspace.com/connect/token">
+          </div>
+          <div class="form-group">
+            <label class="form-label">API Documents URL</label>
+            <input type="url" class="form-input" id="ltr-api-url" placeholder="https://api.payspace.com/odata/v1.1/Company(1)/Document">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Client ID</label>
+            <input type="text" class="form-input" id="ltr-client-id" placeholder="your-payspace-client-id">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Client Secret</label>
+            <input type="password" class="form-input" id="ltr-client-secret" placeholder="your-payspace-client-secret">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Scope</label>
+            <input type="text" class="form-input" id="ltr-scope" placeholder="api" value="api">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Test Connection</label>
+            <button class="btn btn-outline" onclick="ltrTestAuth()" style="width:100%;">🔑 Test Authentication</button>
+          </div>
+        </div>
+        <div id="ltr-auth-status" style="display:none;margin-top:0.8rem;font-size:0.82rem;padding:0.6rem 1rem;border-radius:6px;"></div>
+      </div>
+      <div class="card" style="padding:1.5rem;margin-bottom:1.2rem;">
+        <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:1rem;">Letter Settings</div>
+        <div class="ltr-cred-grid">
+          <div class="form-group">
+            <label class="form-label">Employee Number Column</label>
+            <select class="form-input" id="ltr-empno-col">
+              <option value="">— select after uploading Excel —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Classification</label>
+            <select class="form-input" id="ltr-classification">
+              <option value="Bonus Letter">Bonus Letter</option>
+              <option value="Increase Letter">Increase Letter</option>
+              <option value="Appointment Letter">Appointment Letter</option>
+              <option value="Disciplinary">Disciplinary</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Attachment Description</label>
+            <input type="text" class="form-input" id="ltr-attach-desc" placeholder="e.g. 2025 Performance Bonus">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Output Format</label>
+            <select class="form-input" id="ltr-format">
+              <option value="pdf">PDF</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <button class="btn btn-outline" onclick="ltrGoStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="ltrGoStep(4)">Next: Generate →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Generate PDFs -->
+    <div class="ltr-panel" id="ltr-panel-4">
+      <div class="section-header" style="margin-bottom:1.2rem;">
+        <div class="section-title">Generate PDF Letters</div>
+        <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">Generates one PDF per employee by merging their data into your template. Review before uploading.</p>
+      </div>
+      <div id="ltr-gen-ready" class="card" style="padding:1.5rem;text-align:center;margin-bottom:1.2rem;">
+        <div style="font-size:3rem;margin-bottom:0.8rem;">📄</div>
+        <div id="ltr-gen-summary" style="font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:0.4rem;">—</div>
+        <div style="font-size:0.83rem;color:var(--gray-400);margin-bottom:1.2rem;">Click Generate to create all PDFs in your browser</div>
+        <button class="btn btn-primary" id="ltr-gen-btn" onclick="ltrGenerateAll()">⚙ Generate All Letters</button>
+      </div>
+      <div id="ltr-gen-progress" style="display:none;margin-bottom:1.2rem;">
+        <div style="font-size:0.82rem;font-weight:600;margin-bottom:0.3rem;" id="ltr-gen-prog-label">Generating...</div>
+        <div class="ltr-prog-bar"><div class="ltr-prog-fill" id="ltr-gen-prog-fill" style="width:0%"></div></div>
+      </div>
+      <div id="ltr-gen-list" style="display:none;" class="card">
+        <div class="card-header">
+          <div class="card-title" id="ltr-gen-list-title">Generated Letters</div>
+          <button class="btn btn-outline btn-sm" onclick="ltrDownloadAll()">⬇ Download All (ZIP)</button>
+        </div>
+        <div class="card-body" style="overflow-x:auto;">
+          <table class="responsive-table">
+            <thead><tr><th>Employee #</th><th>Name</th><th>File</th><th>Size</th><th>Action</th></tr></thead>
+            <tbody id="ltr-gen-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top:1rem;display:flex;justify-content:space-between;">
+        <button class="btn btn-outline" onclick="ltrGoStep(3)">← Back</button>
+        <button class="btn btn-primary" id="ltr-to-upload-btn" disabled onclick="ltrGoStep(5)">Next: Upload to PaySpace →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Upload & Results -->
+    <div class="ltr-panel" id="ltr-panel-5">
+      <div class="section-header" style="margin-bottom:1.2rem;">
+        <div class="section-title">Upload to PaySpace</div>
+        <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">Authenticates with PaySpace and uploads each PDF to the matching employee record.</p>
+      </div>
+      <div class="card" style="padding:1.5rem;text-align:center;margin-bottom:1.2rem;" id="ltr-upload-ready">
+        <div style="font-size:3rem;margin-bottom:0.8rem;">🚀</div>
+        <div id="ltr-upload-summary" style="font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:0.4rem;">—</div>
+        <div style="font-size:0.83rem;color:var(--gray-400);margin-bottom:1.2rem;">All uploads go directly from your browser to PaySpace via their API</div>
+        <button class="btn btn-primary" id="ltr-upload-btn" onclick="ltrUploadAll()">📤 Upload All to PaySpace</button>
+      </div>
+      <div id="ltr-upload-progress" style="display:none;margin-bottom:1rem;">
+        <div style="font-size:0.82rem;font-weight:600;margin-bottom:0.3rem;" id="ltr-upload-prog-label">Uploading...</div>
+        <div class="ltr-prog-bar"><div class="ltr-prog-fill" id="ltr-upload-prog-fill" style="width:0%"></div></div>
+      </div>
+      <div class="ltr-log" id="ltr-upload-log" style="display:none;margin-bottom:1rem;"></div>
+      <div id="ltr-upload-results" style="display:none;">
+        <div class="ltr-results-grid">
+          <div class="ltr-result-card green"><div class="rc-val" id="ltr-res-ok">0</div><div class="rc-lbl">Uploaded</div></div>
+          <div class="ltr-result-card red"><div class="rc-val" id="ltr-res-err">0</div><div class="rc-lbl">Failed</div></div>
+          <div class="ltr-result-card blue"><div class="rc-val" id="ltr-res-total">0</div><div class="rc-lbl">Total</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Upload Results</div>
+            <button class="btn btn-outline btn-sm" onclick="ltrExportReport()">⬇ Export CSV</button>
+          </div>
+          <div class="card-body" style="overflow-x:auto;">
+            <table class="responsive-table">
+              <thead><tr><th>Employee #</th><th>Name</th><th>Status</th><th>Message</th></tr></thead>
+              <tbody id="ltr-results-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;display:flex;justify-content:space-between;">
+        <button class="btn btn-outline" onclick="ltrGoStep(4)">← Back</button>
+        <button class="btn btn-outline" onclick="ltrReset()">↺ Start New Batch</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════ MODALS ═══════════════════════════════════ -->
 
@@ -1688,10 +1980,11 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => { if (n.textContent.toLowerCase().includes(name.toLowerCase().slice(0,4))) n.classList.add('active'); });
-  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule', queries:'Client Queries', assign:'Assign Clients', payslips:'Payslip Sends' };
+  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule', queries:'Client Queries', assign:'Assign Clients', payslips:'Payslip Sends', letters:'Letter Uploader' };
   if (name === 'queries') loadAdminQueries();
   if (name === 'assign') loadAssignPage();
   if (name === 'payslips') loadPayslipSends();
+  if (name === 'letters') ltrInit();
   document.getElementById('page-title').textContent = titles[name] || name;
   if (name === 'schedule') loadSchedule();
 }
@@ -2061,6 +2354,407 @@ if (mobBtn) {
       overlay.classList.remove('open');
     });
   });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LETTER UPLOADER
+// ══════════════════════════════════════════════════════════════
+let ltrExcelRows = [];      // array of objects from Excel
+let ltrExcelCols = [];      // column headers
+let ltrGeneratedPdfs = [];  // [{empNo, name, blob, filename}]
+let ltrUploadResults = [];  // [{empNo, name, status, message}]
+let ltrCurrentStep = 1;
+
+function ltrInit() {
+  // wire up drag-drop on the drop zone
+  const dz = document.getElementById('ltr-excel-drop');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) ltrProcessExcelFile(f);
+  });
+}
+
+function ltrGoStep(n) {
+  document.querySelectorAll('.ltr-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ltr-step-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`ltr-panel-${n}`).classList.add('active');
+  document.getElementById(`ltr-tab-${n}`).classList.add('active');
+  // mark previous steps as done
+  for (let i = 1; i < n; i++) document.getElementById(`ltr-tab-${i}`).classList.add('done');
+  ltrCurrentStep = n;
+  if (n === 3) ltrPopulateEmpNoSelect();
+  if (n === 4) ltrShowGenSummary();
+  if (n === 5) ltrShowUploadSummary();
+}
+
+// ── STEP 1: Excel ──────────────────────────────────────────────
+function ltrReadExcel(input) {
+  const f = input.files[0];
+  if (f) ltrProcessExcelFile(f);
+}
+
+function ltrProcessExcelFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
+      if (!data.length) { ltrStatus('No data rows found in file.', 'err'); return; }
+      ltrExcelRows = data;
+      ltrExcelCols = Object.keys(data[0]);
+      ltrRenderExcelPreview(file.name);
+    } catch(err) {
+      ltrStatus('Could not read file: ' + err.message, 'err');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function ltrRenderExcelPreview(filename) {
+  const thead = document.getElementById('ltr-excel-thead');
+  const tbody = document.getElementById('ltr-excel-tbody');
+  thead.innerHTML = '<tr>' + ltrExcelCols.map(c => `<th>${c}</th>`).join('') + '</tr>';
+  const preview = ltrExcelRows.slice(0, 5);
+  tbody.innerHTML = preview.map(row =>
+    '<tr>' + ltrExcelCols.map(c => `<td>${row[c] ?? ''}</td>`).join('') + '</tr>'
+  ).join('');
+  document.getElementById('ltr-excel-title').textContent =
+    `${filename} — ${ltrExcelRows.length} employees, ${ltrExcelCols.length} columns (showing first 5)`;
+  document.getElementById('ltr-excel-status').style.display = 'none';
+  document.getElementById('ltr-excel-preview').style.display = 'block';
+}
+
+function ltrStatus(msg, type='inf') {
+  const el = document.getElementById('ltr-excel-status');
+  el.style.display = 'block';
+  el.style.cssText = `display:block;padding:0.6rem 1rem;border-radius:6px;font-size:0.82rem;background:${type==='err'?'#fef2f2':'#eff6ff'};color:${type==='err'?'#991b1b':'#1e40af'}`;
+  el.textContent = msg;
+}
+
+// ── STEP 2: Template ──────────────────────────────────────────
+const LTR_SAMPLE = `<div style="font-family:Arial,sans-serif;max-width:680px;margin:auto;padding:40px;">
+  <p style="text-align:right;font-size:0.85rem;color:#666;">{{Date}}</p>
+  <br>
+  <p>Dear {{FirstName}} {{Surname}},</p>
+  <br>
+  <h3 style="color:#1B2048;">{{LetterType}}</h3>
+  <br>
+  <p>We are pleased to inform you that, effective <strong>{{EffectiveDate}}</strong>, your
+  {{LetterType}} has been approved as follows:</p>
+  <br>
+  <table style="width:100%;border-collapse:collapse;">
+    <tr style="background:#f8fafc;">
+      <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600;">Employee Number</td>
+      <td style="padding:10px;border:1px solid #e2e8f0;">{{EmployeeNumber}}</td>
+    </tr>
+    <tr>
+      <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600;">Department</td>
+      <td style="padding:10px;border:1px solid #e2e8f0;">{{Department}}</td>
+    </tr>
+    <tr style="background:#f8fafc;">
+      <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600;">Amount / New Package</td>
+      <td style="padding:10px;border:1px solid #e2e8f0;color:#1B2048;font-weight:700;">{{Amount}}</td>
+    </tr>
+  </table>
+  <br>
+  <p>This letter serves as confirmation of the above. Please retain it for your records.</p>
+  <br>
+  <p>Kind regards,<br><strong>Paytech Consulting Solutions</strong><br>HR &amp; Payroll Division</p>
+  <br><br>
+  <hr style="border:1px solid #e2e8f0;">
+  <p style="font-size:0.75rem;color:#94a3b8;text-align:center;">
+    Confidential — Paytech Consulting Solutions &bull; www.paytech.org.za
+  </p>
+</div>`;
+
+function ltrInsertSampleTemplate() {
+  document.getElementById('ltr-template').value = LTR_SAMPLE;
+  ltrUpdatePlaceholders();
+}
+
+function ltrUpdatePlaceholders() {
+  const tmpl = document.getElementById('ltr-template').value;
+  const matches = [...new Set([...tmpl.matchAll(/\{\{(\w+)\}\}/g)].map(m => m[1]))];
+  const el = document.getElementById('ltr-ph-list');
+  el.innerHTML = matches.length
+    ? matches.map(p => `<span class="ltr-ph-tag">{{${p}}}</span>`).join('')
+    : '<span style="font-size:0.78rem;color:var(--gray-400);">No placeholders found yet</span>';
+}
+
+function ltrPreviewTemplate() {
+  const tmpl = document.getElementById('ltr-template').value;
+  if (!tmpl.trim()) { alert('Please write a template first.'); return; }
+  const row = ltrExcelRows[0] || {};
+  // also inject today's date for {{Date}}
+  const merged = tmpl.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+    if (key === 'Date') return new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+    return row[key] !== undefined ? row[key] : `{{${key}}}`;
+  });
+  document.getElementById('ltr-preview-frame').innerHTML = merged;
+}
+
+// ── STEP 3: Config helpers ─────────────────────────────────────
+function ltrPopulateEmpNoSelect() {
+  const sel = document.getElementById('ltr-empno-col');
+  sel.innerHTML = ltrExcelCols.length
+    ? ltrExcelCols.map(c => `<option value="${c}"${c.toLowerCase().includes('emp')||c.toLowerCase().includes('number')?'selected':''}>${c}</option>`).join('')
+    : '<option value="">— upload Excel first —</option>';
+}
+
+async function ltrTestAuth() {
+  const url    = document.getElementById('ltr-token-url').value.trim();
+  const id     = document.getElementById('ltr-client-id').value.trim();
+  const secret = document.getElementById('ltr-client-secret').value.trim();
+  const scope  = document.getElementById('ltr-scope').value.trim() || 'api';
+  const status = document.getElementById('ltr-auth-status');
+  if (!url || !id || !secret) { ltrAuthStatus('Please fill in Token URL, Client ID and Secret.', false); return; }
+  status.style.display = 'block';
+  status.textContent = '⏳ Authenticating…';
+  status.style.background = '#eff6ff'; status.style.color = '#1e40af';
+  try {
+    const body = new URLSearchParams({ grant_type:'client_credentials', client_id:id, client_secret:secret, scope });
+    const res = await fetch(url, { method:'POST', body, headers:{'Content-Type':'application/x-www-form-urlencoded'} });
+    const json = await res.json();
+    if (json.access_token) {
+      ltrAuthStatus('✅ Authentication successful — token received.', true);
+    } else {
+      ltrAuthStatus('❌ ' + (json.error_description || json.error || 'Unknown error'), false);
+    }
+  } catch(err) {
+    ltrAuthStatus('❌ ' + err.message + ' (Check the URL and that CORS is allowed)', false);
+  }
+}
+
+function ltrAuthStatus(msg, ok) {
+  const el = document.getElementById('ltr-auth-status');
+  el.style.display = 'block';
+  el.style.background = ok ? '#f0fdf4' : '#fef2f2';
+  el.style.color = ok ? '#15803d' : '#991b1b';
+  el.textContent = msg;
+}
+
+// ── STEP 4: Generate PDFs ─────────────────────────────────────
+function ltrShowGenSummary() {
+  const n = ltrExcelRows.length;
+  document.getElementById('ltr-gen-summary').textContent =
+    n ? `Ready to generate ${n} letter${n!==1?'s':''}` : 'No employee data loaded — go back to Step 1';
+}
+
+async function ltrGenerateAll() {
+  const tmpl = document.getElementById('ltr-template').value;
+  if (!tmpl.trim())         { alert('Please create a letter template in Step 2 first.'); ltrGoStep(2); return; }
+  if (!ltrExcelRows.length) { alert('Please upload employee data in Step 1 first.');     ltrGoStep(1); return; }
+
+  ltrGeneratedPdfs = [];
+  document.getElementById('ltr-gen-btn').disabled = true;
+  document.getElementById('ltr-gen-progress').style.display = 'block';
+  document.getElementById('ltr-gen-list').style.display = 'none';
+
+  const empCol = document.getElementById('ltr-empno-col').value || ltrExcelCols[0];
+  const total = ltrExcelRows.length;
+  const tbody = document.getElementById('ltr-gen-table-body');
+  tbody.innerHTML = '';
+
+  for (let i = 0; i < total; i++) {
+    const row = ltrExcelRows[i];
+    const empNo = String(row[empCol] || `EMP${i+1}`);
+    const name  = [row.FirstName||'', row.Surname||row.LastName||''].join(' ').trim() || empNo;
+
+    const pct = Math.round(((i+1)/total)*100);
+    document.getElementById('ltr-gen-prog-fill').style.width = pct + '%';
+    document.getElementById('ltr-gen-prog-label').textContent = `Generating ${i+1} of ${total}: ${name}`;
+
+    const merged = tmpl.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+      if (key === 'Date') return new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+      return row[key] !== undefined ? row[key] : '';
+    });
+
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:white;';
+    el.innerHTML = merged;
+    document.body.appendChild(el);
+
+    try {
+      const blob = await html2pdf().set({
+        margin:[15,15,15,15], filename:`${empNo}.pdf`,
+        html2canvas:{ scale:2, useCORS:true },
+        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' },
+        image:{ type:'jpeg', quality:0.95 }
+      }).from(el).output('blob');
+
+      ltrGeneratedPdfs.push({ empNo, name, blob, filename:`${empNo}_letter.pdf` });
+
+      const size = (blob.size/1024).toFixed(1) + ' KB';
+      const url  = URL.createObjectURL(blob);
+      tbody.innerHTML += `<tr>
+        <td>${empNo}</td><td>${name}</td>
+        <td>${empNo}_letter.pdf</td><td>${size}</td>
+        <td><a href="${url}" download="${empNo}_letter.pdf" class="btn btn-outline btn-sm">⬇ Download</a></td>
+      </tr>`;
+    } catch(err) {
+      tbody.innerHTML += `<tr><td>${empNo}</td><td>${name}</td><td colspan="2" style="color:var(--danger);">Error: ${err.message}</td><td>—</td></tr>`;
+    } finally {
+      document.body.removeChild(el);
+    }
+
+    // small yield to keep UI responsive
+    await new Promise(r => setTimeout(r, 30));
+  }
+
+  document.getElementById('ltr-gen-progress').style.display = 'none';
+  document.getElementById('ltr-gen-list').style.display = 'block';
+  document.getElementById('ltr-gen-list-title').textContent = `Generated ${ltrGeneratedPdfs.length} of ${total} letters`;
+  document.getElementById('ltr-gen-btn').disabled = false;
+  document.getElementById('ltr-to-upload-btn').disabled = ltrGeneratedPdfs.length === 0;
+}
+
+async function ltrDownloadAll() {
+  if (!ltrGeneratedPdfs.length) { alert('No PDFs generated yet.'); return; }
+  // simple sequential download (browser may group them)
+  for (const item of ltrGeneratedPdfs) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(item.blob);
+    a.download = item.filename;
+    a.click();
+    await new Promise(r => setTimeout(r, 120));
+  }
+}
+
+// ── STEP 5: Upload ─────────────────────────────────────────────
+function ltrShowUploadSummary() {
+  const n = ltrGeneratedPdfs.length;
+  document.getElementById('ltr-upload-summary').textContent =
+    n ? `${n} PDF${n!==1?'s':''} ready to upload to PaySpace` : 'No PDFs generated — go back to Step 4';
+  document.getElementById('ltr-upload-btn').disabled = n === 0;
+}
+
+async function ltrGetToken() {
+  const url    = document.getElementById('ltr-token-url').value.trim();
+  const id     = document.getElementById('ltr-client-id').value.trim();
+  const secret = document.getElementById('ltr-client-secret').value.trim();
+  const scope  = document.getElementById('ltr-scope').value.trim() || 'api';
+  const body   = new URLSearchParams({ grant_type:'client_credentials', client_id:id, client_secret:secret, scope });
+  const res    = await fetch(url, { method:'POST', body, headers:{'Content-Type':'application/x-www-form-urlencoded'} });
+  const json   = await res.json();
+  if (!json.access_token) throw new Error(json.error_description || 'Auth failed');
+  return json.access_token;
+}
+
+function ltrLog(msg, type='inf') {
+  const log = document.getElementById('ltr-upload-log');
+  log.style.display = 'block';
+  const ts = new Date().toLocaleTimeString('en-ZA');
+  log.innerHTML += `<div class="${type}">[${ts}] ${msg}</div>`;
+  log.scrollTop = log.scrollHeight;
+}
+
+async function ltrUploadAll() {
+  if (!ltrGeneratedPdfs.length) { alert('No PDFs to upload. Please generate letters first.'); return; }
+  const apiUrl   = document.getElementById('ltr-api-url').value.trim();
+  const classif  = document.getElementById('ltr-classification').value;
+  const desc     = document.getElementById('ltr-attach-desc').value.trim();
+  if (!apiUrl)  { alert('Please enter the PaySpace API Documents URL in Step 3.'); ltrGoStep(3); return; }
+
+  document.getElementById('ltr-upload-btn').disabled = true;
+  document.getElementById('ltr-upload-progress').style.display = 'block';
+  document.getElementById('ltr-upload-log').innerHTML = '';
+  ltrUploadResults = [];
+
+  let token;
+  try {
+    ltrLog('Authenticating with PaySpace…', 'inf');
+    token = await ltrGetToken();
+    ltrLog('Token received ✓', 'ok');
+  } catch(err) {
+    ltrLog('Authentication failed: ' + err.message, 'err');
+    document.getElementById('ltr-upload-btn').disabled = false;
+    return;
+  }
+
+  const total = ltrGeneratedPdfs.length;
+  let ok = 0, fail = 0;
+
+  for (let i = 0; i < total; i++) {
+    const item = ltrGeneratedPdfs[i];
+    const pct  = Math.round(((i+1)/total)*100);
+    document.getElementById('ltr-upload-prog-fill').style.width = pct + '%';
+    document.getElementById('ltr-upload-prog-label').textContent = `Uploading ${i+1} of ${total}: ${item.name}`;
+    ltrLog(`Uploading ${item.filename} → Employee ${item.empNo}…`, 'inf');
+
+    const fd = new FormData();
+    fd.append('EmployeeNumber', item.empNo);
+    fd.append('Classification', classif);
+    fd.append('AttachmentDescription', desc || classif);
+    fd.append('file', item.blob, item.filename);
+
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: fd
+      });
+      if (res.ok) {
+        ok++;
+        ltrLog(`✓ ${item.empNo} — ${item.name} uploaded`, 'ok');
+        ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Success', message:'Uploaded' });
+      } else {
+        const txt = await res.text();
+        fail++;
+        ltrLog(`✗ ${item.empNo} — HTTP ${res.status}: ${txt.slice(0,120)}`, 'err');
+        ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Failed', message:`HTTP ${res.status}` });
+      }
+    } catch(err) {
+      fail++;
+      ltrLog(`✗ ${item.empNo} — ${err.message}`, 'err');
+      ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Failed', message:err.message });
+    }
+  }
+
+  ltrLog(`— Done: ${ok} uploaded, ${fail} failed —`, ok===total?'ok':'err');
+  document.getElementById('ltr-res-ok').textContent    = ok;
+  document.getElementById('ltr-res-err').textContent   = fail;
+  document.getElementById('ltr-res-total').textContent = total;
+  document.getElementById('ltr-results-tbody').innerHTML = ltrUploadResults.map(r =>
+    `<tr>
+      <td>${r.empNo}</td><td>${r.name}</td>
+      <td><span style="padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;
+        background:${r.status==='Success'?'#f0fdf4':'#fef2f2'};
+        color:${r.status==='Success'?'#15803d':'#991b1b'};">${r.status}</span></td>
+      <td style="font-size:0.78rem;color:var(--gray-600);">${r.message}</td>
+    </tr>`
+  ).join('');
+  document.getElementById('ltr-upload-results').style.display = 'block';
+  document.getElementById('ltr-upload-progress').style.display = 'none';
+  document.getElementById('ltr-upload-btn').disabled = false;
+}
+
+function ltrExportReport() {
+  if (!ltrUploadResults.length) return;
+  const rows = [['EmployeeNumber','Name','Status','Message'], ...ltrUploadResults.map(r => [r.empNo, r.name, r.status, r.message])];
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a   = document.createElement('a');
+  a.href    = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `payspace_upload_report_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function ltrReset() {
+  ltrExcelRows = []; ltrExcelCols = []; ltrGeneratedPdfs = []; ltrUploadResults = [];
+  document.getElementById('ltr-excel-preview').style.display = 'none';
+  document.getElementById('ltr-template').value = '';
+  document.getElementById('ltr-ph-list').innerHTML = '';
+  document.getElementById('ltr-preview-frame').innerHTML = '<span style="color:var(--gray-400);">Click Preview ▶ to see the merged letter</span>';
+  document.getElementById('ltr-upload-log').innerHTML = '';
+  document.getElementById('ltr-upload-results').style.display = 'none';
+  document.getElementById('ltr-gen-list').style.display = 'none';
+  document.getElementById('ltr-to-upload-btn').disabled = true;
+  // reset all step tabs
+  document.querySelectorAll('.ltr-step-btn').forEach(b => b.classList.remove('active','done'));
+  ltrGoStep(1);
 }
 </script>
 </body>

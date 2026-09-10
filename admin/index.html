@@ -461,8 +461,14 @@
       border: 1px solid rgba(58,171,92,0.3); border-radius: 4px;
       padding: 1px 6px; font-size: 0.72rem; font-weight: 600; font-family: monospace;
     }
-    .ltr-map-row { display: grid; grid-template-columns: 1fr 24px 1fr; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-    .ltr-map-row select { padding: 0.4rem 0.6rem; border: 1.5px solid var(--gray-200); border-radius: 6px; font-size: 0.82rem; }
+    .ltr-map-row { display: grid; grid-template-columns: 1fr 28px 1fr 22px; align-items: center; gap: 0.6rem; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100); }
+    .ltr-map-row:last-child { border-bottom: none; }
+    .ltr-map-ph { font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: 700; color: #1a8040; background: rgba(58,171,92,0.09); border: 1px solid rgba(58,171,92,0.25); border-radius: 5px; padding: 4px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ltr-map-arrow { text-align: center; color: var(--gray-400); font-size: 1rem; }
+    .ltr-map-sel { padding: 0.4rem 0.6rem; border: 1.5px solid var(--gray-200); border-radius: 6px; font-size: 0.82rem; width: 100%; }
+    .ltr-map-sel.matched { border-color: var(--green); background: #f0fdf4; }
+    .ltr-map-sel.unmatched { border-color: var(--warning); background: #fffbeb; }
+    .ltr-map-status { font-size: 1rem; text-align: center; }
     .ltr-log {
       background: #0f172a; border-radius: 8px; padding: 1rem 1.2rem;
       font-family: 'Courier New', monospace; font-size: 0.78rem; color: #94a3b8;
@@ -858,9 +864,18 @@
           <button class="btn btn-outline btn-sm" onclick="ltrChangeDocx()">↺ Change</button>
         </div>
 
-        <div style="margin-bottom:1.2rem;">
-          <div style="font-size:0.75rem;font-weight:700;color:var(--gray-600);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.5rem;">Detected Placeholders</div>
-          <div id="ltr-ph-list" style="display:flex;flex-wrap:wrap;gap:0.4rem;min-height:28px;"></div>
+        <!-- Field mapping table — shown once DOCX is loaded -->
+        <div class="card" style="margin-bottom:1.2rem;">
+          <div class="card-header">
+            <div class="card-title">Map Placeholders → Excel Columns</div>
+            <span style="font-size:0.75rem;color:var(--gray-400);">Match each Word placeholder to the correct Excel column</span>
+          </div>
+          <div class="card-body" style="padding:1rem 1.4rem;">
+            <div id="ltr-no-excel-warn" style="font-size:0.82rem;color:var(--warning);display:none;">
+              ⚠ Go back to Step 1 and upload your Excel file first — columns will appear here once loaded.
+            </div>
+            <div id="ltr-mapping-rows"></div>
+          </div>
         </div>
 
         <div id="ltr-docx-warnings" style="display:none;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1.2rem;font-size:0.78rem;color:#92400e;"></div>
@@ -2376,11 +2391,13 @@ if (mobBtn) {
 // ══════════════════════════════════════════════════════════════
 //  LETTER UPLOADER
 // ══════════════════════════════════════════════════════════════
-let ltrExcelRows = [];      // array of objects from Excel
-let ltrExcelCols = [];      // column headers
-let ltrGeneratedPdfs = [];  // [{empNo, name, blob, filename}]
-let ltrUploadResults = [];  // [{empNo, name, status, message}]
+let ltrExcelRows = [];           // array of objects from Excel
+let ltrExcelCols = [];           // column headers
+let ltrGeneratedPdfs = [];       // [{empNo, name, blob, filename}]
+let ltrUploadResults = [];       // [{empNo, name, status, message}]
 let ltrCurrentStep = 1;
+let ltrDetectedPlaceholders = []; // placeholder names from Word doc
+let ltrMapping = {};              // { "Annual Salary": "CTC", "Name": "First Name", ... }
 
 function ltrInit() {
   // wire up drag-drop on the excel drop zone
@@ -2447,6 +2464,8 @@ function ltrRenderExcelPreview(filename) {
     `${filename} — ${ltrExcelRows.length} employees, ${ltrExcelCols.length} columns (showing first 5)`;
   document.getElementById('ltr-excel-status').style.display = 'none';
   document.getElementById('ltr-excel-preview').style.display = 'block';
+  // re-render mapping table if docx already loaded
+  if (ltrDetectedPlaceholders.length) ltrRenderMappingTable();
 }
 
 function ltrStatus(msg, type='inf') {
@@ -2502,10 +2521,12 @@ async function ltrProcessDocx(file) {
 
     // Detect {{placeholders}} — support spaces in names e.g. {{Annual Salary}}
     const phMatches = [...new Set([...ltrDocxHtml.matchAll(/\{\{([^}]+)\}\}/g)].map(m => m[1].trim()))];
+    ltrDetectedPlaceholders = phMatches;
     const phEl = document.getElementById('ltr-ph-list');
     phEl.innerHTML = phMatches.length
       ? phMatches.map(p => `<span class="ltr-ph-tag">{{${p}}}</span>`).join('')
       : '<span style="font-size:0.78rem;color:var(--gray-400);">No {{placeholders}} found — make sure your Word doc contains them</span>';
+    ltrRenderMappingTable();
 
     // Show raw preview
     document.getElementById('ltr-preview-frame').innerHTML = ltrDocxHtml;
@@ -2544,16 +2565,101 @@ function ltrInitDocxDrop() {
 function ltrPreviewTemplate() {
   if (!ltrDocxHtml) { alert('Please upload a Word template first.'); return; }
   const row = ltrExcelRows[0] || {};
-  const today = new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+  // Use mapping but highlight any unmapped/empty fields in yellow
   const merged = ltrDocxHtml.replace(/\{\{([^}]+)\}\}/g, (_, key) => {
     const k = key.trim();
-    if (k === 'Date') return today;
-    return row[k] !== undefined ? row[k] : `<span style="background:#fef9c3;padding:0 3px;">{{${k}}}</span>`;
+    if (k === 'Date') return new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+    const col = ltrMapping[k];
+    if (!col) return `<span style="background:#fef9c3;border:1px dashed #f59e0b;padding:0 4px;border-radius:3px;font-size:0.8em;">{{${k}}} — not mapped</span>`;
+    const val = row[col];
+    return val !== undefined && val !== '' ? val : `<span style="background:#fee2e2;padding:0 4px;border-radius:3px;font-size:0.8em;">[${col} empty]</span>`;
   });
   document.getElementById('ltr-preview-frame').innerHTML = merged;
 }
 
 function ltrUpdatePlaceholders() { /* no-op — handled in ltrProcessDocx */ }
+
+// ── FIELD MAPPING ──────────────────────────────────────────────
+function ltrFuzzyMatch(placeholder, cols) {
+  // Try exact first
+  if (cols.includes(placeholder)) return placeholder;
+  const ph = placeholder.toLowerCase().replace(/\s+/g,'');
+  // Fuzzy: strip spaces/case from both sides and check containment
+  for (const col of cols) {
+    const c = col.toLowerCase().replace(/\s+/g,'');
+    if (c === ph || c.includes(ph) || ph.includes(c)) return col;
+  }
+  return '';
+}
+
+function ltrRenderMappingTable() {
+  const container = document.getElementById('ltr-mapping-rows');
+  const noExcelWarn = document.getElementById('ltr-no-excel-warn');
+  if (!ltrDetectedPlaceholders.length) { container.innerHTML = ''; return; }
+
+  if (!ltrExcelCols.length) {
+    noExcelWarn.style.display = 'block';
+    container.innerHTML = ltrDetectedPlaceholders.map(ph =>
+      `<div class="ltr-map-row">
+        <div class="ltr-map-ph">{{${ph}}}</div>
+        <div class="ltr-map-arrow">→</div>
+        <div style="font-size:0.78rem;color:var(--gray-400);font-style:italic;">Upload Excel first</div>
+        <div></div>
+      </div>`
+    ).join('');
+    return;
+  }
+
+  noExcelWarn.style.display = 'none';
+
+  // Build options HTML (blank = "— skip —")
+  const opts = `<option value="">— skip / leave blank —</option>` +
+    ltrExcelCols.map(c => `<option value="${c}">${c}</option>`).join('');
+
+  container.innerHTML = ltrDetectedPlaceholders.map(ph => {
+    const auto   = ltrFuzzyMatch(ph, ltrExcelCols);
+    const stored = ltrMapping[ph] !== undefined ? ltrMapping[ph] : auto;
+    const cls    = stored ? 'matched' : 'unmatched';
+    const icon   = stored ? '✅' : '⚠️';
+    // Build select with stored/auto value selected
+    const selOpts = `<option value="">— skip / leave blank —</option>` +
+      ltrExcelCols.map(c => `<option value="${c}"${c===stored?' selected':''}>${c}</option>`).join('');
+    return `<div class="ltr-map-row">
+      <div class="ltr-map-ph">{{${ph}}}</div>
+      <div class="ltr-map-arrow">→</div>
+      <select class="ltr-map-sel ${cls}" data-ph="${ph}" onchange="ltrUpdateMapping(this)">${selOpts}</select>
+      <div class="ltr-map-status" title="${stored?'Matched':'No match found'}">${icon}</div>
+    </div>`;
+  }).join('');
+
+  // Persist auto-matches into ltrMapping
+  ltrDetectedPlaceholders.forEach(ph => {
+    if (ltrMapping[ph] === undefined) {
+      const auto = ltrFuzzyMatch(ph, ltrExcelCols);
+      ltrMapping[ph] = auto;
+    }
+  });
+}
+
+function ltrUpdateMapping(sel) {
+  const ph = sel.dataset.ph;
+  ltrMapping[ph] = sel.value;
+  sel.className = `ltr-map-sel ${sel.value ? 'matched' : 'unmatched'}`;
+  const statusEl = sel.parentElement.querySelector('.ltr-map-status');
+  statusEl.textContent = sel.value ? '✅' : '⚠️';
+  statusEl.title = sel.value ? 'Matched' : 'No match — will be left blank';
+}
+
+function ltrMergeRow(html, row) {
+  // Replace each placeholder using the admin-defined mapping
+  return html.replace(/\{\{([^}]+)\}\}/g, (_, key) => {
+    const k = key.trim();
+    if (k === 'Date') return new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+    const col = ltrMapping[k];           // mapped Excel column name
+    if (!col) return '';                 // skipped / unmapped
+    return row[col] !== undefined ? row[col] : '';
+  });
+}
 
 // ── STEP 3: Config helpers ─────────────────────────────────────
 function ltrPopulateEmpNoSelect() {
@@ -2626,12 +2732,7 @@ async function ltrGenerateAll() {
     document.getElementById('ltr-gen-prog-fill').style.width = pct + '%';
     document.getElementById('ltr-gen-prog-label').textContent = `Generating ${i+1} of ${total}: ${name}`;
 
-    const today = new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
-    const merged = tmpl.replace(/\{\{([^}]+)\}\}/g, (_, key) => {
-      const k = key.trim();
-      if (k === 'Date') return today;
-      return row[k] !== undefined ? row[k] : '';
-    });
+    const merged = ltrMergeRow(tmpl, row);
 
     const el = document.createElement('div');
     el.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:white;';
@@ -2805,6 +2906,10 @@ function ltrExportReport() {
 function ltrReset() {
   ltrExcelRows = []; ltrExcelCols = []; ltrGeneratedPdfs = []; ltrUploadResults = [];
   ltrDocxHtml  = '';
+  ltrDetectedPlaceholders = [];
+  ltrMapping   = {};
+  document.getElementById('ltr-mapping-rows').innerHTML = '';
+  document.getElementById('ltr-no-excel-warn').style.display = 'none';
   document.getElementById('ltr-excel-preview').style.display       = 'none';
   document.getElementById('ltr-ph-list').innerHTML                 = '';
   document.getElementById('ltr-preview-frame').innerHTML           = '';

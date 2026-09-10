@@ -13,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Quicksand:wght@600;700&display=swap');
 
@@ -825,39 +826,55 @@
       </div>
     </div>
 
-    <!-- STEP 2: Letter Template -->
+    <!-- STEP 2: Letter Template (DOCX Upload) -->
     <div class="ltr-panel" id="ltr-panel-2">
       <div class="section-header" style="margin-bottom:1.2rem;">
-        <div class="section-title">Design Letter Template</div>
+        <div class="section-title">Upload Letter Template</div>
         <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">
-          Write your letter below using <code>{{ColumnName}}</code> placeholders. These will be replaced with each employee's data.
+          Upload the client's Word document (.docx) with their letterhead. Add <code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;">{{ColumnName}}</code> placeholders anywhere in the document — e.g. <code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;">{{Name}}</code>, <code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;">{{Annual Salary}}</code>. Each upload is unique per client/batch.
         </p>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
-            <label style="font-size:0.82rem;font-weight:600;color:var(--navy);">HTML Template</label>
-            <div style="display:flex;gap:0.5rem;">
-              <button class="btn btn-outline btn-sm" onclick="ltrInsertSampleTemplate()">Load Sample</button>
-              <button class="btn btn-primary btn-sm" onclick="ltrPreviewTemplate()">Preview ▶</button>
-            </div>
-          </div>
-          <textarea class="ltr-template-editor" id="ltr-template" oninput="ltrUpdatePlaceholders()" placeholder="Type your letter here. Use {{ColumnName}} for dynamic values.&#10;&#10;Example:&#10;Dear {{FirstName}} {{Surname}},&#10;&#10;We are pleased to advise that your salary has been adjusted..."></textarea>
-          <div style="margin-top:0.8rem;">
-            <div style="font-size:0.75rem;font-weight:600;color:var(--gray-600);margin-bottom:0.4rem;">Detected Placeholders:</div>
-            <div id="ltr-ph-list" style="display:flex;flex-wrap:wrap;gap:0.4rem;"></div>
-          </div>
+
+      <div id="ltr-docx-drop-area">
+        <div class="ltr-drop-zone" id="ltr-docx-drop" onclick="document.getElementById('ltr-docx-input').click()">
+          <div class="dz-icon">📝</div>
+          <strong>Click to browse or drag &amp; drop</strong>
+          <p>Accepts .docx Word documents</p>
         </div>
-        <div>
-          <div style="font-size:0.82rem;font-weight:600;color:var(--navy);margin-bottom:0.6rem;">Live Preview — First Employee</div>
-          <div class="ltr-preview-frame" id="ltr-preview-frame">
-            <span style="color:var(--gray-400);">Click Preview ▶ to see the merged letter</span>
-          </div>
-        </div>
+        <input type="file" id="ltr-docx-input" accept=".docx" style="display:none" onchange="ltrReadDocx(this)">
       </div>
-      <div style="margin-top:1rem;display:flex;justify-content:space-between;">
+
+      <div id="ltr-docx-processing" style="display:none;text-align:center;padding:2rem;color:var(--gray-400);">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>Converting document…
+      </div>
+
+      <div id="ltr-docx-loaded" style="display:none;margin-top:1.2rem;">
+        <div style="display:flex;align-items:center;gap:1rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:0.8rem 1.2rem;margin-bottom:1.2rem;">
+          <span style="font-size:1.4rem;">📄</span>
+          <div style="flex:1;">
+            <div id="ltr-docx-filename" style="font-weight:700;color:var(--navy);font-size:0.9rem;"></div>
+            <div id="ltr-docx-meta" style="font-size:0.75rem;color:var(--gray-400);margin-top:1px;"></div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="ltrChangeDocx()">↺ Change</button>
+        </div>
+
+        <div style="margin-bottom:1.2rem;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--gray-600);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.5rem;">Detected Placeholders</div>
+          <div id="ltr-ph-list" style="display:flex;flex-wrap:wrap;gap:0.4rem;min-height:28px;"></div>
+        </div>
+
+        <div id="ltr-docx-warnings" style="display:none;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1.2rem;font-size:0.78rem;color:#92400e;"></div>
+
+        <div style="font-size:0.82rem;font-weight:600;color:var(--navy);margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between;">
+          <span>Document Preview (raw layout)</span>
+          <button class="btn btn-primary btn-sm" onclick="ltrPreviewTemplate()">Preview with First Employee ▶</button>
+        </div>
+        <div class="ltr-preview-frame" id="ltr-preview-frame" style="max-height:480px;overflow-y:auto;"></div>
+      </div>
+
+      <div style="margin-top:1.2rem;display:flex;justify-content:space-between;">
         <button class="btn btn-outline" onclick="ltrGoStep(1)">← Back</button>
-        <button class="btn btn-primary" onclick="ltrGoStep(3)">Next: Config →</button>
+        <button class="btn btn-primary" id="ltr-step2-next" disabled onclick="ltrGoStep(3)">Next: Config →</button>
       </div>
     </div>
 
@@ -2366,15 +2383,19 @@ let ltrUploadResults = [];  // [{empNo, name, status, message}]
 let ltrCurrentStep = 1;
 
 function ltrInit() {
-  // wire up drag-drop on the drop zone
+  // wire up drag-drop on the excel drop zone
   const dz = document.getElementById('ltr-excel-drop');
-  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-  dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('dragover');
-    const f = e.dataTransfer.files[0];
-    if (f) ltrProcessExcelFile(f);
-  });
+  if (dz && !dz._wired) {
+    dz._wired = true;
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('dragover');
+      const f = e.dataTransfer.files[0];
+      if (f) ltrProcessExcelFile(f);
+    });
+  }
+  ltrInitDocxDrop();
 }
 
 function ltrGoStep(n) {
@@ -2435,67 +2456,104 @@ function ltrStatus(msg, type='inf') {
   el.textContent = msg;
 }
 
-// ── STEP 2: Template ──────────────────────────────────────────
-const LTR_SAMPLE = `<div style="font-family:Arial,sans-serif;max-width:680px;margin:auto;padding:40px;">
-  <p style="text-align:right;font-size:0.85rem;color:#666;">{{Date}}</p>
-  <br>
-  <p>Dear {{FirstName}} {{Surname}},</p>
-  <br>
-  <h3 style="color:#1B2048;">{{LetterType}}</h3>
-  <br>
-  <p>We are pleased to inform you that, effective <strong>{{EffectiveDate}}</strong>, your
-  {{LetterType}} has been approved as follows:</p>
-  <br>
-  <table style="width:100%;border-collapse:collapse;">
-    <tr style="background:#f8fafc;">
-      <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600;">Employee Number</td>
-      <td style="padding:10px;border:1px solid #e2e8f0;">{{EmployeeNumber}}</td>
-    </tr>
-    <tr>
-      <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600;">Department</td>
-      <td style="padding:10px;border:1px solid #e2e8f0;">{{Department}}</td>
-    </tr>
-    <tr style="background:#f8fafc;">
-      <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600;">Amount / New Package</td>
-      <td style="padding:10px;border:1px solid #e2e8f0;color:#1B2048;font-weight:700;">{{Amount}}</td>
-    </tr>
-  </table>
-  <br>
-  <p>This letter serves as confirmation of the above. Please retain it for your records.</p>
-  <br>
-  <p>Kind regards,<br><strong>Paytech Consulting Solutions</strong><br>HR &amp; Payroll Division</p>
-  <br><br>
-  <hr style="border:1px solid #e2e8f0;">
-  <p style="font-size:0.75rem;color:#94a3b8;text-align:center;">
-    Confidential — Paytech Consulting Solutions &bull; www.paytech.org.za
-  </p>
-</div>`;
+// ── STEP 2: DOCX Template ─────────────────────────────────────
+let ltrDocxHtml = '';   // converted HTML from mammoth
 
-function ltrInsertSampleTemplate() {
-  document.getElementById('ltr-template').value = LTR_SAMPLE;
-  ltrUpdatePlaceholders();
+function ltrReadDocx(input) {
+  const file = input.files[0];
+  if (!file) return;
+  ltrProcessDocx(file);
 }
 
-function ltrUpdatePlaceholders() {
-  const tmpl = document.getElementById('ltr-template').value;
-  const matches = [...new Set([...tmpl.matchAll(/\{\{(\w+)\}\}/g)].map(m => m[1]))];
-  const el = document.getElementById('ltr-ph-list');
-  el.innerHTML = matches.length
-    ? matches.map(p => `<span class="ltr-ph-tag">{{${p}}}</span>`).join('')
-    : '<span style="font-size:0.78rem;color:var(--gray-400);">No placeholders found yet</span>';
+function ltrChangeDocx() {
+  ltrDocxHtml = '';
+  document.getElementById('ltr-docx-loaded').style.display    = 'none';
+  document.getElementById('ltr-docx-drop-area').style.display = 'block';
+  document.getElementById('ltr-step2-next').disabled          = true;
+  document.getElementById('ltr-docx-input').value             = '';
+}
+
+async function ltrProcessDocx(file) {
+  document.getElementById('ltr-docx-drop-area').style.display    = 'none';
+  document.getElementById('ltr-docx-processing').style.display   = 'block';
+  document.getElementById('ltr-docx-loaded').style.display       = 'none';
+
+  try {
+    const buf = await file.arrayBuffer();
+    const result = await mammoth.convertToHtml(
+      { arrayBuffer: buf },
+      {
+        convertImage: mammoth.images.imgElement(img =>
+          img.read('base64').then(data => ({ src: `data:${img.contentType};base64,${data}` }))
+        )
+      }
+    );
+
+    ltrDocxHtml = result.value;
+
+    // Show warnings if any
+    const warnEl = document.getElementById('ltr-docx-warnings');
+    if (result.messages && result.messages.length) {
+      warnEl.style.display = 'block';
+      warnEl.innerHTML = '⚠ Conversion notes: ' + result.messages.slice(0,3).map(m => m.message).join('; ');
+    } else {
+      warnEl.style.display = 'none';
+    }
+
+    // Detect {{placeholders}} — support spaces in names e.g. {{Annual Salary}}
+    const phMatches = [...new Set([...ltrDocxHtml.matchAll(/\{\{([^}]+)\}\}/g)].map(m => m[1].trim()))];
+    const phEl = document.getElementById('ltr-ph-list');
+    phEl.innerHTML = phMatches.length
+      ? phMatches.map(p => `<span class="ltr-ph-tag">{{${p}}}</span>`).join('')
+      : '<span style="font-size:0.78rem;color:var(--gray-400);">No {{placeholders}} found — make sure your Word doc contains them</span>';
+
+    // Show raw preview
+    document.getElementById('ltr-preview-frame').innerHTML = ltrDocxHtml;
+
+    // File info
+    document.getElementById('ltr-docx-filename').textContent = file.name;
+    document.getElementById('ltr-docx-meta').textContent =
+      `${phMatches.length} placeholder${phMatches.length!==1?'s':''} detected · ${(file.size/1024).toFixed(0)} KB`;
+
+    document.getElementById('ltr-docx-processing').style.display = 'none';
+    document.getElementById('ltr-docx-loaded').style.display     = 'block';
+    document.getElementById('ltr-step2-next').disabled           = false;
+
+  } catch(err) {
+    document.getElementById('ltr-docx-processing').style.display = 'none';
+    document.getElementById('ltr-docx-drop-area').style.display  = 'block';
+    alert('Could not read the Word document: ' + err.message + '\n\nMake sure the file is a .docx (not .doc or .pdf).');
+  }
+}
+
+// Wire up drag-drop on the docx zone (called from ltrInit)
+function ltrInitDocxDrop() {
+  const dz = document.getElementById('ltr-docx-drop');
+  if (!dz || dz._wired) return;
+  dz._wired = true;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f && f.name.endsWith('.docx')) ltrProcessDocx(f);
+    else alert('Please drop a .docx file.');
+  });
 }
 
 function ltrPreviewTemplate() {
-  const tmpl = document.getElementById('ltr-template').value;
-  if (!tmpl.trim()) { alert('Please write a template first.'); return; }
+  if (!ltrDocxHtml) { alert('Please upload a Word template first.'); return; }
   const row = ltrExcelRows[0] || {};
-  // also inject today's date for {{Date}}
-  const merged = tmpl.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-    if (key === 'Date') return new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
-    return row[key] !== undefined ? row[key] : `{{${key}}}`;
+  const today = new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+  const merged = ltrDocxHtml.replace(/\{\{([^}]+)\}\}/g, (_, key) => {
+    const k = key.trim();
+    if (k === 'Date') return today;
+    return row[k] !== undefined ? row[k] : `<span style="background:#fef9c3;padding:0 3px;">{{${k}}}</span>`;
   });
   document.getElementById('ltr-preview-frame').innerHTML = merged;
 }
+
+function ltrUpdatePlaceholders() { /* no-op — handled in ltrProcessDocx */ }
 
 // ── STEP 3: Config helpers ─────────────────────────────────────
 function ltrPopulateEmpNoSelect() {
@@ -2545,9 +2603,9 @@ function ltrShowGenSummary() {
 }
 
 async function ltrGenerateAll() {
-  const tmpl = document.getElementById('ltr-template').value;
-  if (!tmpl.trim())         { alert('Please create a letter template in Step 2 first.'); ltrGoStep(2); return; }
-  if (!ltrExcelRows.length) { alert('Please upload employee data in Step 1 first.');     ltrGoStep(1); return; }
+  const tmpl = ltrDocxHtml;
+  if (!tmpl.trim())         { alert('Please upload a Word template in Step 2 first.'); ltrGoStep(2); return; }
+  if (!ltrExcelRows.length) { alert('Please upload employee data in Step 1 first.');   ltrGoStep(1); return; }
 
   ltrGeneratedPdfs = [];
   document.getElementById('ltr-gen-btn').disabled = true;
@@ -2568,9 +2626,11 @@ async function ltrGenerateAll() {
     document.getElementById('ltr-gen-prog-fill').style.width = pct + '%';
     document.getElementById('ltr-gen-prog-label').textContent = `Generating ${i+1} of ${total}: ${name}`;
 
-    const merged = tmpl.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-      if (key === 'Date') return new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
-      return row[key] !== undefined ? row[key] : '';
+    const today = new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+    const merged = tmpl.replace(/\{\{([^}]+)\}\}/g, (_, key) => {
+      const k = key.trim();
+      if (k === 'Date') return today;
+      return row[k] !== undefined ? row[k] : '';
     });
 
     const el = document.createElement('div');
@@ -2744,15 +2804,19 @@ function ltrExportReport() {
 
 function ltrReset() {
   ltrExcelRows = []; ltrExcelCols = []; ltrGeneratedPdfs = []; ltrUploadResults = [];
-  document.getElementById('ltr-excel-preview').style.display = 'none';
-  document.getElementById('ltr-template').value = '';
-  document.getElementById('ltr-ph-list').innerHTML = '';
-  document.getElementById('ltr-preview-frame').innerHTML = '<span style="color:var(--gray-400);">Click Preview ▶ to see the merged letter</span>';
-  document.getElementById('ltr-upload-log').innerHTML = '';
-  document.getElementById('ltr-upload-results').style.display = 'none';
-  document.getElementById('ltr-gen-list').style.display = 'none';
-  document.getElementById('ltr-to-upload-btn').disabled = true;
-  // reset all step tabs
+  ltrDocxHtml  = '';
+  document.getElementById('ltr-excel-preview').style.display       = 'none';
+  document.getElementById('ltr-ph-list').innerHTML                 = '';
+  document.getElementById('ltr-preview-frame').innerHTML           = '';
+  document.getElementById('ltr-docx-loaded').style.display         = 'none';
+  document.getElementById('ltr-docx-drop-area').style.display      = 'block';
+  document.getElementById('ltr-docx-warnings').style.display       = 'none';
+  document.getElementById('ltr-step2-next').disabled               = true;
+  document.getElementById('ltr-docx-input').value                  = '';
+  document.getElementById('ltr-upload-log').innerHTML              = '';
+  document.getElementById('ltr-upload-results').style.display      = 'none';
+  document.getElementById('ltr-gen-list').style.display            = 'none';
+  document.getElementById('ltr-to-upload-btn').disabled            = true;
   document.querySelectorAll('.ltr-step-btn').forEach(b => b.classList.remove('active','done'));
   ltrGoStep(1);
 }

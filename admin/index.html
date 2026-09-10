@@ -14,6 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Quicksand:wght@600;700&display=swap');
 
@@ -2742,7 +2743,7 @@ async function ltrGenerateAll() {
     const merged = ltrMergeRow(tmpl, row);
 
     const el = document.createElement('div');
-    el.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:white;';
+    el.style.cssText = 'position:absolute;left:-9999px;top:0;width:794px;background:white;font-family:Arial,sans-serif;font-size:12pt;line-height:1.5;';
     el.innerHTML = merged;
     document.body.appendChild(el);
 
@@ -2782,14 +2783,15 @@ async function ltrGenerateAll() {
 
 async function ltrDownloadAll() {
   if (!ltrGeneratedPdfs.length) { alert('No PDFs generated yet.'); return; }
-  // simple sequential download (browser may group them)
+  const zip = new JSZip();
   for (const item of ltrGeneratedPdfs) {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(item.blob);
-    a.download = item.filename;
-    a.click();
-    await new Promise(r => setTimeout(r, 120));
+    zip.file(item.filename, item.blob);
   }
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = 'letters.zip';
+  a.click();
 }
 
 // ── STEP 5: Upload ─────────────────────────────────────────────

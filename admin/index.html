@@ -3014,6 +3014,7 @@ async function ltrUploadAll() {
       Attachment:            b64
     };
 
+    ltrLog(`Payload: ${JSON.stringify({...payload, Attachment: payload.Attachment.slice(0,20)+'…'})}`, 'inf');
     try {
       const res = await fetch(LTR_PROXY, {
         method:  'POST',
@@ -3029,7 +3030,7 @@ async function ltrUploadAll() {
         ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Success', message: respId ? 'ID: ' + respId : 'OK ' + res.status });
       } else {
         fail++;
-        ltrLog(`✗ ${item.empNo} — HTTP ${res.status}: ${respText.slice(0,120)}`, 'err');
+        ltrLog(`✗ ${item.empNo} — HTTP ${res.status}: ${respText.slice(0,400)}`, 'err');
         ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Failed', message:`HTTP ${res.status}` });
       }
     } catch(err) {

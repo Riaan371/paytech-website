@@ -104,6 +104,38 @@
     .nav-item:hover { background: rgba(255,255,255,0.06); color: white; }
     .nav-item.active { background: var(--green); color: white; }
     .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    /* ── Nav groups ── */
+    .nav-group { margin-top: 0.5rem; }
+    .nav-group-label {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.6rem 1.2rem 0.3rem;
+      opacity: 0.45; color: #fff; user-select: none;
+    }
+    /* Payslip group — teal accent */
+    .nav-group.group-payslip .nav-item {
+      border-left: 3px solid transparent;
+      padding-left: calc(1.1rem - 3px);
+    }
+    .nav-group.group-payslip .nav-item:hover,
+    .nav-group.group-payslip .nav-item.active {
+      border-left-color: #2dd4bf;
+    }
+    .nav-group.group-payslip .nav-item.active {
+      background: rgba(45,212,191,0.18); color: #2dd4bf;
+    }
+    /* Letter group — indigo accent */
+    .nav-group.group-letters .nav-item {
+      border-left: 3px solid transparent;
+      padding-left: calc(1.1rem - 3px);
+    }
+    .nav-group.group-letters .nav-item:hover,
+    .nav-group.group-letters .nav-item.active {
+      border-left-color: #a78bfa;
+    }
+    .nav-group.group-letters .nav-item.active {
+      background: rgba(167,139,250,0.18); color: #a78bfa;
+    }
     .nav-badge {
       margin-left: auto; background: var(--green); color: white;
       font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 999px;
@@ -542,18 +574,24 @@
     <div class="nav-item" onclick="showPage('assign')">
       <span class="nav-icon">🔗</span> Assign Clients
     </div>
-    <div class="nav-item" onclick="showPage('payslips')">
-      <span class="nav-icon">📤</span> Payslip Sends
+    <div class="nav-group group-payslip">
+      <div class="nav-group-label">Payslip Tools</div>
+      <div class="nav-item" onclick="showPage('payslips')">
+        <span class="nav-icon">📤</span> Payslip Sends
+      </div>
+      <a class="nav-item" href="https://www.paytech.org.za/whatsapp" target="_blank" rel="noreferrer">
+        <span class="nav-icon">🛠</span> Payslip Sender Tool
+      </a>
     </div>
-    <div class="nav-item" onclick="showPage('letters')">
-      <span class="nav-icon">📨</span> Letter Uploader
+    <div class="nav-group group-letters">
+      <div class="nav-group-label">Letter Tools</div>
+      <div class="nav-item" onclick="showPage('letters')">
+        <span class="nav-icon">📨</span> Letter Uploader
+      </div>
+      <div class="nav-item" onclick="showPage('attachments')">
+        <span class="nav-icon">📎</span> Attachment Uploads
+      </div>
     </div>
-    <div class="nav-item" onclick="showPage('attachments')">
-      <span class="nav-icon">📎</span> Attachment Uploads
-    </div>
-    <a class="nav-item" href="https://www.paytech.org.za/whatsapp" target="_blank" rel="noreferrer">
-      <span class="nav-icon">🛠</span> Payslip Sender Tool
-    </a>
   </nav>
   <div class="sidebar-footer">
     <div class="sidebar-user">

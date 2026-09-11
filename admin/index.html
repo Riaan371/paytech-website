@@ -2951,7 +2951,7 @@ async function ltrUploadAll() {
   const apiUrl   = document.getElementById('ltr-api-url').value.trim();
   const classif  = document.getElementById('ltr-classification').value;
   const desc     = document.getElementById('ltr-attach-desc').value.trim();
-  if (!apiUrl)  { alert('Please enter the PaySpace API Documents URL in Step 3.'); ltrGoStep(3); return; }
+  if (!apiUrl)  { alert('Please enter the PaySpace API Base URL in Step 4.'); ltrGoStep(4); return; }
 
   document.getElementById('ltr-upload-btn').disabled = true;
   document.getElementById('ltr-upload-progress').style.display = 'block';
@@ -2972,6 +2972,12 @@ async function ltrUploadAll() {
   const total = ltrGeneratedPdfs.length;
   let ok = 0, fail = 0;
 
+  // Build the full endpoint URL: {apiBase}/odata/v2.0/{companyId}/EmployeeAttachment
+  const companyId = document.getElementById('ltr-company-id').value.trim();
+  if (!companyId) { alert('Please enter the Company ID in Step 4.'); document.getElementById('ltr-upload-btn').disabled = false; return; }
+  const uploadUrl = apiUrl.replace(/\/$/, '') + `/odata/v2.0/${companyId}/EmployeeAttachment`;
+  ltrLog(`Upload endpoint: ${uploadUrl}`, 'inf');
+
   for (let i = 0; i < total; i++) {
     const item = ltrGeneratedPdfs[i];
     const pct  = Math.round(((i+1)/total)*100);
@@ -2979,26 +2985,39 @@ async function ltrUploadAll() {
     document.getElementById('ltr-upload-prog-label').textContent = `Uploading ${i+1} of ${total}: ${item.name}`;
     ltrLog(`Uploading ${item.filename} → Employee ${item.empNo}…`, 'inf');
 
-    const fd = new FormData();
-    fd.append('EmployeeNumber', item.empNo);
-    fd.append('Classification', classif);
-    fd.append('AttachmentDescription', desc || classif);
-    fd.append('file', item.blob, item.filename);
+    // Convert blob to Base64 (matching the PowerShell ReadAllBytes → ToBase64String approach)
+    const b64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(item.blob);
+    });
+
+    const payload = {
+      EmployeeNumber:        item.empNo,
+      Classification:        classif,
+      AttachmentDescription: desc || classif,
+      AttachmentName:        item.filename,
+      AttachmentUrl:         null,
+      Attachment:            b64
+    };
 
     try {
-      const res = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + token },
-        body: fd
+      const res = await fetch(uploadUrl, {
+        method:  'POST',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
       });
+      const respText = await res.text();
+      let respId = '';
+      try { respId = JSON.parse(respText)?.Id || ''; } catch(_) {}
       if (res.ok) {
         ok++;
-        ltrLog(`✓ ${item.empNo} — ${item.name} uploaded`, 'ok');
-        ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Success', message:'Uploaded' });
+        ltrLog(`✓ ${item.empNo} — uploaded${respId ? ' (ID: ' + respId + ')' : ''}`, 'ok');
+        ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Success', message: respId ? 'ID: ' + respId : 'OK ' + res.status });
       } else {
-        const txt = await res.text();
         fail++;
-        ltrLog(`✗ ${item.empNo} — HTTP ${res.status}: ${txt.slice(0,120)}`, 'err');
+        ltrLog(`✗ ${item.empNo} — HTTP ${res.status}: ${respText.slice(0,120)}`, 'err');
         ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Failed', message:`HTTP ${res.status}` });
       }
     } catch(err) {

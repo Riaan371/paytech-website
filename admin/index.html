@@ -1105,6 +1105,28 @@
   </div>
 </div>
 
+<!-- PaySpace API Error Modal -->
+<div id="ltr-api-error-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:2rem;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1.2rem;">
+      <div style="font-size:2rem;">⚠️</div>
+      <div>
+        <div style="font-size:1rem;font-weight:700;color:#991b1b;">PaySpace API Error</div>
+        <div id="ltr-api-err-code" style="font-size:0.78rem;color:#94a3b8;margin-top:2px;"></div>
+      </div>
+    </div>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:1rem;margin-bottom:1.2rem;">
+      <div style="font-size:0.75rem;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.3rem;" id="ltr-api-err-field"></div>
+      <div style="font-size:0.9rem;color:#7f1d1d;" id="ltr-api-err-msg"></div>
+    </div>
+    <div style="font-size:0.82rem;color:#64748b;margin-bottom:1.4rem;">Go back to <strong>Step 4 · PaySpace Config</strong> and correct the highlighted field, then try uploading again.</div>
+    <div style="display:flex;gap:0.8rem;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="document.getElementById('ltr-api-error-modal').style.display='none'">Dismiss</button>
+      <button class="btn btn-primary" onclick="document.getElementById('ltr-api-error-modal').style.display='none';ltrGoStep(4);">Go to Step 4</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════ MODALS ═══════════════════════════════════ -->
 
 <!-- CLIENT MODAL -->
@@ -2953,6 +2975,14 @@ async function ltrGetToken() {
   return json.access_token;
 }
 
+function ltrShowApiError(field, message, status) {
+  const el = document.getElementById('ltr-api-error-modal');
+  document.getElementById('ltr-api-err-field').textContent = field;
+  document.getElementById('ltr-api-err-msg').textContent   = message;
+  document.getElementById('ltr-api-err-code').textContent  = 'HTTP ' + status;
+  el.style.display = 'flex';
+}
+
 function ltrLog(msg, type='inf') {
   const log = document.getElementById('ltr-upload-log');
   log.style.display = 'block';
@@ -3033,8 +3063,29 @@ async function ltrUploadAll() {
         ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Success', message: respId ? 'ID: ' + respId : 'OK ' + res.status });
       } else {
         fail++;
-        ltrLog(`✗ ${item.empNo} — HTTP ${res.status}: ${respText.slice(0,400)}`, 'err');
-        ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Failed', message:`HTTP ${res.status}` });
+        // Parse PaySpace error for a readable message
+        let errMsg = `HTTP ${res.status}`;
+        let showPopup = false;
+        try {
+          const errJson = JSON.parse(respText);
+          const psMsg = errJson.Message || errJson.message || '';
+          const details = errJson.Details || errJson.details || [];
+          const fieldErr = details.find(d => d.Field || d.field);
+          if (fieldErr) {
+            const field = fieldErr.Field || fieldErr.field;
+            const msg   = fieldErr.Message || fieldErr.message || psMsg;
+            errMsg = `${field}: ${msg}`;
+            showPopup = true;
+            ltrShowApiError(field, msg, res.status);
+          } else if (psMsg) {
+            errMsg = psMsg;
+            showPopup = true;
+            ltrShowApiError('PaySpace API Error', psMsg, res.status);
+          }
+        } catch(_) {}
+        ltrLog(`✗ ${item.empNo} — ${errMsg}`, 'err');
+        ltrUploadResults.push({ empNo:item.empNo, name:item.name, status:'Failed', message:errMsg });
+        if (showPopup) break; // stop processing after a config-level error
       }
     } catch(err) {
       fail++;

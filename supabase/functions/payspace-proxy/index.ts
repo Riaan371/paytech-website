@@ -13,12 +13,13 @@ serve(async (req) => {
 
     // ── Token request ─────────────────────────────────────────────
     if (action === 'token') {
-      const body = new URLSearchParams({
+      const params: Record<string, string> = {
         grant_type:    'client_credentials',
         client_id:     p.client_id,
         client_secret: p.client_secret,
-        scope:         p.scope || 'api',
-      })
+      }
+      if (p.scope) params.scope = p.scope;
+      const body = new URLSearchParams(params)
       const res  = await fetch(p.token_url, {
         method:  'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

@@ -944,7 +944,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">OAuth Scope (optional)</label>
-            <input type="text" class="form-input" id="ltr-scope" placeholder="api" value="api">
+            <input type="text" class="form-input" id="ltr-scope" placeholder="leave blank if not required">
           </div>
           <div class="form-group">
             <label class="form-label">Test Connection</label>
@@ -2765,10 +2765,12 @@ async function ltrTestAuth() {
   status.textContent = '⏳ Authenticating…';
   status.style.background = '#eff6ff'; status.style.color = '#1e40af';
   try {
+    const payload = { action:'token', token_url:url, client_id:id, client_secret:secret };
+    if (scope) payload.scope = scope;
     const res  = await fetch(LTR_PROXY, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ action:'token', token_url:url, client_id:id, client_secret:secret, scope }),
+      body:    JSON.stringify(payload),
     });
     const json = await res.json();
     if (json.access_token) {
@@ -2936,10 +2938,12 @@ async function ltrGetToken() {
   const id     = document.getElementById('ltr-client-id').value.trim();
   const secret = document.getElementById('ltr-client-secret').value.trim();
   const scope  = document.getElementById('ltr-scope').value.trim() || 'api';
+  const payload = { action:'token', token_url:url, client_id:id, client_secret:secret };
+  if (scope) payload.scope = scope;
   const res    = await fetch(LTR_PROXY, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ action:'token', token_url:url, client_id:id, client_secret:secret, scope }),
+    body:    JSON.stringify(payload),
   });
   const json = await res.json();
   if (!json.access_token) throw new Error(json.error_description || 'Auth failed');

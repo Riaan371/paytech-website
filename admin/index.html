@@ -548,6 +548,9 @@
     <div class="nav-item" onclick="showPage('letters')">
       <span class="nav-icon">📨</span> Letter Uploader
     </div>
+    <div class="nav-item" onclick="showPage('attachments')">
+      <span class="nav-icon">📎</span> Attachment Uploads
+    </div>
     <a class="nav-item" href="https://www.paytech.org.za/whatsapp" target="_blank" rel="noreferrer">
       <span class="nav-icon">🛠</span> Payslip Sender Tool
     </a>
@@ -793,6 +796,33 @@
     </div>
   </div>
 
+<!-- ══════════════════════════ ATTACHMENT UPLOADS PAGE ══════════════════════════ -->
+<div class="page" id="page-attachments">
+  <div style="padding:2rem;">
+    <div class="section-header">
+      <div class="section-title">Attachment Uploads — Monthly Totals</div>
+      <div class="flex gap-2 items-center">
+        <select id="attachments-month-filter" onchange="renderAttachmentUploads()" style="padding:0.5rem 0.8rem;border:1.5px solid var(--gray-200);border-radius:7px;font-size:0.85rem;">
+          <option value="">All months</option>
+        </select>
+      </div>
+    </div>
+    <p style="font-size:0.82rem;color:var(--gray-400);margin-bottom:1rem;">
+      Count of PDF letters uploaded per client per month via the Letter Uploader — use this to work out monthly invoicing.
+    </p>
+    <div class="card">
+      <div class="card-body">
+        <table class="responsive-table">
+          <thead><tr><th>Client</th><th>Month</th><th>Description</th><th>Classification</th><th>Uploaded</th><th>Failed</th></tr></thead>
+          <tbody id="attachments-table-body">
+            <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════ LETTERS PAGE ═══════════════════════════════ -->
 <div class="page" id="page-letters">
   <div style="padding:2rem;">
@@ -811,6 +841,14 @@
       <div class="section-header" style="margin-bottom:1.2rem;">
         <div class="section-title">Upload Employee Data</div>
         <p style="font-size:0.83rem;color:var(--gray-400);margin-top:0.3rem;">Upload an Excel file (.xlsx) with one employee per row. Must include an EmployeeNumber column.</p>
+      </div>
+      <div class="card" style="padding:1rem 1.4rem;margin-bottom:1.2rem;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" style="font-weight:700;">Client <span style="color:var(--danger);">*</span></label>
+          <select class="form-input" id="ltr-client-select" style="max-width:400px;">
+            <option value="">— Select client for invoicing —</option>
+          </select>
+        </div>
       </div>
       <div class="ltr-drop-zone" id="ltr-excel-drop" onclick="document.getElementById('ltr-excel-input').click()">
         <div class="dz-icon">📊</div>
@@ -2094,11 +2132,12 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => { if (n.textContent.toLowerCase().includes(name.toLowerCase().slice(0,4))) n.classList.add('active'); });
-  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule', queries:'Client Queries', assign:'Assign Clients', payslips:'Payslip Sends', letters:'Letter Uploader' };
+  const titles = { dashboard:'Dashboard', clients:'Clients', invoices:'Invoices', quotes:'Quotes', schedule:'Monthly Schedule', queries:'Client Queries', assign:'Assign Clients', payslips:'Payslip Sends', letters:'Letter Uploader', attachments:'Attachment Uploads' };
   if (name === 'queries') loadAdminQueries();
   if (name === 'assign') loadAssignPage();
   if (name === 'payslips') loadPayslipSends();
   if (name === 'letters') ltrInit();
+  if (name === 'attachments') loadAttachmentUploads();
   document.getElementById('page-title').textContent = titles[name] || name;
   if (name === 'schedule') loadSchedule();
 }
@@ -2170,6 +2209,75 @@ function renderPayslipSends() {
       <td data-label="Reference(s)">${[...g.references].join(', ') || '—'}</td>
       <td data-label="Payslips Sent"><strong>${g.total}</strong></td>
       <td data-label="Delivered"><span class="badge badge-green">${g.delivered}</span></td>
+      <td data-label="Failed">${g.failed ? `<span class="badge badge-red">${g.failed}</span>` : '0'}</td>
+    </tr>`).join('');
+}
+
+// ── ATTACHMENT UPLOADS (invoicing) ──
+let attachmentUploadRows = [];
+
+async function loadAttachmentUploads() {
+  const tbody = document.getElementById('attachments-table-body');
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>';
+  const { data, error } = await sb
+    .from('attachment_uploads')
+    .select('client_id, description, classification, total, uploaded, failed, created_at, clients(company_name)')
+    .order('created_at', { ascending: false });
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p style="color:red;">${error.message}</p></div></td></tr>`;
+    return;
+  }
+  attachmentUploadRows = data || [];
+
+  const months = [...new Set(attachmentUploadRows.map(r => (r.created_at || '').slice(0, 7)))].sort().reverse();
+  const monthSelect = document.getElementById('attachments-month-filter');
+  const currentSelection = monthSelect.value;
+  monthSelect.innerHTML = '<option value="">All months</option>' +
+    months.map(m => `<option value="${m}">${m}</option>`).join('');
+  if (months.includes(currentSelection)) monthSelect.value = currentSelection;
+
+  renderAttachmentUploads();
+}
+
+function renderAttachmentUploads() {
+  const tbody = document.getElementById('attachments-table-body');
+  const monthFilter = document.getElementById('attachments-month-filter').value;
+
+  // Group by client + month for monthly invoicing
+  const groups = new Map();
+  for (const r of attachmentUploadRows) {
+    const month = (r.created_at || '').slice(0, 7);
+    if (monthFilter && month !== monthFilter) continue;
+    const key = `${r.client_id}|${month}|${r.description}|${r.classification}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        companyName: r.clients?.company_name || '(unknown client)',
+        month,
+        description: r.description || '—',
+        classification: r.classification || '—',
+        uploaded: 0,
+        failed: 0,
+      });
+    }
+    const g = groups.get(key);
+    g.uploaded += r.uploaded || 0;
+    g.failed   += r.failed   || 0;
+  }
+
+  const rows = [...groups.values()].sort((a, b) => b.month.localeCompare(a.month) || a.companyName.localeCompare(b.companyName));
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📎</div><p>No attachment uploads recorded yet.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(g => `
+    <tr>
+      <td data-label="Client"><strong>${g.companyName}</strong></td>
+      <td data-label="Month">${g.month}</td>
+      <td data-label="Description">${g.description}</td>
+      <td data-label="Classification">${g.classification}</td>
+      <td data-label="Uploaded"><span class="badge badge-green">${g.uploaded}</span></td>
       <td data-label="Failed">${g.failed ? `<span class="badge badge-red">${g.failed}</span>` : '0'}</td>
     </tr>`).join('');
 }
@@ -2481,7 +2589,7 @@ let ltrCurrentStep = 1;
 let ltrDetectedPlaceholders = []; // placeholder names from Word doc
 let ltrMapping = {};              // { "Annual Salary": "CTC", "Name": "First Name", ... }
 
-function ltrInit() {
+async function ltrInit() {
   // wire up drag-drop on the excel drop zone
   const dz = document.getElementById('ltr-excel-drop');
   if (dz && !dz._wired) {
@@ -2495,6 +2603,16 @@ function ltrInit() {
     });
   }
   ltrInitDocxDrop();
+
+  // Populate client dropdown for invoicing tracking
+  const clientSel = document.getElementById('ltr-client-select');
+  if (clientSel && clientSel.options.length <= 1) {
+    const { data } = await sb.from('clients').select('id, company_name').order('company_name');
+    if (data) {
+      clientSel.innerHTML = '<option value="">— Select client for invoicing —</option>' +
+        data.map(c => `<option value="${c.id}">${c.company_name}</option>`).join('');
+    }
+  }
 }
 
 function ltrGoStep(n) {
@@ -3095,6 +3213,20 @@ async function ltrUploadAll() {
   }
 
   ltrLog(`— Done: ${ok} uploaded, ${fail} failed —`, ok===total?'ok':'err');
+
+  // Save batch record for invoicing
+  const clientId = (document.getElementById('ltr-client-select')?.value || '') || null;
+  const batchDesc = document.getElementById('ltr-att-desc')?.value?.trim() || classif;
+  await sb.from('attachment_uploads').insert({
+    client_id: clientId,
+    description: batchDesc,
+    classification: classif,
+    total,
+    uploaded: ok,
+    failed: fail,
+    employee_numbers: ltrUploadResults.map(r => r.empNo),
+  });
+
   document.getElementById('ltr-res-ok').textContent    = ok;
   document.getElementById('ltr-res-err').textContent   = fail;
   document.getElementById('ltr-res-total').textContent = total;

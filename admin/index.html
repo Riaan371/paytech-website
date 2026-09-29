@@ -1235,8 +1235,29 @@
       <div class="form-group"><label>Number of Employees</label><input id="c-employees" type="number" placeholder="0" /></div>
       <div class="form-group"><label>Invoice Day (1-28)</label><input id="c-invoice-day" type="number" placeholder="1" min="1" max="28" value="1" /></div>
       <div class="form-group full" style="flex-direction:row;align-items:center;gap:0.6rem;">
-        <input type="checkbox" id="c-whatsapp-enabled" style="width:auto;" />
+        <input type="checkbox" id="c-whatsapp-enabled" onchange="renderWhatsappLoginControls()" style="width:auto;" />
         <label style="margin:0;">Enable WhatsApp Payslips for this client (shows in their portal)</label>
+      </div>
+      <div class="form-group full" id="whatsapp-login-panel" style="display:none;background:#f8fafc;border:1px solid var(--gray-200);border-radius:8px;padding:0.9rem;">
+        <div id="whatsapp-login-idle">
+          <button type="button" class="btn btn-outline" id="whatsapp-login-btn" onclick="createWhatsappLogin()" style="font-size:0.85rem;">
+            🔑 Create WhatsApp Login for this client
+          </button>
+          <p style="margin:0.4rem 0 0;font-size:0.78rem;color:#94a3b8;" id="whatsapp-login-hint">
+            Creates (or resets) a client-portal login for the Email address above, so they can log in and send payslips.
+          </p>
+        </div>
+        <div id="whatsapp-login-result" style="display:none;">
+          <p style="margin:0 0 0.5rem;font-size:0.85rem;font-weight:600;color:#166534;" id="whatsapp-login-status"></p>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;font-size:0.85rem;">
+            <span><strong>Username:</strong> <code id="whatsapp-login-email"></code></span>
+            <span><strong>Password:</strong> <code id="whatsapp-login-password"></code></span>
+          </div>
+          <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+            <button type="button" class="btn btn-outline" style="font-size:0.8rem;" onclick="copyWhatsappCreds()">📋 Copy credentials</button>
+            <a class="btn btn-outline" style="font-size:0.8rem;text-decoration:none;" id="whatsapp-login-mailto" href="#" target="_blank" rel="noopener">✉️ Email to client</a>
+          </div>
+        </div>
       </div>
       <div class="form-group full"><label>Notes</label><textarea id="c-notes" rows="2" placeholder="Any special requirements or notes..."></textarea></div>
     </div>
@@ -1601,6 +1622,7 @@ function openClientModal(id = null) {
   document.getElementById('c-invoice-day').value = '1';
   document.getElementById('c-whatsapp-enabled').checked = false;
   document.getElementById('client-modal-title').textContent = 'Add New Client';
+  renderWhatsappLoginControls();
   openModal('client-modal');
 }
 
@@ -1622,7 +1644,86 @@ function editClient(id) {
   document.getElementById('c-whatsapp-enabled').checked = Boolean(c.whatsapp_payslip_enabled);
   document.getElementById('c-notes').value    = c.notes || '';
   document.getElementById('client-modal-title').textContent = 'Edit Client';
+  renderWhatsappLoginControls();
   openModal('client-modal');
+}
+
+// ── WHATSAPP CLIENT LOGIN (Supabase Edge Function, service-role — never in the browser) ──
+function renderWhatsappLoginControls() {
+  const panel = document.getElementById('whatsapp-login-panel');
+  const enabled = document.getElementById('c-whatsapp-enabled').checked;
+  const hasId = Boolean(document.getElementById('client-id').value);
+  panel.style.display = enabled ? '' : 'none';
+  document.getElementById('whatsapp-login-result').style.display = 'none';
+  document.getElementById('whatsapp-login-idle').style.display = '';
+  const btn = document.getElementById('whatsapp-login-btn');
+  const hint = document.getElementById('whatsapp-login-hint');
+  if (!hasId) {
+    btn.disabled = true;
+    hint.textContent = 'Save this client first, then reopen Edit to create their WhatsApp login.';
+  } else {
+    btn.disabled = false;
+    hint.textContent = 'Creates (or resets) a client-portal login for the Email address above, so they can log in and send payslips.';
+  }
+}
+
+async function createWhatsappLogin() {
+  const btn = document.getElementById('whatsapp-login-btn');
+  const email = document.getElementById('c-email').value.trim();
+  const companyName = document.getElementById('c-company').value.trim();
+  if (!email) return toast('Enter the client email first', 'error');
+  if (!confirm(`Create (or reset) a WhatsApp Payslips login for ${email}?\n\nThis generates a new password immediately — do this only when you're ready to send it to the client.`)) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/create-client-user`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+        apikey: SUPABASE_KEY,
+      },
+      body: JSON.stringify({ email, companyName }),
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Could not create the login.');
+
+    document.getElementById('whatsapp-login-idle').style.display = 'none';
+    const resultBox = document.getElementById('whatsapp-login-result');
+    resultBox.style.display = '';
+    document.getElementById('whatsapp-login-status').textContent = result.isNewUser
+      ? '✅ Login created.'
+      : '✅ Existing login found — password reset.';
+    document.getElementById('whatsapp-login-email').textContent = result.email;
+    document.getElementById('whatsapp-login-password').textContent = result.password;
+    window.__whatsappCreds = { email: result.email, password: result.password, companyName };
+
+    const portalUrl = 'https://www.paytech.org.za/portal';
+    const subject = encodeURIComponent(`Your Paytech WhatsApp Payslips login — ${companyName}`);
+    const body = encodeURIComponent(
+      `Hi,\n\nHere are your login details for the Paytech client portal (WhatsApp Payslips):\n\n` +
+      `Portal: ${portalUrl}\nUsername: ${result.email}\nPassword: ${result.password}\n\n` +
+      `Please log in and change your password once you're in.\n\nRegards,\nPaytech Consulting Solutions`
+    );
+    document.getElementById('whatsapp-login-mailto').href = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+
+    toast('WhatsApp login ready', 'success');
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔑 Create WhatsApp Login for this client';
+  }
+}
+
+async function copyWhatsappCreds() {
+  const c = window.__whatsappCreds;
+  if (!c) return;
+  const text = `Portal: https://www.paytech.org.za/portal\nUsername: ${c.email}\nPassword: ${c.password}`;
+  await navigator.clipboard.writeText(text);
+  toast('Credentials copied', 'success');
 }
 
 async function saveClient() {

@@ -819,12 +819,12 @@
         </div>
       </div>
       <p style="font-size:0.82rem;color:var(--gray-400);margin-bottom:1rem;">
-        Payslips per client per month via the WhatsApp Payslip Sender. <strong>Billable</strong> = Delivered + Pending (went to WhatsApp and did not fail); Failed includes numbers excluded or rejected before sending. Pending updates automatically within minutes — invoice from Billable once Pending reaches 0.
+        Payslips per client per month via the WhatsApp Payslip Sender. <strong>Billable</strong> = Delivered + Pending (went to WhatsApp and did not fail); Failed = WhatsApp/Twilio errors or rejected sends. Not sent = payslips the user deselected or that had no valid cell number (never sent, not billable). Pending updates automatically within minutes — invoice from Billable once Pending reaches 0.
       </p>
       <div class="card">
         <div class="card-body">
           <table class="responsive-table">
-            <thead><tr><th>Client</th><th>Month</th><th>Reference(s)</th><th>Payslips Sent</th><th>Delivered</th><th>Pending</th><th>Failed</th><th>Billable</th></tr></thead>
+            <thead><tr><th>Client</th><th>Month</th><th>Reference(s)</th><th>Payslips Sent</th><th>Delivered</th><th>Pending</th><th>Failed</th><th>Not sent</th><th>Billable</th></tr></thead>
             <tbody id="payslips-table-body">
               <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:3rem;">Loading...</td></tr>
             </tbody>
@@ -2324,6 +2324,7 @@ function renderPayslipSends() {
         total: 0,
         delivered: 0,
         pending: 0,
+        notSent: 0,
         failed: 0,
         references: new Set(),
       });
@@ -2332,8 +2333,11 @@ function renderPayslipSends() {
     g.total += 1;
     if (r.batch_reference) g.references.add(r.batch_reference);
     const isDelivered = r.delivery_status === 'delivered' || r.delivery_status === 'read';
-    const isFailed = r.delivery_status === 'failed' || r.delivery_status === 'undelivered' || r.send_status === 'rejected' || r.send_status === 'excluded';
+    // 'excluded' = never sent on purpose (deselected, or no valid cell number) — not a failure.
+    const isNotSent = r.send_status === 'excluded';
+    const isFailed = r.delivery_status === 'failed' || r.delivery_status === 'undelivered' || r.send_status === 'rejected';
     if (isDelivered) g.delivered += 1;
+    else if (isNotSent) g.notSent += 1;
     else if (isFailed) g.failed += 1;
     else g.pending += 1; // handed to WhatsApp but no final status yet (sent / queued / not yet checked)
   }
@@ -2357,6 +2361,7 @@ function renderPayslipSends() {
       <td data-label="Delivered"><span class="badge badge-green">${g.delivered}</span></td>
       <td data-label="Pending">${g.pending ? `<span class="badge">${g.pending}</span>` : '0'}</td>
       <td data-label="Failed">${g.failed ? `<span class="badge badge-red">${g.failed}</span>` : '0'}</td>
+      <td data-label="Not sent">${g.notSent ? `<span title="Deselected or no valid cell number — never sent, not billable">${g.notSent}</span>` : '0'}</td>
       <td data-label="Billable"><strong>${g.billable}</strong></td>
     </tr>`).join('');
 }

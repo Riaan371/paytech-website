@@ -728,13 +728,8 @@
             <span id="xero-status" style="font-size:0.85rem;color:#94a3b8;margin-left:0.5rem;">Checking…</span>
           </div>
           <div class="flex gap-2 items-center" style="flex-wrap:wrap;">
-            <span id="xero-defaults" style="display:none;gap:0.4rem;align-items:center;flex-wrap:wrap;">
-              <select id="xero-account" style="padding:0.4rem;border:1.5px solid var(--gray-200);border-radius:7px;font-size:0.8rem;"></select>
-              <select id="xero-tax" style="padding:0.4rem;border:1.5px solid var(--gray-200);border-radius:7px;font-size:0.8rem;"></select>
-              <button class="btn btn-outline btn-sm" onclick="saveXeroDefaults()">Save</button>
-            </span>
-            <button class="btn btn-outline btn-sm" id="xero-defaults-btn" style="display:none;" onclick="loadXeroSettings()">⚙ Sales account &amp; VAT</button>
-            <button class="btn btn-primary btn-sm" id="xero-connect-btn" onclick="connectXero()">🔗 Connect to Xero</button>
+            <button class="btn btn-primary btn-sm" id="xero-sync-btn" style="display:none;" onclick="syncFromXero()">↻ Sync from Xero</button>
+            <button class="btn btn-outline btn-sm" id="xero-connect-btn" onclick="connectXero()">🔗 Connect to Xero</button>
           </div>
         </div>
       </div>
@@ -1276,6 +1271,7 @@
           </div>
         </div>
       </div>
+      <div class="form-group full"><label>Xero contact name <span style="font-weight:400;color:#94a3b8;">(only if it differs from the company name)</span></label><input id="c-xero-name" placeholder="Exactly as it appears in Xero" /></div>
       <div class="form-group full"><label>Notes</label><textarea id="c-notes" rows="2" placeholder="Any special requirements or notes..."></textarea></div>
     </div>
     <div class="modal-footer">
@@ -1633,7 +1629,7 @@ function switchClientTab(tab) {
 }
 
 function openClientModal(id = null) {
-  ['client-id','c-company','c-contact','c-email','c-phone','c-vat','c-reg','c-address','c-notes'].forEach(f => document.getElementById(f).value = '');
+  ['client-id','c-company','c-contact','c-email','c-phone','c-vat','c-reg','c-address','c-notes','c-xero-name'].forEach(f => document.getElementById(f).value = '');
   document.getElementById('c-fee').value = '';
   document.getElementById('c-employees').value = '';
   document.getElementById('c-invoice-day').value = '1';
@@ -1660,6 +1656,7 @@ function editClient(id) {
   document.getElementById('c-invoice-day').value = c.invoice_day || '1';
   document.getElementById('c-whatsapp-enabled').checked = Boolean(c.whatsapp_payslip_enabled);
   document.getElementById('c-notes').value    = c.notes || '';
+  document.getElementById('c-xero-name').value = c.xero_contact_name || '';
   document.getElementById('client-modal-title').textContent = 'Edit Client';
   renderWhatsappLoginControls();
   openModal('client-modal');
@@ -1760,6 +1757,8 @@ async function saveClient() {
     whatsapp_payslip_enabled: document.getElementById('c-whatsapp-enabled').checked,
     notes:          document.getElementById('c-notes').value,
   };
+  const xeroName = document.getElementById('c-xero-name').value.trim();
+  if (xeroName || document.getElementById('client-id').value) payload.xero_contact_name = xeroName || null;
   if (!payload.company_name) return toast('Company name is required', 'error');
   let err;
   if (id) {
@@ -1803,7 +1802,7 @@ async function permanentDeleteClient(id) {
 // ═══════════════════════════════════════════
 // INVOICES
 // ═══════════════════════════════════════════
-// ── XERO (all calls go through the admin-only xero-api edge function) ──
+// ── XERO → PAYTECH (invoices are created in Xero and pulled in by the admin-only xero-api function) ──
 async function xeroCall(action, body = {}) {
   const { data: { session } } = await sb.auth.getSession();
   const res = await fetch(`${SUPABASE_URL}/functions/v1/xero-api`, {
@@ -1816,28 +1815,20 @@ async function xeroCall(action, body = {}) {
   return json;
 }
 
-let xeroState = { connected: false, defaultAccountCode: null, defaultTaxType: null };
+let xeroAutoSynced = false;
 
 async function loadXeroStatus() {
   const label = document.getElementById('xero-status');
-  try {
-    xeroState = await xeroCall('status');
-  } catch (err) {
-    label.textContent = 'Xero unavailable: ' + err.message;
-    return;
-  }
-  const btn = document.getElementById('xero-connect-btn');
-  document.getElementById('xero-defaults-btn').style.display = xeroState.connected ? '' : 'none';
-  if (!xeroState.connected) {
-    label.textContent = 'Not connected';
-    btn.textContent = '🔗 Connect to Xero';
-    return;
-  }
-  btn.textContent = '↻ Reconnect';
-  const ready = xeroState.defaultAccountCode && xeroState.defaultTaxType;
-  label.innerHTML = `Connected to <strong>${xeroState.tenantName || 'Xero'}</strong> — ` +
-    (ready ? `sales account ${xeroState.defaultAccountCode}, VAT ${xeroState.defaultTaxType}` : '<span style="color:#dc2626;">choose the sales account &amp; VAT type before pushing invoices</span>');
-  if (!ready) loadXeroSettings();
+  let st;
+  try { st = await xeroCall('status'); }
+  catch (err) { label.textContent = 'Xero unavailable: ' + err.message; return; }
+  document.getElementById('xero-sync-btn').style.display = st.connected ? '' : 'none';
+  document.getElementById('xero-connect-btn').textContent = st.connected ? '↻ Reconnect' : '🔗 Connect to Xero';
+  if (!st.connected) { label.textContent = 'Not connected'; return; }
+  label.innerHTML = `Connected to <strong>${st.tenantName || 'Xero'}</strong> — ` +
+    (st.lastSyncedAt ? 'last synced ' + new Date(st.lastSyncedAt).toLocaleString('en-ZA') : 'not synced yet');
+  // Pull new invoices once each time the page is opened, so the list is current.
+  if (!xeroAutoSynced) { xeroAutoSynced = true; syncFromXero(true); }
 }
 
 async function connectXero() {
@@ -1847,42 +1838,30 @@ async function connectXero() {
   } catch (err) { toast(err.message, 'error'); }
 }
 
-async function loadXeroSettings() {
+async function syncFromXero(silent = false) {
+  const btn = document.getElementById('xero-sync-btn');
+  btn.disabled = true; btn.textContent = 'Syncing…';
   try {
-    const s = await xeroCall('settings');
-    const acc = document.getElementById('xero-account');
-    const tax = document.getElementById('xero-tax');
-    acc.innerHTML = s.accounts.map(a => `<option value="${a.code}">${a.code} — ${a.name}</option>`).join('');
-    tax.innerHTML = s.taxRates.map(t => `<option value="${t.taxType}">${t.name}${t.rate != null ? ` (${t.rate}%)` : ''}</option>`).join('');
-    if (xeroState.defaultAccountCode) acc.value = xeroState.defaultAccountCode;
-    if (xeroState.defaultTaxType) tax.value = xeroState.defaultTaxType;
-    document.getElementById('xero-defaults').style.display = 'inline-flex';
-  } catch (err) { toast(err.message, 'error'); }
-}
-
-async function saveXeroDefaults() {
-  try {
-    await xeroCall('save-defaults', {
-      accountCode: document.getElementById('xero-account').value,
-      taxType: document.getElementById('xero-tax').value,
-    });
-    document.getElementById('xero-defaults').style.display = 'none';
-    toast('Xero settings saved', 'success');
-    await loadXeroStatus();
-  } catch (err) { toast(err.message, 'error'); }
-}
-
-async function pushInvoiceToXero(id) {
-  const inv = invoices.find(i => i.id === id);
-  if (!inv) return;
-  if (!confirm(`Send invoice ${inv.invoice_number} to Xero as APPROVED?\n\nApproved invoices can't be edited in Xero afterwards (only voided or credited), and it can only be sent once.`)) return;
-  try {
-    const r = await xeroCall('push-invoice', { invoiceId: id });
-    toast(r.alreadySynced ? 'Already in Xero' : 'Invoice sent to Xero', 'success');
+    const r = await xeroCall('sync-invoices');
+    if (r.skipped && r.skipped.length) {
+      const names = r.skipped.map(s => `${s.name} (${s.count})`).join(', ');
+      toast(`Skipped invoices with no matching client: ${names}. Add that name under the client's "Xero contact name".`, 'error');
+    }
+    if (r.imported || r.updated) toast(`Xero sync: ${r.imported} new, ${r.updated} updated`, 'success');
+    else if (!silent) toast('Already up to date', 'success');
+    if (r.imported || r.updated) {
+      const { data } = await sb.from('invoices').select('*, clients(company_name, email, address, vat_number)').order('created_at', { ascending: false });
+      invoices = data || [];
+      renderInvoicesTable();
+      document.getElementById('badge-invoices').textContent = invoices.filter(i => i.status === 'Sent' || i.status === 'Overdue').length;
+    }
+    loadXeroStatus();
   } catch (err) {
-    toast(err.message, 'error');
+    if (!silent) toast(err.message, 'error');
+    document.getElementById('xero-status').textContent = 'Sync failed: ' + err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = '↻ Sync from Xero';
   }
-  await loadInvoices();
 }
 
 // Back from Xero's approval screen (the xero-oauth function redirects here).
@@ -1923,10 +1902,9 @@ function renderInvoicesTable(filter = '') {
           <button class="btn btn-outline btn-sm" onclick="viewInvoice('${i.id}')">👁</button>
           <button class="btn btn-primary btn-sm" onclick="emailInvoice('${i.id}')">📧</button>
           ${i.xero_invoice_id
-            ? `<span class="badge badge-green" title="In Xero (approved)">✓ Xero</span>`
-            : `<button class="btn btn-outline btn-sm" ${i.xero_error ? `title="${String(i.xero_error).replace(/"/g, '&quot;')}" style="border-color:#dc2626;color:#dc2626;"` : ''} onclick="pushInvoiceToXero('${i.id}')">📤 Xero</button>`}
-          <button class="btn btn-outline btn-sm" onclick="markPaid('${i.id}')">✓ Paid</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${i.id}')">🗑</button>
+            ? '<span class="badge badge-gray" title="Synced from Xero — change it in Xero">Xero</span>'
+            : `<button class="btn btn-outline btn-sm" onclick="markPaid('${i.id}')">✓ Paid</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${i.id}')">🗑</button>`}
         </div>
       </td>
     </tr>`).join('');

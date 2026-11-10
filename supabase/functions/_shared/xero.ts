@@ -22,8 +22,9 @@ export function serviceClient() {
   })
 }
 
-// Granular scopes only — apps created after March 2026 can't use the old broad ones.
-export const XERO_SCOPES = 'offline_access accounting.invoices accounting.contacts accounting.settings.read'
+// Granular, read-only scopes (apps created after March 2026 can't use the old broad ones) —
+// invoices only ever flow Xero -> Paytech, so nothing here can write to Xero.
+export const XERO_SCOPES = 'offline_access accounting.invoices.read accounting.contacts.read'
 
 export function redirectUri() {
   return `${Deno.env.get('SUPABASE_URL')}/functions/v1/xero-oauth`

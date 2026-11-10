@@ -721,6 +721,23 @@
           <button class="btn btn-primary" onclick="openInvoiceModal()">➕ New Invoice</button>
         </div>
       </div>
+      <div class="card" id="xero-panel" style="margin-bottom:1rem;">
+        <div class="card-body" style="display:flex;flex-wrap:wrap;gap:0.8rem;align-items:center;justify-content:space-between;">
+          <div>
+            <strong>Xero</strong>
+            <span id="xero-status" style="font-size:0.85rem;color:#94a3b8;margin-left:0.5rem;">Checking…</span>
+          </div>
+          <div class="flex gap-2 items-center" style="flex-wrap:wrap;">
+            <span id="xero-defaults" style="display:none;gap:0.4rem;align-items:center;flex-wrap:wrap;">
+              <select id="xero-account" style="padding:0.4rem;border:1.5px solid var(--gray-200);border-radius:7px;font-size:0.8rem;"></select>
+              <select id="xero-tax" style="padding:0.4rem;border:1.5px solid var(--gray-200);border-radius:7px;font-size:0.8rem;"></select>
+              <button class="btn btn-outline btn-sm" onclick="saveXeroDefaults()">Save</button>
+            </span>
+            <button class="btn btn-outline btn-sm" id="xero-defaults-btn" style="display:none;" onclick="loadXeroSettings()">⚙ Sales account &amp; VAT</button>
+            <button class="btn btn-primary btn-sm" id="xero-connect-btn" onclick="connectXero()">🔗 Connect to Xero</button>
+          </div>
+        </div>
+      </div>
       <div class="card">
         <div class="card-body">
           <table class="responsive-table">
@@ -1786,10 +1803,102 @@ async function permanentDeleteClient(id) {
 // ═══════════════════════════════════════════
 // INVOICES
 // ═══════════════════════════════════════════
+// ── XERO (all calls go through the admin-only xero-api edge function) ──
+async function xeroCall(action, body = {}) {
+  const { data: { session } } = await sb.auth.getSession();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/xero-api`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}`, apikey: SUPABASE_KEY },
+    body: JSON.stringify({ action, ...body }),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json.error || `Xero request failed (${res.status})`);
+  return json;
+}
+
+let xeroState = { connected: false, defaultAccountCode: null, defaultTaxType: null };
+
+async function loadXeroStatus() {
+  const label = document.getElementById('xero-status');
+  try {
+    xeroState = await xeroCall('status');
+  } catch (err) {
+    label.textContent = 'Xero unavailable: ' + err.message;
+    return;
+  }
+  const btn = document.getElementById('xero-connect-btn');
+  document.getElementById('xero-defaults-btn').style.display = xeroState.connected ? '' : 'none';
+  if (!xeroState.connected) {
+    label.textContent = 'Not connected';
+    btn.textContent = '🔗 Connect to Xero';
+    return;
+  }
+  btn.textContent = '↻ Reconnect';
+  const ready = xeroState.defaultAccountCode && xeroState.defaultTaxType;
+  label.innerHTML = `Connected to <strong>${xeroState.tenantName || 'Xero'}</strong> — ` +
+    (ready ? `sales account ${xeroState.defaultAccountCode}, VAT ${xeroState.defaultTaxType}` : '<span style="color:#dc2626;">choose the sales account &amp; VAT type before pushing invoices</span>');
+  if (!ready) loadXeroSettings();
+}
+
+async function connectXero() {
+  try {
+    const { url } = await xeroCall('authorize-url');
+    window.location.href = url;
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function loadXeroSettings() {
+  try {
+    const s = await xeroCall('settings');
+    const acc = document.getElementById('xero-account');
+    const tax = document.getElementById('xero-tax');
+    acc.innerHTML = s.accounts.map(a => `<option value="${a.code}">${a.code} — ${a.name}</option>`).join('');
+    tax.innerHTML = s.taxRates.map(t => `<option value="${t.taxType}">${t.name}${t.rate != null ? ` (${t.rate}%)` : ''}</option>`).join('');
+    if (xeroState.defaultAccountCode) acc.value = xeroState.defaultAccountCode;
+    if (xeroState.defaultTaxType) tax.value = xeroState.defaultTaxType;
+    document.getElementById('xero-defaults').style.display = 'inline-flex';
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function saveXeroDefaults() {
+  try {
+    await xeroCall('save-defaults', {
+      accountCode: document.getElementById('xero-account').value,
+      taxType: document.getElementById('xero-tax').value,
+    });
+    document.getElementById('xero-defaults').style.display = 'none';
+    toast('Xero settings saved', 'success');
+    await loadXeroStatus();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function pushInvoiceToXero(id) {
+  const inv = invoices.find(i => i.id === id);
+  if (!inv) return;
+  if (!confirm(`Send invoice ${inv.invoice_number} to Xero as APPROVED?\n\nApproved invoices can't be edited in Xero afterwards (only voided or credited), and it can only be sent once.`)) return;
+  try {
+    const r = await xeroCall('push-invoice', { invoiceId: id });
+    toast(r.alreadySynced ? 'Already in Xero' : 'Invoice sent to Xero', 'success');
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+  await loadInvoices();
+}
+
+// Back from Xero's approval screen (the xero-oauth function redirects here).
+(function handleXeroReturn() {
+  const q = new URLSearchParams(window.location.search);
+  const result = q.get('xero');
+  if (!result) return;
+  window.history.replaceState({}, '', window.location.pathname);
+  setTimeout(() => toast(result === 'connected' ? 'Xero connected ✓' : 'Xero connection failed: ' + (q.get('msg') || 'unknown error'), result === 'connected' ? 'success' : 'error'), 1200);
+})();
+
 async function loadInvoices() {
   const { data } = await sb.from('invoices').select('*, clients(company_name, email, address, vat_number)').order('created_at', { ascending: false });
   invoices = data || [];
   renderInvoicesTable();
+  loadXeroStatus();
   const pending = invoices.filter(i => i.status === 'Sent' || i.status === 'Overdue').length;
   document.getElementById('badge-invoices').textContent = pending;
 }
@@ -1813,6 +1922,9 @@ function renderInvoicesTable(filter = '') {
         <div class="flex gap-2">
           <button class="btn btn-outline btn-sm" onclick="viewInvoice('${i.id}')">👁</button>
           <button class="btn btn-primary btn-sm" onclick="emailInvoice('${i.id}')">📧</button>
+          ${i.xero_invoice_id
+            ? `<span class="badge badge-green" title="In Xero (approved)">✓ Xero</span>`
+            : `<button class="btn btn-outline btn-sm" ${i.xero_error ? `title="${String(i.xero_error).replace(/"/g, '&quot;')}" style="border-color:#dc2626;color:#dc2626;"` : ''} onclick="pushInvoiceToXero('${i.id}')">📤 Xero</button>`}
           <button class="btn btn-outline btn-sm" onclick="markPaid('${i.id}')">✓ Paid</button>
           <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${i.id}')">🗑</button>
         </div>

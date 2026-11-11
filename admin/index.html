@@ -1905,7 +1905,7 @@ function renderInvoicesTable(filter = '') {
       <td data-label="Client">${i.clients?.company_name||'Unknown'}</td>
       <td data-label="Amount"><strong>R ${Number(i.total||0).toFixed(2)}</strong></td>
       <td data-label="Period">${i.period||'-'}</td>
-      <td data-label="Status"><span class="badge ${statusBadge(i.status)}">${i.status}</span></td>
+      <td data-label="Status"><span class="badge ${statusBadge(effStatus(i))}">${effStatus(i)}</span></td>
       <td data-label="Due Date">${i.due_date ? new Date(i.due_date).toLocaleDateString('en-ZA') : '-'}</td>
       <td data-label="Actions">
         <div class="flex gap-2">
@@ -2285,7 +2285,7 @@ function updateDashboard() {
     <tr>
       <td>${i.clients?.company_name||'?'}</td>
       <td>R ${Number(i.total||0).toFixed(2)}</td>
-      <td><span class="badge ${statusBadge(i.status)}">${i.status}</span></td>
+      <td><span class="badge ${statusBadge(effStatus(i))}">${effStatus(i)}</span></td>
       <td>${i.invoice_date ? new Date(i.invoice_date).toLocaleDateString('en-ZA') : '-'}</td>
     </tr>`).join('') : `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:2rem;">No invoices yet</td></tr>`;
 }
@@ -2656,6 +2656,11 @@ async function submitPasswordChange() {
   setTimeout(() => { window.location.href = '../login/'; }, 1200);
 }
 
+// A "Sent" invoice whose due date has passed is Overdue. Worked out when shown, because Xero only
+// tells us about an invoice when it changes — an invoice quietly becoming overdue isn't a change.
+function effStatus(i) {
+  return i.status === 'Sent' && i.due_date && i.due_date < new Date().toISOString().slice(0, 10) ? 'Overdue' : i.status;
+}
 function statusBadge(s) {
   return { 'Paid':'badge-green','Draft':'badge-gray','Sent':'badge-blue','Overdue':'badge-red','Accepted':'badge-green','Declined':'badge-red' }[s] || 'badge-gray';
 }

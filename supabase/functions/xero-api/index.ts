@@ -13,7 +13,16 @@ import {
 // client portal both read the `invoices` table). Admin-only: every call re-verifies the caller's
 // own session is a Paytech admin — the role is never taken from the request body.
 
-const norm = (s: string | null | undefined) => (s ?? '').toLowerCase().replace(/\s+/g, ' ').trim()
+// Company names rarely match character for character ("Swordfish Software (Pty) Ltd" vs
+// "Swordfish Software Pty Ltd"), so compare with punctuation and legal suffixes stripped.
+const norm = (s: string | null | undefined) =>
+  (s ?? '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\b(pty|ltd|limited|proprietary|cc|inc|the)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 
 type XeroLine = { Description?: string; Quantity?: number; UnitAmount?: number; LineAmount?: number; TaxAmount?: number }
 type XeroInvoice = {
@@ -188,7 +197,12 @@ serve(async (req) => {
         if (list.length < 100) break
       }
 
-      await admin.from('xero_connection').update({ invoices_synced_at: syncStartedAt }).eq('id', 1)
+      // Only move the "since" marker forward when nothing was skipped. An invoice skipped for having
+      // no matching client hasn't changed in Xero, so once the client is added it would never be
+      // fetched again if we had already moved past it.
+      if (skipped.size === 0) {
+        await admin.from('xero_connection').update({ invoices_synced_at: syncStartedAt }).eq('id', 1)
+      }
       return json({
         imported,
         updated,

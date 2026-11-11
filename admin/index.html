@@ -729,6 +729,7 @@
           <div>
             <strong>Xero</strong>
             <span id="xero-status" style="font-size:0.85rem;color:#94a3b8;margin-left:0.5rem;">Checking…</span>
+            <div id="xero-skipped" style="display:none;margin-top:0.4rem;font-size:0.8rem;color:#b45309;"></div>
           </div>
           <div class="flex gap-2 items-center" style="flex-wrap:wrap;">
             <button class="btn btn-primary btn-sm" id="xero-sync-btn" style="display:none;" onclick="syncFromXero()">↻ Sync from Xero</button>
@@ -1852,9 +1853,14 @@ async function syncFromXero(silent = false) {
   btn.disabled = true; btn.textContent = 'Syncing…';
   try {
     const r = await xeroCall('sync-invoices');
+    const skippedBox = document.getElementById('xero-skipped');
     if (r.skipped && r.skipped.length) {
       const names = r.skipped.map(s => `${s.name} (${s.count})`).join(', ');
-      toast(`Skipped invoices with no matching client: ${names}. Add that name under the client's "Xero contact name".`, 'error');
+      // Stays on screen (a toast vanishes) until the clients exist / are matched.
+      skippedBox.style.display = '';
+      skippedBox.textContent = `⚠ Not imported — no matching client: ${names}. Add the client, or put the exact Xero name in the client's "Xero contact name", then sync again.`;
+    } else {
+      skippedBox.style.display = 'none';
     }
     if (r.imported || r.updated) toast(`Xero sync: ${r.imported} new, ${r.updated} updated`, 'success');
     else if (!silent) toast('Already up to date', 'success');

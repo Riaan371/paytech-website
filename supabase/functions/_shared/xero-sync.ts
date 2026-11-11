@@ -86,8 +86,9 @@ export async function syncContacts(
     contacts.push(...list)
     if (list.length < 100) break
   }
-  // Customers and not-yet-flagged contacts; pure suppliers aren't clients.
-  const wanted = contacts.filter((c) => c.IsCustomer === true || c.IsSupplier !== true)
+  // Same as Xero's own "Customers" list: only contacts that have been billed (IsCustomer).
+  // This keeps out suppliers and placeholders such as "Bank Transaction".
+  const wanted = contacts.filter((c) => c.IsCustomer === true)
 
   const { data: existing } = await admin
     .from('clients')

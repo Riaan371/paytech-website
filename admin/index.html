@@ -623,6 +623,9 @@
   <!-- ── DASHBOARD ── -->
   <div class="page active" id="page-dashboard">
     <div style="padding:2rem;">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+        <button class="btn btn-outline btn-sm" id="dash-refresh-btn" onclick="refreshDashboard()">↻ Refresh</button>
+      </div>
       <div class="stats-grid">
         <div class="stat-card green">
           <div class="stat-label">Total Clients</div>
@@ -1545,6 +1548,12 @@ async function loadAll() {
   loadSchedule();
 }
 
+async function refreshDashboard() {
+  const btn = document.getElementById('dash-refresh-btn');
+  btn.disabled = true; btn.textContent = 'Refreshing…';
+  try { await loadAll(); } finally { btn.disabled = false; btn.textContent = '↻ Refresh'; }
+}
+
 // ═══════════════════════════════════════════
 // CLIENTS
 // ═══════════════════════════════════════════
@@ -1854,6 +1863,7 @@ async function syncFromXero(silent = false) {
       invoices = data || [];
       renderInvoicesTable();
       document.getElementById('badge-invoices').textContent = invoices.filter(i => i.status === 'Sent' || i.status === 'Overdue').length;
+      updateDashboard(); // the page-load sync finishes after the dashboard first drew, so redraw it
     }
     loadXeroStatus();
   } catch (err) {

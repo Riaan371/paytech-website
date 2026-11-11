@@ -664,7 +664,6 @@
         <div class="card">
           <div class="card-header"><div class="card-title">Quick Actions</div></div>
           <div style="padding:1.4rem;display:flex;flex-direction:column;gap:0.7rem;">
-            <button class="btn btn-primary" style="justify-content:center;" onclick="openClientModal()">➕ New Client</button>
             <button class="btn btn-navy" style="justify-content:center;" onclick="openInvoiceModal()">🧾 Create Invoice</button>
             <button class="btn btn-outline" style="justify-content:center;" onclick="openQuoteModal()">📄 Create Quote</button>
             <button class="btn btn-outline" style="justify-content:center;" onclick="showPage('schedule')">📅 View Schedule</button>
@@ -681,7 +680,6 @@
         <div class="section-title">Clients</div>
         <div class="flex gap-2 items-center">
           <input type="text" class="search-input" id="client-search" placeholder="🔍 Search clients..." oninput="filterClients()" />
-          <button class="btn btn-primary" onclick="openClientModal()">➕ Add Client</button>
         </div>
       </div>
       <!-- Tabs -->
@@ -1275,7 +1273,7 @@
           </div>
         </div>
       </div>
-      <div class="form-group full"><label>Xero contact name <span style="font-weight:400;color:#94a3b8;">(only if it differs from the company name)</span></label><input id="c-xero-name" placeholder="Exactly as it appears in Xero" /></div>
+      <div class="form-group full" id="c-xero-note" style="display:none;font-size:0.8rem;color:#64748b;">🔗 Company details (name, contact, email, phone, VAT, address) are managed in Xero and refresh automatically every morning. Change them in Xero, not here.</div>
       <div class="form-group full"><label>Notes</label><textarea id="c-notes" rows="2" placeholder="Any special requirements or notes..."></textarea></div>
     </div>
     <div class="modal-footer">
@@ -1639,7 +1637,8 @@ function switchClientTab(tab) {
 }
 
 function openClientModal(id = null) {
-  ['client-id','c-company','c-contact','c-email','c-phone','c-vat','c-reg','c-address','c-notes','c-xero-name'].forEach(f => document.getElementById(f).value = '');
+  ['client-id','c-company','c-contact','c-email','c-phone','c-vat','c-reg','c-address','c-notes'].forEach(f => document.getElementById(f).value = '');
+  setXeroLocked(false);
   document.getElementById('c-fee').value = '';
   document.getElementById('c-employees').value = '';
   document.getElementById('c-invoice-day').value = '1';
@@ -1647,6 +1646,17 @@ function openClientModal(id = null) {
   document.getElementById('client-modal-title').textContent = 'Add New Client';
   renderWhatsappLoginControls();
   openModal('client-modal');
+}
+
+// Clients linked to Xero get their company details from Xero, so those fields can't be edited here
+// (an edit would just be overwritten at the next morning sync).
+function setXeroLocked(locked) {
+  ['c-company','c-contact','c-email','c-phone','c-vat','c-address'].forEach(f => {
+    const el = document.getElementById(f);
+    el.readOnly = locked;
+    el.style.background = locked ? '#f1f5f9' : '';
+  });
+  document.getElementById('c-xero-note').style.display = locked ? '' : 'none';
 }
 
 function editClient(id) {
@@ -1666,7 +1676,7 @@ function editClient(id) {
   document.getElementById('c-invoice-day').value = c.invoice_day || '1';
   document.getElementById('c-whatsapp-enabled').checked = Boolean(c.whatsapp_payslip_enabled);
   document.getElementById('c-notes').value    = c.notes || '';
-  document.getElementById('c-xero-name').value = c.xero_contact_name || '';
+  setXeroLocked(Boolean(c.xero_contact_id));
   document.getElementById('client-modal-title').textContent = 'Edit Client';
   renderWhatsappLoginControls();
   openModal('client-modal');
@@ -1767,8 +1777,6 @@ async function saveClient() {
     whatsapp_payslip_enabled: document.getElementById('c-whatsapp-enabled').checked,
     notes:          document.getElementById('c-notes').value,
   };
-  const xeroName = document.getElementById('c-xero-name').value.trim();
-  if (xeroName || document.getElementById('client-id').value) payload.xero_contact_name = xeroName || null;
   if (!payload.company_name) return toast('Company name is required', 'error');
   let err;
   if (id) {
@@ -1826,12 +1834,14 @@ async function xeroCall(action, body = {}) {
 }
 
 let xeroAutoSynced = false;
+let xeroClientsApproved = false; // set once the first, reviewed client sync has been confirmed
 
 async function loadXeroStatus() {
   const label = document.getElementById('xero-status');
   let st;
   try { st = await xeroCall('status'); }
   catch (err) { label.textContent = 'Xero unavailable: ' + err.message; return; }
+  xeroClientsApproved = Boolean(st.clientsSyncedAt);
   document.getElementById('xero-sync-btn').style.display = st.connected ? '' : 'none';
   document.getElementById('xero-connect-btn').textContent = st.connected ? '↻ Reconnect' : '🔗 Connect to Xero';
   if (!st.connected) { label.textContent = 'Not connected'; return; }
@@ -1852,13 +1862,34 @@ async function syncFromXero(silent = false) {
   const btn = document.getElementById('xero-sync-btn');
   btn.disabled = true; btn.textContent = 'Syncing…';
   try {
+    // 1) Clients first, so new customers exist before their invoices arrive. The very first run is
+    //    previewed and needs a click to confirm; the silent page-load sync never does it.
+    let clientsChanged = false;
+    if (!xeroClientsApproved && !silent) {
+      const prev = await xeroCall('sync-clients', { dryRun: true });
+      const sample = (a) => a.slice(0, 8).join(', ') + (a.length > 8 ? ` … +${a.length - 8} more` : '');
+      const msg = `First Xero client sync — Xero has ${prev.total} customers.\n\n` +
+        `• ${prev.linked.length} existing Paytech clients will be linked${prev.linked.length ? ': ' + sample(prev.linked) : ''}\n` +
+        `• ${prev.created.length} new clients will be created${prev.created.length ? ': ' + sample(prev.created) : ''}\n` +
+        `• ${prev.archived.length} will be archived (archived in Xero)\n\n` +
+        `Nothing is deleted, and fees/service types/WhatsApp settings are kept. Continue?`;
+      if (!confirm(msg)) { toast('Client sync cancelled', 'error'); return; }
+    }
+    if (xeroClientsApproved || !silent) {
+      const c = await xeroCall('sync-clients');
+      xeroClientsApproved = true;
+      clientsChanged = c.linked.length + c.created.length + c.archived.length + c.restored.length > 0 || c.updated > 0;
+      if (c.created.length || c.linked.length) toast(`Xero clients: ${c.created.length} new, ${c.linked.length} linked`, 'success');
+      if (clientsChanged) { await loadClients(); updateDashboard(); }
+    }
+    // 2) Invoices
     const r = await xeroCall('sync-invoices');
     const skippedBox = document.getElementById('xero-skipped');
     if (r.skipped && r.skipped.length) {
       const names = r.skipped.map(s => `${s.name} (${s.count})`).join(', ');
-      // Stays on screen (a toast vanishes) until the clients exist / are matched.
+      // Stays on screen (a toast vanishes) until the client exists in Xero's customer list.
       skippedBox.style.display = '';
-      skippedBox.textContent = `⚠ Not imported — no matching client: ${names}. Add the client, or put the exact Xero name in the client's "Xero contact name", then sync again.`;
+      skippedBox.textContent = `⚠ Not imported — this customer isn't in the Xero client list yet: ${names}. Press Sync again after checking the contact in Xero.`;
     } else {
       skippedBox.style.display = 'none';
     }

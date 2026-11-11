@@ -2656,13 +2656,20 @@ async function submitPasswordChange() {
   setTimeout(() => { window.location.href = '../login/'; }, 1200);
 }
 
-// A "Sent" invoice whose due date has passed is Overdue. Worked out when shown, because Xero only
-// tells us about an invoice when it changes — an invoice quietly becoming overdue isn't a change.
+// Unpaid invoice states, worked out when shown (Xero only tells us when an invoice CHANGES, and
+// "due soon" / "now overdue" are just the calendar moving):
+//   Sent    = awaiting payment, due date more than 7 days away
+//   Due     = due today or within the next 7 days
+//   Overdue = due date has passed
 function effStatus(i) {
-  return i.status === 'Sent' && i.due_date && i.due_date < new Date().toISOString().slice(0, 10) ? 'Overdue' : i.status;
+  if (i.status !== 'Sent' || !i.due_date) return i.status;
+  const today = new Date().toISOString().slice(0, 10);
+  if (i.due_date < today) return 'Overdue';
+  const soon = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  return i.due_date <= soon ? 'Due' : 'Sent';
 }
 function statusBadge(s) {
-  return { 'Paid':'badge-green','Draft':'badge-gray','Sent':'badge-blue','Overdue':'badge-red','Accepted':'badge-green','Declined':'badge-red' }[s] || 'badge-gray';
+  return { 'Paid':'badge-green','Draft':'badge-gray','Sent':'badge-blue','Overdue':'badge-red','Due':'badge-amber','Accepted':'badge-green','Declined':'badge-red' }[s] || 'badge-gray';
 }
 
 function nextNumber(prefix, existing) {
